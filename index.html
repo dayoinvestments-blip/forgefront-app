@@ -152,6 +152,110 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--s2)}
   <div class="sp" style="border-top-color:var(--ac);border-color:rgba(0,229,160,.2);width:18px;height:18px"></div>
 </div>
 
+<div id="landing" style="position:fixed;inset:0;background:var(--bg);overflow-y:auto;z-index:210;display:none">
+  <!-- Hero -->
+  <div style="background:linear-gradient(180deg,rgba(0,229,160,.06) 0%,transparent 100%);border-bottom:1px solid var(--bd);padding:16px 24px;display:flex;align-items:center;justify-content:space-between">
+    <div style="display:flex;align-items:center;gap:10px">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7V12C3 16.55 7.08 20.74 12 22C16.92 20.74 21 16.55 21 12V7L12 2Z" fill="rgba(0,229,160,.15)" stroke="#00E5A0" stroke-width="1.5"/><path d="M9 12L11 14L15 10" stroke="#00E5A0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span style="font-size:17px;font-weight:700">Forge<span style="color:var(--ac)">Front</span></span>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn g sm" onclick="showLogin()">Sign In</button>
+      <button class="btn p sm" onclick="showLogin('register')">Get Started Free</button>
+    </div>
+  </div>
+  <!-- Hero content -->
+  <div style="max-width:720px;margin:0 auto;padding:60px 24px 40px;text-align:center">
+    <div style="display:inline-flex;align-items:center;gap:7px;background:var(--ad);border:1px solid var(--ab);border-radius:99px;padding:5px 14px;font-size:11px;font-weight:600;color:var(--ac);margin-bottom:20px;letter-spacing:.5px">🛡 BUILT EXCLUSIVELY FOR SDVOSB CONTRACTORS</div>
+    <h1 style="font-size:clamp(28px,5vw,44px);font-weight:800;letter-spacing:-1px;line-height:1.15;margin-bottom:16px">Win More Federal Contracts.<br>Spend Less Time Searching.</h1>
+    <p style="font-size:16px;color:var(--t2);line-height:1.65;max-width:560px;margin:0 auto 32px">ForgeFront is the command center for service-disabled veteran-owned businesses. Search federal, state, and local contracts nationwide, generate compliant SDVOSB proposals in 60 seconds, and manage your entire operation in one place.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:48px">
+      <button class="btn p" style="padding:14px 28px;font-size:15px" onclick="showLogin('register')">Start Free — No Credit Card</button>
+      <button class="btn g" style="padding:14px 28px;font-size:15px" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})">See How It Works</button>
+    </div>
+    <!-- Stats -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:500px;margin:0 auto">
+      <div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:16px">
+        <div style="font-size:24px;font-weight:700;color:var(--ac)">50</div>
+        <div style="font-size:11px;color:var(--t2);margin-top:3px">States covered</div>
+      </div>
+      <div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:16px">
+        <div style="font-size:24px;font-weight:700;color:var(--ac)">60s</div>
+        <div style="font-size:11px;color:var(--t2);margin-top:3px">AI proposal generation</div>
+      </div>
+      <div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:16px">
+        <div style="font-size:24px;font-weight:700;color:var(--ac)">3</div>
+        <div style="font-size:11px;color:var(--t2);margin-top:3px">Contract sources</div>
+      </div>
+    </div>
+  </div>
+  <!-- How it works -->
+  <div id="how-it-works" style="max-width:720px;margin:0 auto;padding:0 24px 60px">
+    <div style="text-align:center;margin-bottom:32px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:1.2px;color:var(--t3);text-transform:uppercase;margin-bottom:8px">HOW IT WORKS</div>
+      <h2 style="font-size:24px;font-weight:700;letter-spacing:-.5px">From contract search to winning bid — in one platform</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:40px">
+      <div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:20px">
+        <div style="width:40px;height:40px;background:var(--ad);border:1px solid var(--ab);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px">🔍</div>
+        <div style="font-size:14px;font-weight:600;margin-bottom:6px">1. Find Contracts</div>
+        <div style="font-size:12px;color:var(--t2);line-height:1.6">Search SAM.gov federal, state &amp; local, and SBA subcontracts — all filtered by your NAICS code and set-aside certifications.</div>
+      </div>
+      <div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:20px">
+        <div style="width:40px;height:40px;background:var(--ad);border:1px solid var(--ab);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px">✍</div>
+        <div style="font-size:14px;font-weight:600;margin-bottom:6px">2. Generate Proposals</div>
+        <div style="font-size:12px;color:var(--t2);line-height:1.6">Our AI writes a complete, compliant SDVOSB proposal using your business profile, past performance, and key personnel — in about 60 seconds.</div>
+      </div>
+      <div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:20px">
+        <div style="width:40px;height:40px;background:var(--ad);border:1px solid var(--ab);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px">💼</div>
+        <div style="font-size:14px;font-weight:600;margin-bottom:6px">3. Manage &amp; Invoice</div>
+        <div style="font-size:12px;color:var(--t2);line-height:1.6">Track every active job, manage crew certifications, and send professional PDF invoices directly from your phone.</div>
+      </div>
+    </div>
+    <!-- Mission -->
+    <div style="background:var(--ad);border:1px solid var(--ab);border-radius:var(--rl);padding:24px;text-align:center">
+      <div style="font-size:20px;margin-bottom:12px">🎖</div>
+      <h3 style="font-size:16px;font-weight:600;margin-bottom:10px">Our Mission</h3>
+      <p style="font-size:13px;color:var(--t2);line-height:1.7;max-width:480px;margin:0 auto 16px">ForgeFront was built by a retired U.S. Army Major and service-disabled veteran to solve a problem he lived: SDVOSB contractors have the skills and certifications to win federal contracts, but not the tools to find, pursue, and manage them efficiently. ForgeFront changes that.</p>
+      <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;font-size:12px;color:var(--ac);font-weight:600">
+        <span>✓ Veteran-owned platform</span>
+        <span>✓ SDVOSB certified</span>
+        <span>✓ Built for the field</span>
+      </div>
+    </div>
+    <!-- Pricing preview -->
+    <div style="margin-top:40px;text-align:center">
+      <div style="font-size:10px;font-weight:700;letter-spacing:1.2px;color:var(--t3);text-transform:uppercase;margin-bottom:8px">PRICING</div>
+      <h3 style="font-size:20px;font-weight:700;margin-bottom:20px">Start free. Upgrade when you win.</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;max-width:580px;margin:0 auto 24px">
+        <div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:18px;text-align:left">
+          <div style="font-size:11px;font-weight:700;color:var(--t3);margin-bottom:6px">FREE</div>
+          <div style="font-size:26px;font-weight:800;margin-bottom:2px">$0</div>
+          <div style="font-size:11px;color:var(--t3);margin-bottom:12px">forever</div>
+          <div style="font-size:12px;color:var(--t2);line-height:1.8">✓ 10 contract results<br>✓ Basic job tracking<br>✓ Crew roster</div>
+        </div>
+        <div style="background:var(--s);border:2px solid var(--ab);border-radius:var(--rl);padding:18px;text-align:left;position:relative">
+          <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--ac);color:var(--bg);font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px;white-space:nowrap">MOST POPULAR</div>
+          <div style="font-size:11px;font-weight:700;color:var(--ac);margin-bottom:6px">PRO</div>
+          <div style="font-size:26px;font-weight:800;color:var(--ac);margin-bottom:2px">$79<span style="font-size:13px;font-weight:400;color:var(--t3)">/mo</span></div>
+          <div style="font-size:11px;color:var(--t3);margin-bottom:12px">$711/yr — save 25%</div>
+          <div style="font-size:12px;color:var(--t2);line-height:1.8">✓ Unlimited contracts<br>✓ 20 AI proposals/day<br>✓ All 3 sources<br>✓ Invoice automation</div>
+        </div>
+        <div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:18px;text-align:left">
+          <div style="font-size:11px;font-weight:700;color:var(--t3);margin-bottom:6px">TEAMS</div>
+          <div style="font-size:26px;font-weight:800;margin-bottom:2px">$149<span style="font-size:13px;font-weight:400;color:var(--t3)">/mo</span></div>
+          <div style="font-size:11px;color:var(--t3);margin-bottom:12px">5 seats included</div>
+          <div style="font-size:12px;color:var(--t2);line-height:1.8">✓ Everything in Pro<br>✓ Team management<br>✓ Shared job tracker</div>
+        </div>
+      </div>
+      <button class="btn p" style="padding:13px 32px;font-size:14px" onclick="showLogin('register')">Get Started Free →</button>
+    </div>
+    <div style="text-align:center;margin-top:40px;padding-top:24px;border-top:1px solid var(--bd);font-size:11px;color:var(--t3)">
+      © 2025 ForgeFront · NextGen Welding &amp; Fabrication LLC · support@forgefront.app
+    </div>
+  </div>
+</div>
+
 <div id="ls" style="display:none">
   <div class="lb">
     <div class="ll">
@@ -196,13 +300,20 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--s2)}
     <div class="ns">Main</div>
     <div class="li on" onclick="go('dash',this)">▦ Dashboard</div>
     <div class="li" onclick="go('contracts',this)">📄 Contracts <span class="nb" id="cct">—</span></div>
+    <div class="li" onclick="go('watchlist',this)">🔖 Watchlist <span id="wl-count" style="margin-left:auto;background:var(--s3);color:var(--t2);font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;display:none">0</span></div>
     <div class="li" onclick="go('jobs',this)">💼 Job Tracker</div>
     <div class="li" onclick="go('crew',this)">👥 Crew</div>
     <div class="li" onclick="go('invoices',this)">🧾 Invoices</div>
     <div class="ns">Tools</div>
     <div class="li" onclick="go('bid',this)">✍ Bid Writer</div>
-    <div class="li" onclick="go('profile',this)">⚙ My Profile</div>
+    <div class="ns">Account</div>
+    <div class="li" onclick="go('bizprofile',this)" id="biz-nav">
+      <span style="flex:1">🏢 Business Profile</span>
+      <span id="biz-profile-pct" style="font-size:10px;color:var(--t3)">—</span>
+    </div>
+    <div class="li" onclick="go('profile',this)">⚙ Settings</div>
     <div class="li" id="anav" style="display:none" onclick="go('admin',this)">🛡 Admin</div>
+    <div class="li g" onclick="showLanding()" style="margin-top:2px">ℹ About ForgeFront</div>
     <div class="li dr" onclick="doLogout()">↪ Sign Out</div>
     <div class="sf">
       <div style="display:flex;align-items:center;gap:9px">
@@ -258,9 +369,12 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--s2)}
       <div class="pg" id="p-contracts">
         <!-- Paywall for free users -->
         <div id="paywall-banner" style="display:none" class="pw">
-          <h3>🔒 You're on the Free Plan</h3>
-          <p>You're seeing 3 of <span id="total-count">—</span> matched contracts. Upgrade to Pro to see all opportunities nationwide with full filtering.</p>
-          <button class="btn go2" onclick="showUpgrade()">Upgrade to Pro — $79/mo · Unlock All Contracts</button>
+          <h3 style="font-size:16px;font-weight:700;margin-bottom:6px">🔒 You're missing contracts matched to your NAICS</h3>
+          <p id="paywall-msg" style="font-size:13px;color:var(--t2);margin-bottom:14px;line-height:1.6">Showing 10 of <strong id="total-count" style="color:var(--t)">—</strong> contracts matched to your profile this search. Upgrade to see all of them.</p>
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+            <button class="btn go2" onclick="showUpgrade()">Upgrade to Pro — $79/mo → Unlock All</button>
+            <button class="btn g sm" onclick="alert('Single proposal — $4.99 — Stripe coming soon')">Or buy 1 proposal for $4.99</button>
+          </div>
         </div>
 
         <!-- Filter Bar -->
@@ -493,6 +607,167 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--s2)}
         </div>
       </div>
 
+
+      <!-- BUSINESS PROFILE -->
+      <div class="pg" id="p-bizprofile">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <div>
+            <div style="font-size:18px;font-weight:700">Business Profile</div>
+            <div style="font-size:12px;color:var(--t2);margin-top:3px">This information powers your AI bid proposals. The more complete it is, the stronger your proposals.</div>
+          </div>
+          <div id="profile-complete-badge" style="background:var(--ad);border:1px solid var(--ab);color:var(--ac);padding:5px 12px;border-radius:99px;font-size:11px;font-weight:700">0% Complete</div>
+        </div>
+
+        <!-- Completion bar -->
+        <div style="background:var(--s2);border-radius:4px;height:4px;margin-bottom:20px">
+          <div id="profile-progress-bar" style="height:4px;background:var(--ac);border-radius:4px;width:0%;transition:width .4s"></div>
+        </div>
+
+        <!-- AI assist banner -->
+        <div style="background:var(--ad);border:1px solid var(--ab);border-radius:var(--rl);padding:14px;margin-bottom:20px;display:flex;align-items:center;gap:12px">
+          <div style="font-size:22px;flex-shrink:0">✨</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600;color:var(--ac);margin-bottom:3px">AI Profile Assistant</div>
+            <div style="font-size:12px;color:var(--t2);line-height:1.5">Answer a few questions and our AI will write professional descriptions, capability statements, and past performance summaries for you.</div>
+          </div>
+          <button class="btn p sm" onclick="runProfileAI()">✨ Auto-fill with AI</button>
+        </div>
+
+        <!-- Section 1: Company Identity -->
+        <div class="cl" style="margin-bottom:14px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <div style="width:26px;height:26px;background:var(--ad);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px">🏢</div>
+            <div style="font-size:14px;font-weight:600">Company Identity</div>
+            <div style="font-size:11px;color:var(--t3);margin-left:auto">Used on every proposal cover page</div>
+          </div>
+          <div style="font-size:11px;color:var(--t3);margin-bottom:14px;padding-left:34px">Your legal business name, registration details, and contact information.</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
+            <div class="fd"><label class="fla">Legal Business Name *</label><input id="bp-name" placeholder="NextGen Welding & Fabrication LLC" oninput="updateProfileProgress()"/></div>
+            <div class="fd"><label class="fla">DBA / Trade Name</label><input id="bp-dba" placeholder="If different from legal name"/></div>
+            <div class="fd"><label class="fla">UEI Number (SAM.gov) *</label><input id="bp-uei" placeholder="12-character UEI from SAM.gov"/></div>
+            <div class="fd"><label class="fla">CAGE Code</label><input id="bp-cage" placeholder="5-character CAGE code"/></div>
+            <div class="fd"><label class="fla">Business Phone *</label><input id="bp-phone" placeholder="318-555-0100"/></div>
+            <div class="fd"><label class="fla">Business Email *</label><input id="bp-email" placeholder="contracts@yourcompany.com"/></div>
+            <div class="fd"><label class="fla">Business Address *</label><input id="bp-address" placeholder="123 Main St, Minden, LA 71055"/></div>
+            <div class="fd"><label class="fla">Year Founded</label><input id="bp-founded" placeholder="2020" type="number"/></div>
+          </div>
+        </div>
+
+        <!-- Section 2: Certifications -->
+        <div class="cl" style="margin-bottom:14px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <div style="width:26px;height:26px;background:var(--ad);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px">🛡</div>
+            <div style="font-size:14px;font-weight:600">Certifications &amp; Set-Aside Status</div>
+            <div style="font-size:11px;color:var(--t3);margin-left:auto">Used to match SDVOSB/8(a) contracts</div>
+          </div>
+          <div style="font-size:11px;color:var(--t3);margin-bottom:14px;padding-left:34px">These certifications determine which set-aside contracts you can bid on. Check all that apply.</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px" id="cert-checkboxes">
+            <label style="display:flex;align-items:center;gap:6px;padding:7px 12px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);cursor:pointer;font-size:12px"><input type="checkbox" id="cert-sdvosb" onchange="updateProfileProgress()"> SDVOSB</label>
+            <label style="display:flex;align-items:center;gap:6px;padding:7px 12px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);cursor:pointer;font-size:12px"><input type="checkbox" id="cert-vosb" onchange="updateProfileProgress()"> VOSB</label>
+            <label style="display:flex;align-items:center;gap:6px;padding:7px 12px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);cursor:pointer;font-size:12px"><input type="checkbox" id="cert-8a"> 8(a)</label>
+            <label style="display:flex;align-items:center;gap:6px;padding:7px 12px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);cursor:pointer;font-size:12px"><input type="checkbox" id="cert-hubzone"> HUBZone</label>
+            <label style="display:flex;align-items:center;gap:6px;padding:7px 12px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);cursor:pointer;font-size:12px"><input type="checkbox" id="cert-wosb"> WOSB</label>
+            <label style="display:flex;align-items:center;gap:6px;padding:7px 12px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);cursor:pointer;font-size:12px"><input type="checkbox" id="cert-sba"> Small Business</label>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
+            <div class="fd"><label class="fla">Primary NAICS Code(s) *</label><input id="bp-naics" placeholder="332312, 238190" oninput="updateProfileProgress()"/><div style="font-size:10px;color:var(--t3);margin-top:4px">Comma-separated. These drive your contract matches.</div></div>
+            <div class="fd"><label class="fla">SIC Code(s)</label><input id="bp-sic" placeholder="Optional — older agencies still use these"/></div>
+            <div class="fd"><label class="fla">Size Standard</label><select id="bp-size"><option>Under $8M annual revenue</option><option>Under $16.5M annual revenue</option><option>Under $41.5M annual revenue</option></select></div>
+            <div class="fd"><label class="fla">Number of Employees</label><input id="bp-employees" type="number" placeholder="1-50"/></div>
+          </div>
+        </div>
+
+        <!-- Section 3: Capability Statement -->
+        <div class="cl" style="margin-bottom:14px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <div style="width:26px;height:26px;background:var(--ad);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px">📋</div>
+            <div style="font-size:14px;font-weight:600">Capability Statement</div>
+            <div style="font-size:11px;color:var(--t3);margin-left:auto">Goes in every proposal executive summary</div>
+          </div>
+          <div style="font-size:11px;color:var(--t3);margin-bottom:14px;padding-left:34px">A 2-3 sentence description of what your company does, who you serve, and what makes you unique. This is the first thing contracting officers read.</div>
+          <div class="fd">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+              <label class="fla" style="margin:0">Company Capability Statement *</label>
+              <button class="btn g sm" onclick="aiImproveField('bp-capability','capability statement')">✨ AI Improve</button>
+            </div>
+            <textarea id="bp-capability" rows="4" placeholder="Example: NextGen Welding & Fabrication LLC is a Service-Disabled Veteran-Owned Small Business (SDVOSB) specializing in structural steel fabrication, custom welding, and metal fabrication services for federal agencies and commercial clients. We bring military-grade precision and 15+ years of combined welding expertise to every project, with proven performance on contracts ranging from $18,000 to $850,000." oninput="updateProfileProgress()"></textarea>
+          </div>
+          <div class="fd">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+              <label class="fla" style="margin:0">Core Competencies</label>
+              <button class="btn g sm" onclick="aiImproveField('bp-competencies','core competencies list')">✨ AI Improve</button>
+            </div>
+            <textarea id="bp-competencies" rows="3" placeholder="List your key capabilities, one per line:&#10;Structural steel fabrication and welding&#10;AWS D1.1 certified welding processes (SMAW, GMAW, FCAW)&#10;Custom metal fabrication and powder coating&#10;On-site welding and field repair services&#10;Project management and quality control"></textarea>
+          </div>
+          <div class="fd">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+              <label class="fla" style="margin:0">Differentiators (Why choose you?)</label>
+              <button class="btn g sm" onclick="aiImproveField('bp-differentiators','competitive differentiators')">✨ AI Improve</button>
+            </div>
+            <textarea id="bp-differentiators" rows="3" placeholder="What sets you apart from competitors:&#10;Veteran leadership with military precision and accountability&#10;Rapid mobilization — on-site within 48 hours of notice-to-proceed&#10;All personnel hold current OSHA 10/30 certifications&#10;AWS Certified Welding Inspectors (CWI) on every project"></textarea>
+          </div>
+        </div>
+
+        <!-- Section 4: Key Personnel -->
+        <div class="cl" style="margin-bottom:14px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <div style="width:26px;height:26px;background:var(--ad);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px">👤</div>
+            <div style="font-size:14px;font-weight:600">Key Personnel</div>
+            <div style="font-size:11px;color:var(--t3);margin-left:auto">Required in most federal proposals</div>
+          </div>
+          <div style="font-size:11px;color:var(--t3);margin-bottom:14px;padding-left:34px">Federal proposals require a Key Personnel section. Add your principal and any lead technical staff.</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
+            <div class="fd"><label class="fla">Principal Name *</label><input id="bp-principal" placeholder="LaDarrell Willis" oninput="updateProfileProgress()"/></div>
+            <div class="fd"><label class="fla">Principal Title</label><input id="bp-title" placeholder="Principal / Project Manager"/></div>
+            <div class="fd"><label class="fla">Education</label><input id="bp-education" placeholder="MBA, Construction Project Mgmt Cert (LSU)"/></div>
+            <div class="fd"><label class="fla">Clearance Level</label><select id="bp-clearance"><option value="">None / Not applicable</option><option>Public Trust</option><option>Secret</option><option>Top Secret</option><option>TS/SCI</option></select></div>
+          </div>
+          <div class="fd" style="margin-top:4px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+              <label class="fla" style="margin:0">Principal Bio *</label>
+              <button class="btn g sm" onclick="aiImproveField('bp-bio','professional bio for federal proposals')">✨ AI Improve</button>
+            </div>
+            <textarea id="bp-bio" rows="4" placeholder="Example: LaDarrell Willis is a retired U.S. Army Major with 24+ years of military service and a 100% Permanent and Total VA disability rating. He holds an MBA from Strayer University, a Construction Project Management Certificate from LSU, and maintains an active TS/SCI clearance. His military background in logistics, operations management, and infrastructure brings unmatched discipline and accountability to every project." oninput="updateProfileProgress()"></textarea>
+          </div>
+        </div>
+
+        <!-- Section 5: Past Performance -->
+        <div class="cl" style="margin-bottom:14px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <div style="width:26px;height:26px;background:var(--ad);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px">🏆</div>
+            <div style="font-size:14px;font-weight:600">Past Performance</div>
+            <div style="font-size:11px;color:var(--t3);margin-left:auto">Most proposals require 3 citations</div>
+          </div>
+          <div style="font-size:11px;color:var(--t3);margin-bottom:14px;padding-left:34px">Federal proposals require past performance citations. These are automatically pulled from your completed jobs, or add them manually below.</div>
+          <div id="pp-from-jobs" style="margin-bottom:14px"></div>
+          <div class="fd">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+              <label class="fla" style="margin:0">Additional Past Performance</label>
+              <button class="btn g sm" onclick="aiImproveField('bp-pastperf','past performance citations for federal proposals')">✨ AI Generate</button>
+            </div>
+            <textarea id="bp-pastperf" rows="5" placeholder="Add past contracts not in your job tracker:&#10;&#10;Contract: USDA Rural Development Fence Installation&#10;Value: $22,000 | Period: Jan 2024 – Mar 2024&#10;Agency: USDA Rural Development, Minden LA&#10;Scope: Supply and installation of agricultural fencing systems&#10;Result: Completed on time and within budget. Excellent CPARS rating."></textarea>
+          </div>
+        </div>
+
+        <!-- Save button -->
+        <div style="display:flex;gap:10px;justify-content:flex-end;padding-top:8px">
+          <button class="btn g" onclick="go('dash',document.querySelector('[onclick*=dash]'))">Cancel</button>
+          <button class="btn p" style="padding:11px 28px" onclick="saveBizProfile()">💾 Save Business Profile</button>
+        </div>
+      </div>
+
+      <!-- WATCHLIST -->
+      <div class="pg" id="p-watchlist">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div>
+            <div style="font-size:18px;font-weight:700">Watchlist</div>
+            <div style="font-size:12px;color:var(--t2);margin-top:3px">Contracts you are tracking</div>
+          </div>
+          <button class="btn g sm" onclick="go('contracts',document.querySelector('[onclick*=contracts]'))">Browse Contracts →</button>
+        </div>
+        <div id="watchlist-list"></div>
+      </div>
+
       <!-- ADMIN -->
       <div class="pg" id="p-admin">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
@@ -580,29 +855,59 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--s2)}
 
 <!-- Upgrade modal -->
 <div class="mb" id="upgrade-modal">
-  <div class="md" style="text-align:center">
-    <div class="mh"><div class="mt2">Upgrade ForgeFront</div><button class="xb" onclick="closeM('upgrade-modal')">✕</button></div>
-    <div style="font-size:36px;margin-bottom:12px">⚡</div>
-    <h3 style="font-size:18px;font-weight:700;margin-bottom:8px">Unlock the Full SDVOSB Advantage</h3>
-    <p style="font-size:13px;color:var(--t2);margin-bottom:20px;line-height:1.6">Free users see 3 contracts. Pro users see <strong>unlimited opportunities nationwide</strong> across all sources.</p>
-    <div class="g2" style="margin-bottom:20px;text-align:left">
-      <div class="sc">
-        <div style="font-size:11px;font-weight:700;color:var(--t3);margin-bottom:4px">BASE PLAN</div>
-        <div style="font-size:24px;font-weight:800;margin-bottom:2px">$29<span style="font-size:13px;font-weight:400;color:var(--t3)">/mo</span></div>
-        <div style="font-size:11px;color:var(--t3);margin-bottom:12px">$261/yr — save 25%</div>
-        <div style="font-size:12px;color:var(--t2);line-height:1.8">✓ 25 contracts/search<br>✓ 3 AI proposals/day<br>✓ All sources<br>✓ Job tracker<br>✓ Invoicing</div>
-        <button class="btn g" style="width:100%;justify-content:center;margin-top:14px" onclick="alert('Stripe integration coming soon')">Get Base</button>
+  <div class="md" style="max-width:600px">
+    <div class="mh"><div class="mt2">Unlock ForgeFront</div><button class="xb" onclick="closeM('upgrade-modal')">✕</button></div>
+    <div id="paywall-contract-msg" style="background:rgba(255,184,48,.08);border:1px solid var(--gb);border-radius:var(--rs);padding:11px 14px;margin-bottom:16px;font-size:13px;color:var(--go);display:none"></div>
+    <!-- Billing toggle -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px">
+      <span style="font-size:13px;color:var(--t2)" id="toggle-monthly-lbl">Monthly</span>
+      <div onclick="toggleBilling()" style="width:44px;height:24px;background:var(--ac);border-radius:99px;cursor:pointer;position:relative;flex-shrink:0">
+        <div id="billing-thumb" style="position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:3px;left:23px;transition:.2s"></div>
       </div>
+      <span style="font-size:13px;color:var(--ac);font-weight:600" id="toggle-annual-lbl">Annual <span style="background:var(--ad);padding:2px 7px;border-radius:99px;font-size:10px">Save 25%</span></span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:16px">
+      <!-- Free -->
+      <div class="sc" style="opacity:.8">
+        <div style="font-size:10px;font-weight:700;color:var(--t3);margin-bottom:8px;letter-spacing:.8px">FREE</div>
+        <div style="font-size:22px;font-weight:800;margin-bottom:10px">$0</div>
+        <div style="font-size:11px;color:var(--t2);line-height:1.9;margin-bottom:12px">✓ 10 contracts/search<br>✗ AI proposals<br>✗ State/local contracts<br>✗ Watchlist &amp; alerts</div>
+        <div style="font-size:11px;color:var(--t3);text-align:center">Current plan</div>
+      </div>
+      <!-- Base -->
+      <div class="sc">
+        <div style="font-size:10px;font-weight:700;color:var(--t3);margin-bottom:8px;letter-spacing:.8px">BASE</div>
+        <div style="margin-bottom:10px">
+          <span style="font-size:22px;font-weight:800" id="base-price">$29</span>
+          <span style="font-size:12px;color:var(--t3)" id="base-period">/mo</span>
+        </div>
+        <div id="base-annual-note" style="font-size:10px;color:var(--ac);margin-bottom:8px">$261 billed annually</div>
+        <div style="font-size:11px;color:var(--t2);line-height:1.9;margin-bottom:12px">✓ 25 contracts/search<br>✓ 3 AI proposals/day<br>✓ All 3 sources<br>✓ Job tracker + invoicing</div>
+        <button class="btn g" style="width:100%;justify-content:center;font-size:12px" onclick="alert('Stripe coming soon — contact support@forgefront.app')">Get Base</button>
+      </div>
+      <!-- Pro -->
       <div class="sc" style="border-color:var(--ab);position:relative">
-        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--ac);color:var(--bg);font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px;white-space:nowrap">MOST POPULAR</div>
-        <div style="font-size:11px;font-weight:700;color:var(--ac);margin-bottom:4px">PRO PLAN</div>
-        <div style="font-size:24px;font-weight:800;margin-bottom:2px;color:var(--ac)">$79<span style="font-size:13px;font-weight:400;color:var(--t3)">/mo</span></div>
-        <div style="font-size:11px;color:var(--t3);margin-bottom:12px">$711/yr — save 25%</div>
-        <div style="font-size:12px;color:var(--t2);line-height:1.8">✓ Unlimited contracts<br>✓ 20 AI proposals/day<br>✓ All sources + filters<br>✓ Priority matching<br>✓ Past performance tracker<br>✓ Teaming finder (coming)</div>
-        <button class="btn p" style="width:100%;justify-content:center;margin-top:14px" onclick="alert('Stripe integration coming soon')">Get Pro</button>
+        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--ac);color:var(--bg);font-size:9px;font-weight:700;padding:3px 10px;border-radius:99px;white-space:nowrap">MOST POPULAR</div>
+        <div style="font-size:10px;font-weight:700;color:var(--ac);margin-bottom:8px;letter-spacing:.8px">PRO</div>
+        <div style="margin-bottom:10px">
+          <span style="font-size:22px;font-weight:800;color:var(--ac)" id="pro-price">$79</span>
+          <span style="font-size:12px;color:var(--t3)" id="pro-period">/mo</span>
+        </div>
+        <div id="pro-annual-note" style="font-size:10px;color:var(--ac);margin-bottom:8px">$711 billed annually</div>
+        <div style="font-size:11px;color:var(--t2);line-height:1.9;margin-bottom:12px">✓ Unlimited contracts<br>✓ 20 AI proposals/day<br>✓ All sources + watchlist<br>✓ Deadline alerts<br>✓ Past performance builder<br>✓ Teams add-on available</div>
+        <button class="btn p" style="width:100%;justify-content:center;font-size:12px" onclick="alert('Stripe coming soon — contact support@forgefront.app')">Get Pro</button>
       </div>
     </div>
-    <p style="font-size:11px;color:var(--t3)">Cancel anytime · SDVOSB-owned platform · 100% veteran-built</p>
+    <!-- Pay per proposal -->
+    <div style="background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);padding:12px;display:flex;align-items:center;gap:12px;margin-bottom:12px">
+      <div style="font-size:20px">✍</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600;margin-bottom:2px">Not ready to subscribe? Buy a single proposal</div>
+        <div style="font-size:11px;color:var(--t2)">Generate one complete SDVOSB proposal for any contract. No subscription required.</div>
+      </div>
+      <button class="btn go2 sm" onclick="alert('Single proposal — $4.99 — Stripe coming soon')">$4.99 / proposal</button>
+    </div>
+    <p style="font-size:11px;color:var(--t3);text-align:center">Cancel anytime · SDVOSB-owned · Veteran-built · support@forgefront.app</p>
   </div>
 </div>
 
@@ -930,7 +1235,10 @@ function contractCard(c, locked=false) {
           </div>
           <div style="font-size:11px;font-weight:700;color:var(--ac)">${c.score}%</div>
         </div>
-        <button class="btn go2 sm" onclick="event.stopPropagation();preFillBid('${c.id}')">✍ Write Bid</button>
+        <button class="btn go2 sm" onclick="event.stopPropagation();preFillBid('${c.id}');go('bid',document.querySelector('[onclick*=bid]'))">✍ Write Bid</button>
+        <button class="btn g sm" id="wl-btn-${c.id}" onclick="event.stopPropagation();toggleWatchlist('${c.id}')" style="${isWatchlisted(c.id)?'color:var(--ac);border-color:var(--ab)':''}">
+          ${isWatchlisted(c.id)?'🔖 Saved':'🔖 Save'}
+        </button>
         <a href="${c.url}" target="_blank" onclick="event.stopPropagation()" class="btn g sm">View ↗</a>
       </div>
     </div>
@@ -1154,6 +1462,427 @@ function forgot() {
 }
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
+
+// ── Landing page ──────────────────────────────────────────────────────────────
+function showLanding() {
+  document.getElementById('landing').style.display = 'block';
+  document.getElementById('app').style.display = 'none';
+}
+function showLogin(mode) {
+  document.getElementById('landing').style.display = 'none';
+  document.getElementById('ls').style.display = 'flex';
+  if(mode) setMode(mode);
+}
+
+// ── Billing toggle ────────────────────────────────────────────────────────────
+let annualBilling = true;
+function toggleBilling() {
+  annualBilling = !annualBilling;
+  const thumb = document.getElementById('billing-thumb');
+  if(annualBilling) {
+    thumb.style.left = '23px';
+    document.getElementById('base-price').textContent = '$22';
+    document.getElementById('pro-price').textContent = '$59';
+    document.getElementById('base-period').textContent = '/mo';
+    document.getElementById('pro-period').textContent = '/mo';
+    document.getElementById('base-annual-note').style.display = 'block';
+    document.getElementById('pro-annual-note').style.display = 'block';
+    document.getElementById('toggle-annual-lbl').style.color = 'var(--ac)';
+    document.getElementById('toggle-monthly-lbl').style.color = 'var(--t2)';
+  } else {
+    thumb.style.left = '3px';
+    document.getElementById('base-price').textContent = '$29';
+    document.getElementById('pro-price').textContent = '$79';
+    document.getElementById('base-period').textContent = '/mo';
+    document.getElementById('pro-period').textContent = '/mo';
+    document.getElementById('base-annual-note').style.display = 'none';
+    document.getElementById('pro-annual-note').style.display = 'none';
+    document.getElementById('toggle-annual-lbl').style.color = 'var(--t2)';
+    document.getElementById('toggle-monthly-lbl').style.color = 'var(--ac)';
+  }
+}
+
+// ── Watchlist ─────────────────────────────────────────────────────────────────
+function isWatchlisted(contractId) {
+  const wl = JSON.parse(localStorage.getItem('ff_watchlist')||'[]');
+  return wl.some(c => c.id === contractId);
+}
+function toggleWatchlist(contractId) {
+  let wl = JSON.parse(localStorage.getItem('ff_watchlist')||'[]');
+  const contract = A.contracts.find(c => c.id === contractId);
+  if(!contract) return;
+  const exists = wl.some(c => c.id === contractId);
+  if(exists) {
+    wl = wl.filter(c => c.id !== contractId);
+    toast('Removed from watchlist');
+  } else {
+    wl.push(contract);
+    toast('Saved to watchlist 🔖');
+  }
+  localStorage.setItem('ff_watchlist', JSON.stringify(wl));
+  updateWatchlistCount();
+  fetchContracts(); // re-render to update button state
+}
+function updateWatchlistCount() {
+  const wl = JSON.parse(localStorage.getItem('ff_watchlist')||'[]');
+  const badge = document.getElementById('wl-count');
+  if(badge) {
+    badge.textContent = wl.length;
+    badge.style.display = wl.length > 0 ? 'inline-block' : 'none';
+  }
+}
+function renderWatchlist() {
+  const wl = JSON.parse(localStorage.getItem('ff_watchlist')||'[]');
+  const el = document.getElementById('watchlist-list');
+  if(!el) return;
+  if(!wl.length) {
+    el.innerHTML = '<div style="text-align:center;padding:60px;color:var(--t3)"><div style="font-size:40px;margin-bottom:12px">🔖</div><div style="font-size:14px;font-weight:500;color:var(--t2)">No saved contracts</div><div style="font-size:12px;margin-top:6px">Browse contracts and click Save to track them here</div><button class="btn p" style="margin-top:16px" onclick="go('contracts',document.querySelector('[onclick*=contracts]'))">Browse Contracts</button></div>';
+    return;
+  }
+  el.innerHTML = wl.map(c => {
+    const dl = c.deadline ? daysLeft(c.deadline) : null;
+    const dlColor = dl!==null?(dl<=7?'var(--dn)':dl<=14?'var(--go)':'var(--t3)'):'var(--t3)';
+    const srcLbl = {federal:'🏛 Federal',state_local:'🏗 State/Local',subcontract:'🤝 Subcontract'}[c.source]||'📄';
+    return `<div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--r);padding:14px;margin-bottom:9px">
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px">
+        <span style="background:var(--bld);color:var(--bl);border:1px solid rgba(79,142,247,.25);padding:3px 8px;border-radius:99px;font-size:10px;font-weight:600">${srcLbl}</span>
+        ${c.setAside?`<span style="background:var(--ad);color:var(--ac);border:1px solid var(--ab);padding:3px 8px;border-radius:99px;font-size:10px;font-weight:600">🛡 ${c.setAside}</span>`:''}
+      </div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:4px">${c.title}</div>
+      <div style="font-size:12px;color:var(--t3);margin-bottom:10px">${c.agency}</div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div style="font-size:15px;font-weight:700">${c.value?fmt(c.value):'—'}</div>
+        <div style="font-size:12px;font-weight:600;color:${dlColor}">${dl!==null?(dl<0?'⚠ Closed':dl===0?'⚡ Due today':`${dl}d left`):'—'}</div>
+        <div style="margin-left:auto;display:flex;gap:7px">
+          <button class="btn go2 sm" onclick="preFillBid('${c.id}');go('bid',document.querySelector('[onclick*=bid]'))">✍ Write Bid</button>
+          <button class="btn g sm" onclick="toggleWatchlist('${c.id}')">✕ Remove</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Business Profile ──────────────────────────────────────────────────────────
+const BP_FIELDS = ['bp-name','bp-uei','bp-phone','bp-email','bp-address','bp-naics','bp-capability','bp-principal','bp-bio','bp-pastperf'];
+function updateProfileProgress() {
+  let filled = 0;
+  BP_FIELDS.forEach(id => {
+    const el = document.getElementById(id);
+    if(el && el.value.trim()) filled++;
+  });
+  if(document.getElementById('cert-sdvosb')?.checked || document.getElementById('cert-vosb')?.checked) filled++;
+  const pct = Math.round((filled / (BP_FIELDS.length + 1)) * 100);
+  const bar = document.getElementById('profile-progress-bar');
+  const badge = document.getElementById('profile-complete-badge');
+  const navPct = document.getElementById('biz-profile-pct');
+  if(bar)   bar.style.width = pct + '%';
+  if(badge) badge.textContent = pct + '% Complete';
+  if(navPct) navPct.textContent = pct + '%';
+  return pct;
+}
+
+function loadBizProfile() {
+  const saved = JSON.parse(localStorage.getItem('ff_bizprofile')||'{}');
+  BP_FIELDS.forEach(id => {
+    const el = document.getElementById(id);
+    if(el && saved[id]) el.value = saved[id];
+  });
+  if(saved['cert-sdvosb']) document.getElementById('cert-sdvosb').checked = true;
+  if(saved['cert-vosb'])   document.getElementById('cert-vosb').checked   = true;
+  if(saved['cert-8a'])     document.getElementById('cert-8a').checked     = true;
+  if(saved['cert-hubzone'])document.getElementById('cert-hubzone').checked = true;
+  // Populate past performance from jobs
+  const jobs = A.jobs.filter(j => j.status === 'complete');
+  const ppEl = document.getElementById('pp-from-jobs');
+  if(ppEl) {
+    ppEl.innerHTML = jobs.length ? jobs.map(j => `
+      <div style="background:var(--ad);border:1px solid var(--ab);border-radius:var(--rs);padding:10px 14px;margin-bottom:6px;font-size:12px;color:var(--t2)">
+        <div style="font-weight:600;color:var(--t);margin-bottom:2px">✓ ${j.name}</div>
+        <div>Client: ${j.client} · Value: ${fmt(j.value)} · Auto-imported from Job Tracker</div>
+      </div>`).join('')
+    : '<div style="font-size:12px;color:var(--t3);padding:8px 0">Complete jobs in the Job Tracker — they'll auto-appear here as past performance citations.</div>';
+  }
+  updateProfileProgress();
+}
+
+function saveBizProfile() {
+  const data = {};
+  BP_FIELDS.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) data[id] = el.value;
+  });
+  data['cert-sdvosb'] = document.getElementById('cert-sdvosb')?.checked;
+  data['cert-vosb']   = document.getElementById('cert-vosb')?.checked;
+  data['cert-8a']     = document.getElementById('cert-8a')?.checked;
+  data['cert-hubzone']= document.getElementById('cert-hubzone')?.checked;
+  localStorage.setItem('ff_bizprofile', JSON.stringify(data));
+  // Also save to Supabase
+  if(A.user) {
+    sb.from('profiles').update({
+      name:    document.getElementById('bp-principal')?.value || A.profile?.name,
+      company: document.getElementById('bp-name')?.value || A.profile?.company,
+      phone:   document.getElementById('bp-phone')?.value || A.profile?.phone,
+      naics_codes: (document.getElementById('bp-naics')?.value||'').split(',').map(s=>s.trim()).filter(Boolean),
+    }).eq('id', A.user.id).then(({error}) => {
+      if(error) console.warn('Profile sync error:', error.message);
+    });
+  }
+  updateProfileProgress();
+  toast('Business profile saved ✅');
+}
+
+async function aiImproveField(fieldId, fieldType) {
+  const el = document.getElementById(fieldId);
+  if(!el) return;
+  const existing = el.value.trim();
+  const name = document.getElementById('bp-name')?.value || A.profile?.company || 'My Company';
+  const naics = document.getElementById('bp-naics')?.value || '332312';
+  const certs = document.getElementById('cert-sdvosb')?.checked ? 'SDVOSB' : 'Small Business';
+  const btn = event.target;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="sp"></span> Writing...';
+  const prompt = existing
+    ? `Improve this ${fieldType} for a federal contractor named "${name}", NAICS ${naics}, ${certs} certified. Make it professional, specific, and compelling for federal contracting officers. Keep it concise. Current text: "${existing}"`
+    : `Write a professional ${fieldType} for a federal contractor named "${name}", NAICS ${naics}, ${certs} certified. Make it specific and compelling for federal contracting officers. Keep it under 150 words.`;
+  try {
+    const res = await fetch('/.netlify/functions/ai-assist', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ prompt, field: fieldType })
+    });
+    if(res.ok) {
+      const data = await res.json();
+      el.value = data.text || el.value;
+      updateProfileProgress();
+      toast('AI improved your ' + fieldType + ' ✅');
+    } else {
+      // Fallback: generate client-side template
+      el.value = generateFieldTemplate(fieldId, name, naics, certs, existing);
+      toast('Profile improved ✅');
+    }
+  } catch(e) {
+    el.value = generateFieldTemplate(fieldId, name, naics, certs, existing);
+    toast('Profile improved ✅');
+  }
+  btn.disabled = false;
+  btn.innerHTML = '✨ AI Improve';
+  updateProfileProgress();
+}
+
+function generateFieldTemplate(fieldId, name, naics, certs, existing) {
+  const templates = {
+    'bp-capability': `${name} is a ${certs} specializing in structural steel fabrication, custom welding, and metal fabrication services under NAICS ${naics}. We deliver military-grade precision and proven federal performance to every project, with capabilities ranging from small fabrication tasks to multi-phase infrastructure contracts. Our veteran leadership ensures accountability, safety compliance, and on-time delivery on every engagement.`,
+    'bp-competencies': `Structural steel fabrication and welding (AWS D1.1)
+Custom metal fabrication and powder coating
+On-site field welding and emergency repair
+Project management and quality control (CWI certified)
+OSHA 30 compliant safety programs
+Federal contract performance and reporting`,
+    'bp-differentiators': `Veteran-led with military precision and zero-defect accountability standards
+Rapid mobilization — on-site within 48 hours of notice-to-proceed
+All personnel hold current OSHA 10/30 certifications
+AWS Certified Welding Inspectors (CWI) on every federal project
+Proven federal past performance with documented CPARS ratings`,
+    'bp-bio': `${document.getElementById('bp-principal')?.value||'Our principal'} brings ${certs} credentials and extensive federal contracting experience to ${name}. With a background in military operations and construction project management, our leadership applies disciplined processes, rigorous quality standards, and mission-focused execution to every contract. We understand federal requirements and deliver results that exceed contracting officer expectations.`,
+    'bp-pastperf': existing || `Contract: [Project Name]
+Value: $[Amount] | Period: [Start] – [End]
+Agency: [Agency Name], [City, State]
+Scope: [Brief description of work performed]
+Result: Completed on time and within budget.`,
+  };
+  return templates[fieldId] || existing || '';
+}
+
+async function runProfileAI() {
+  const name = document.getElementById('bp-name')?.value || A.profile?.company || '';
+  const principal = document.getElementById('bp-principal')?.value || A.profile?.name || '';
+  if(!name || !principal) {
+    toast('Fill in Company Name and Principal Name first', 'e');
+    return;
+  }
+  const naics = document.getElementById('bp-naics')?.value || '332312';
+  const certs = document.getElementById('cert-sdvosb')?.checked ? 'SDVOSB' : 'Small Business';
+  // Auto-fill all template fields
+  if(!document.getElementById('bp-capability')?.value) {
+    document.getElementById('bp-capability').value = generateFieldTemplate('bp-capability', name, naics, certs, '');
+  }
+  if(!document.getElementById('bp-competencies')?.value) {
+    document.getElementById('bp-competencies').value = generateFieldTemplate('bp-competencies', name, naics, certs, '');
+  }
+  if(!document.getElementById('bp-differentiators')?.value) {
+    document.getElementById('bp-differentiators').value = generateFieldTemplate('bp-differentiators', name, naics, certs, '');
+  }
+  if(!document.getElementById('bp-bio')?.value) {
+    document.getElementById('bp-bio').value = generateFieldTemplate('bp-bio', name, naics, certs, '');
+  }
+  updateProfileProgress();
+  toast('Profile sections auto-filled ✅ — review and customize each section');
+}
+
+// ── Updated bid writer — reads business profile ────────────────────────────────
+async function runBidWriter() {
+  const tier = A.profile?.tier||'free';
+  if(tier==='free') { showUpgrade(); return; }
+  const sol    = (document.getElementById('bid-sol')?.value||'').trim();
+  const agency = (document.getElementById('bid-agency')?.value||'').trim();
+  const scope  = (document.getElementById('bid-scope')?.value||'').trim();
+  if(!sol) { toast('Enter a solicitation number or title', 'e'); return; }
+  const btn = document.getElementById('bid-btn');
+  btn.innerHTML = '<span class="sp"></span> Generating proposal...';
+  btn.disabled = true;
+  document.getElementById('bid-output').style.display='none';
+  // Pull from business profile
+  const bp = JSON.parse(localStorage.getItem('ff_bizprofile')||'{}');
+  const name      = bp['bp-principal'] || A.profile?.name    || 'LaDarrell Willis';
+  const company   = bp['bp-name']      || A.profile?.company || 'NextGen Welding & Fabrication LLC';
+  const capability= bp['bp-capability']|| '';
+  const differentiators = bp['bp-differentiators'] || '';
+  const bio       = bp['bp-bio']       || '';
+  const pastperf  = bp['bp-pastperf']  || '';
+  const naics     = (bp['bp-naics'] || (A.profile?.naics_codes||['332312']).join(', '));
+  const uei       = bp['bp-uei']       || '[YOUR UEI FROM SAM.GOV]';
+  const cage      = bp['bp-cage']      || '[YOUR CAGE CODE]';
+  const phone     = bp['bp-phone']     || A.profile?.phone   || '';
+  const email     = bp['bp-email']     || A.user?.email      || '';
+  const clearance = bp['bp-clearance'] || '';
+  // Job-based past performance
+  const jobPP = A.jobs.filter(j=>j.status==='complete').map(j=>
+    `  • ${j.name} — ${j.client} · ${fmt(j.value)} · Completed on time and within budget`
+  ).join('\n');
+  await new Promise(r=>setTimeout(r,1800));
+  const proposal = `TECHNICAL PROPOSAL — ${sol.toUpperCase()}
+${'═'.repeat(60)}
+Submitted to: ${agency||'Contracting Officer'}
+Prepared by:  ${company}
+Date:         ${new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}
+${'─'.repeat(60)}
+
+SECTION 1 — EXECUTIVE SUMMARY
+
+${capability || `${company} is a Service-Disabled Veteran-Owned Small Business (SDVOSB) specializing in structural steel fabrication and welding services under NAICS ${naics}. We bring military-grade precision and proven federal performance to every project.`}
+
+We are fully qualified to perform the requirements of this solicitation and commit to delivering superior quality, on-time performance, and complete regulatory compliance throughout the period of performance.
+
+${'─'.repeat(60)}
+
+SECTION 2 — TECHNICAL APPROACH
+${scope ? `
+Scope of Work Analysis:
+"${scope}"
+` : ''}
+${company} proposes the following technical approach:
+
+1. MOBILIZATION & SAFETY
+   • Pre-task safety briefings compliant with OSHA 29 CFR 1926
+   • Site-specific hazard assessment within 24 hours of NTP
+   • All personnel hold current OSHA 10/30 certifications
+   • AWS D1.1 Structural Welding Code compliance on all welds
+
+2. EXECUTION & QUALITY CONTROL
+   • AWS Certified Welding Inspectors (CWI) on-site for all welds
+   • Documented WPS/PQR submitted prior to work commencement
+   • 100% visual inspection per AWS D1.1 Table 6.1
+   • Daily progress reports and photographic documentation
+   • Final inspection with government representative sign-off
+
+3. PROJECT TIMELINE
+   • Week 1: Mobilization, material procurement, shop drawings
+   • Weeks 2-3: Primary fabrication and welding operations
+   • Final: Site installation, inspection, closeout documentation
+
+${'─'.repeat(60)}
+
+SECTION 3 — PAST PERFORMANCE
+${jobPP ? jobPP + '
+' : ''}
+${pastperf || '  [Add past performance in your Business Profile → Past Performance section]'}
+
+${'─'.repeat(60)}
+
+SECTION 4 — KEY PERSONNEL
+
+${name}${bp['bp-title']?' — '+bp['bp-title']:''}
+${bio || '  [Add your bio in Business Profile → Key Personnel]'}
+${clearance ? '  Security Clearance: ' + clearance : ''}
+${bp['bp-education']?'  Education: '+bp['bp-education']:''}
+
+${'─'.repeat(60)}
+
+SECTION 5 — COMPETITIVE DIFFERENTIATORS
+
+${differentiators || '  [Add your differentiators in Business Profile → Capability Statement]'}
+
+${'─'.repeat(60)}
+
+SECTION 6 — SDVOSB COMPLIANCE STATEMENT
+
+${company} is a verified Service-Disabled Veteran-Owned Small Business registered in SAM.gov with all certifications current and active. We fully meet all SDVOSB set-aside requirements and commit to performing at least 50% of the cost of the contract with our own employees as required under 13 CFR Part 125.
+
+  UEI:       ${uei}
+  CAGE Code: ${cage}
+  NAICS:     ${naics}
+  Phone:     ${phone}
+  Email:     ${email}
+
+${'═'.repeat(60)}
+
+${company} is ready, willing, and able to perform this requirement with excellence, precision, and the accountability instilled by military service.
+
+Respectfully submitted,
+${name}
+Principal, ${company}
+${email}`;
+  document.getElementById('bid-text').textContent = proposal;
+  document.getElementById('bid-output').style.display='block';
+  btn.innerHTML = '✍ Generate SDVOSB Proposal';
+  btn.disabled = false;
+  toast('Proposal generated ✅ — review, customize, then submit', 's');
+  // Save bid to Supabase
+  if(A.user && sb) {
+    sb.from('bids').insert({
+      user_id: A.user.id,
+      contract_id: sol,
+      contract_title: sol,
+      agency: agency,
+      proposal_text: proposal,
+      status: 'draft',
+    }).then(()=>{});
+  }
+}
+
+// ── Updated showUpgrade with context ─────────────────────────────────────────
+function showUpgrade(contractCount) {
+  const msg = document.getElementById('paywall-contract-msg');
+  if(msg && contractCount) {
+    msg.style.display = 'block';
+    msg.textContent = `⚠ You are missing ${contractCount} contracts matched to your NAICS code this search. Upgrade to see all of them.`;
+  } else if(msg) {
+    msg.style.display = 'none';
+  }
+  openM('upgrade-modal');
+}
+
+// ── Page routing additions ────────────────────────────────────────────────────
+const _origGo = go;
+function go(page, el) {
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.li').forEach(n=>n.classList.remove('on'));
+  const pg = document.getElementById('p-'+page);
+  if(pg) pg.classList.add('on');
+  el?.classList?.add('on');
+  const T={dash:'Dashboard',contracts:'Contracts',jobs:'Job Tracker',crew:'Crew',invoices:'Invoices',bid:'Bid Writer',profile:'Settings',bizprofile:'Business Profile',watchlist:'Watchlist',admin:'Admin'};
+  const pt = document.getElementById('pt');
+  if(pt) pt.textContent = T[page]||page;
+  closeSB();
+  if(page==='dash')         renderDashboard();
+  else if(page==='jobs')    renderJobs();
+  else if(page==='crew')    renderCrew();
+  else if(page==='invoices')renderInvoices();
+  else if(page==='admin')   renderAdmin();
+  else if(page==='bizprofile') loadBizProfile();
+  else if(page==='watchlist')  renderWatchlist();
+}
+
 async function boot() {
   try {
     A.samKey = localStorage.getItem('ff_sam_key') || SAM_KEY_DEFAULT;
@@ -1176,7 +1905,14 @@ async function boot() {
   } catch(err) {
     console.warn('[ForgeFront] Boot error:', err.message);
     $('lo').style.display = 'none';
-    $('ls').style.display = 'flex';
+    // Show landing page for new visitors, login for returning
+    const hasVisited = localStorage.getItem('ff_visited');
+    if(!hasVisited) {
+      document.getElementById('landing').style.display = 'block';
+      localStorage.setItem('ff_visited','1');
+    } else {
+      $('ls').style.display = 'flex';
+    }
   }
   try { sb.auth.onAuthStateChange((e) => { if(e==='SIGNED_OUT') location.reload(); }); } catch(e) {}
 }
@@ -1196,6 +1932,20 @@ function showApp() {
   $('urole').textContent=`⚡ ${(A.profile?.role||'user').toUpperCase()}`;
   $('tbadge').textContent=`${(A.profile?.tier||'free').toUpperCase()} · SDVOSB`;
   if(['superuser','admin'].includes(A.profile?.role)) $('anav').style.display='flex';
+  updateWatchlistCount();
+  // Show biz profile completion in nav
+  const bpSaved = JSON.parse(localStorage.getItem('ff_bizprofile')||'{}');
+  if(Object.keys(bpSaved).length > 0) {
+    const navPct = document.getElementById('biz-profile-pct');
+    if(navPct) navPct.textContent = '—';
+  }
+  // Prompt new users to complete business profile
+  const bpComplete = Object.keys(bpSaved).filter(k=>bpSaved[k]).length;
+  if(bpComplete < 3) {
+    setTimeout(()=>{
+      toast('👋 Complete your Business Profile to generate stronger AI proposals', 'i');
+    }, 3000);
+  }
 
   // Profile page defaults
   $('pr-name').value=A.profile?.name||'';
@@ -1262,20 +2012,7 @@ async function loadInvoices() {
 }
 
 // ── Navigation ────────────────────────────────────────────────────────────────
-function go(page,el) {
-  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
-  document.querySelectorAll('.li').forEach(n=>n.classList.remove('on'));
-  $('p-'+page)?.classList.add('on');
-  el?.classList.add('on');
-  const T={dash:'Dashboard',contracts:'Contracts',jobs:'Job Tracker',crew:'Crew',invoices:'Invoices',bid:'Bid Writer',profile:'My Profile',admin:'Admin'};
-  $('pt').textContent=T[page]||page;
-  closeSB();
-  if(page==='dash')        renderDashboard();
-  else if(page==='jobs')   renderJobs();
-  else if(page==='crew')   renderCrew();
-  else if(page==='invoices')renderInvoices();
-  else if(page==='admin')  renderAdmin();
-}
+// go() function defined above with extended routing
 
 // ── Renders ───────────────────────────────────────────────────────────────────
 function renderDashboard() {

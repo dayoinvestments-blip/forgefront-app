@@ -1,32 +1,28 @@
-# ForgeFront — SDVOSB Command Center
+# ForgeFront v5 — SDVOSB Command Center
 
-**Built by LaDarrell Willis · NextGen Welding & Fabrication LLC**
-
-## How to Deploy
-
-### Netlify (Web Dashboard)
-1. Upload this entire folder to GitHub
+## Deploy to Netlify (web dashboard)
+1. Push this repo to GitHub (all files, root level)
 2. Connect GitHub repo to Netlify
 3. Add environment variables in Netlify → Site Settings → Environment Variables:
-   - `SAM_GOV_API_KEY` = SAM-f65fe6c1-4ac7-4244-ab06-2cf3fd0af73e
-   - `SUPABASE_URL` = https://ycadicxcwcgdiefdqbrn.supabase.co
-   - `SUPABASE_SERVICE_ROLE_KEY` = your service role key from Supabase
-4. Netlify auto-detects `netlify.toml` and deploys everything
+   - SAM_GOV_API_KEY        = SAM-f65fe6c1-4ac7-4244-ab06-2cf3fd0af73e
+   - SUPABASE_URL           = https://ycadicxcwcgdiefdqbrn.supabase.co
+   - SUPABASE_SERVICE_ROLE_KEY = your service role key
+   - ANTHROPIC_API_KEY      = your Anthropic key (for AI profile assist)
+4. Deploy — Netlify auto-detects netlify.toml and functions/
 
-### Database (First time only)
-1. Go to Supabase → SQL Editor → New Query
-2. Paste contents of `database/STEP1-run-this-in-supabase.sql`
-3. Click Run
+## What's new in v5
+- Landing/About page (public-facing, explains app before login)
+- Business Profile page (5-section AI-assisted form — powers all bid proposals)
+- Watchlist — save and track contracts
+- Annual billing toggle in upgrade modal (default)
+- Pay-per-proposal ($4.99 single bid option)
+- Reframed paywall with specific contract count
+- Bid Writer reads Business Profile automatically
+- AI Improve buttons on every profile field
+- About ForgeFront in nav
+- Boot shows landing page for first-time visitors
 
-### Mobile App (iOS / Android)
-```bash
-npm install
-eas build --platform ios
-eas build --platform android
-```
-
-## Your Credentials
-- Supabase: https://ycadicxcwcgdiefdqbrn.supabase.co
+## Your credentials
 - Login: darrelltwillis@hotmail.com
-- Netlify: luxury-cactus-b84bad.netlify.app
-- SAM.gov key expires in ~88 days — renew at sam.gov/profile/details
+- Supabase: https://ycadicxcwcgdiefdqbrn.supabase.co
+- SAM.gov key expires ~88 days from issue — renew at sam.gov/profile/details
