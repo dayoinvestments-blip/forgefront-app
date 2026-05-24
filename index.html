@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>ForgeFront · SDVOSB Command Center</title>
 <meta name="theme-color" content="#00E5A0"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
 :root{--bg:#0A0C0F;--s:#111418;--s2:#181C22;--s3:#1F242C;--bd:#232830;--ac:#00E5A0;--ad:rgba(0,229,160,.10);--ab:rgba(0,229,160,.22);--go:#FFB830;--gd:rgba(255,184,48,.10);--gb:rgba(255,184,48,.22);--bl:#4F8EF7;--bld:rgba(79,142,247,.10);--dn:#FF5A5A;--t:#F0F2F5;--t2:#A8B3C0;--t3:#7A8494;--r:12px;--rs:8px;--rl:16px}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
@@ -151,60 +152,6 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--s2)}
   <div class="sp" style="border-top-color:var(--ac);border-color:rgba(0,229,160,.2);width:18px;height:18px"></div>
 </div>
 
-<!-- LANDING PAGE — shown to first-time visitors, hidden by default -->
-<div id="landing" style="position:fixed;inset:0;background:var(--bg);overflow-y:auto;z-index:250;display:none">
-  <div style="border-bottom:1px solid var(--bd);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;background:var(--s)">
-    <div style="display:flex;align-items:center;gap:9px">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7V12C3 16.55 7.08 20.74 12 22C16.92 20.74 21 16.55 21 12V7L12 2Z" fill="rgba(0,229,160,.15)" stroke="#00E5A0" stroke-width="1.5"/><path d="M9 12L11 14L15 10" stroke="#00E5A0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span style="font-size:16px;font-weight:700">Forge<span style="color:var(--ac)">Front</span></span>
-    </div>
-    <div style="display:flex;gap:8px">
-      <button class="btn g sm" onclick="hideLandingPage()">Sign In</button>
-      <button class="btn p sm" onclick="hideLandingPage('register')">Get Started Free</button>
-    </div>
-  </div>
-  <div style="max-width:680px;margin:0 auto;padding:52px 24px 36px;text-align:center">
-    <div style="display:inline-flex;align-items:center;gap:6px;background:var(--ad);border:1px solid var(--ab);border-radius:99px;padding:4px 13px;font-size:11px;font-weight:600;color:var(--ac);margin-bottom:18px">🛡 BUILT FOR SDVOSB CONTRACTORS</div>
-    <h1 style="font-size:clamp(24px,5vw,40px);font-weight:800;letter-spacing:-1px;line-height:1.2;margin-bottom:14px">Win More Federal Contracts.<br>Spend Less Time Searching.</h1>
-    <p style="font-size:15px;color:var(--t2);line-height:1.65;max-width:520px;margin:0 auto 26px">ForgeFront is the command center for service-disabled veteran-owned businesses. Search SAM.gov federal contracts, state and local bids, and SBA subcontracts — filtered to your NAICS and certifications. Generate compliant SDVOSB proposals in 60 seconds.</p>
-    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:40px">
-      <button class="btn p" style="padding:12px 24px;font-size:14px" onclick="hideLandingPage('register')">Start Free — No Credit Card</button>
-      <button class="btn g" style="padding:12px 24px;font-size:14px" onclick="document.getElementById('land-hiw').scrollIntoView({behavior:'smooth'})">See How It Works</button>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:420px;margin:0 auto">
-      <div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:14px"><div style="font-size:20px;font-weight:700;color:var(--ac)">50</div><div style="font-size:11px;color:var(--t2);margin-top:2px">States</div></div>
-      <div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:14px"><div style="font-size:20px;font-weight:700;color:var(--ac)">60s</div><div style="font-size:11px;color:var(--t2);margin-top:2px">AI proposals</div></div>
-      <div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:14px"><div style="font-size:20px;font-weight:700;color:var(--ac)">3</div><div style="font-size:11px;color:var(--t2);margin-top:2px">Sources</div></div>
-    </div>
-  </div>
-  <div id="land-hiw" style="max-width:680px;margin:0 auto;padding:0 24px 52px">
-    <div style="text-align:center;margin-bottom:24px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:1.2px;color:var(--t3);text-transform:uppercase;margin-bottom:6px">HOW IT WORKS</div>
-      <h2 style="font-size:20px;font-weight:700">From search to winning bid in one platform</h2>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:32px">
-      <div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:16px"><div style="font-size:26px;margin-bottom:9px">🔍</div><div style="font-size:13px;font-weight:600;margin-bottom:4px">1. Find Contracts</div><div style="font-size:12px;color:var(--t2);line-height:1.6">Search federal, state, and SBA subcontracts filtered to your NAICS and certifications.</div></div>
-      <div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:16px"><div style="font-size:26px;margin-bottom:9px">✍</div><div style="font-size:13px;font-weight:600;margin-bottom:4px">2. Generate Proposals</div><div style="font-size:12px;color:var(--t2);line-height:1.6">AI writes a complete, compliant SDVOSB proposal using your profile in about 60 seconds.</div></div>
-      <div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:16px"><div style="font-size:26px;margin-bottom:9px">💼</div><div style="font-size:13px;font-weight:600;margin-bottom:4px">3. Manage Everything</div><div style="font-size:12px;color:var(--t2);line-height:1.6">Track jobs, manage crew certifications, and send professional invoices from your phone.</div></div>
-    </div>
-    <div style="background:var(--ad);border:1px solid var(--ab);border-radius:var(--rl);padding:20px;text-align:center;margin-bottom:32px">
-      <div style="font-size:16px;margin-bottom:8px">🎖</div>
-      <h3 style="font-size:14px;font-weight:600;margin-bottom:7px">Our Mission</h3>
-      <p style="font-size:12px;color:var(--t2);line-height:1.65;max-width:440px;margin:0 auto">ForgeFront was built by a retired U.S. Army Major and service-disabled veteran to solve a problem he lived: SDVOSB contractors have the skills to win federal contracts but not the tools to find and pursue them efficiently. ForgeFront changes that.</p>
-    </div>
-    <div style="text-align:center;margin-bottom:32px">
-      <h3 style="font-size:18px;font-weight:700;margin-bottom:16px">Pricing — Start free. Upgrade when you win.</h3>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;max-width:500px;margin:0 auto 20px">
-        <div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:15px;text-align:left"><div style="font-size:10px;font-weight:700;color:var(--t3);margin-bottom:4px">FREE</div><div style="font-size:20px;font-weight:800;margin-bottom:7px">$0</div><div style="font-size:11px;color:var(--t2);line-height:1.9">✓ 10 contracts<br>✓ Job tracking<br>✓ Crew roster</div></div>
-        <div style="background:var(--s);border:2px solid var(--ab);border-radius:var(--rl);padding:15px;text-align:left;position:relative"><div style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--ac);color:var(--bg);font-size:9px;font-weight:700;padding:2px 9px;border-radius:99px;white-space:nowrap">POPULAR</div><div style="font-size:10px;font-weight:700;color:var(--ac);margin-bottom:4px">PRO</div><div style="font-size:20px;font-weight:800;color:var(--ac);margin-bottom:7px">$79<span style="font-size:11px;font-weight:400;color:var(--t3)">/mo</span></div><div style="font-size:11px;color:var(--t2);line-height:1.9">✓ Unlimited contracts<br>✓ AI proposals<br>✓ All 3 sources</div></div>
-        <div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:15px;text-align:left"><div style="font-size:10px;font-weight:700;color:var(--t3);margin-bottom:4px">TEAMS</div><div style="font-size:20px;font-weight:800;margin-bottom:7px">$149<span style="font-size:11px;font-weight:400;color:var(--t3)">/mo</span></div><div style="font-size:11px;color:var(--t2);line-height:1.9">✓ 5 seats<br>✓ Everything in Pro<br>✓ Team management</div></div>
-      </div>
-      <button class="btn p" style="padding:11px 26px;font-size:13px" onclick="hideLandingPage('register')">Get Started Free</button>
-    </div>
-    <div style="text-align:center;padding-top:20px;border-top:1px solid var(--bd);font-size:11px;color:var(--t3)">© 2025 ForgeFront · NextGen Welding &amp; Fabrication LLC · support@forgefront.app</div>
-  </div>
-</div>
-
 <div id="ls" style="display:none">
   <div class="lb">
     <div class="ll">
@@ -249,17 +196,13 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--s2)}
     <div class="ns">Main</div>
     <div class="li on" onclick="go('dash',this)">▦ Dashboard</div>
     <div class="li" onclick="go('contracts',this)">📄 Contracts <span class="nb" id="cct">—</span></div>
-    <div class="li" onclick="go('watchlist',this)">🔖 Watchlist <span id="wl-badge" style="display:none;margin-left:auto;background:var(--s3);color:var(--t2);font-size:10px;font-weight:700;padding:2px 6px;border-radius:99px">0</span></div>
     <div class="li" onclick="go('jobs',this)">💼 Job Tracker</div>
     <div class="li" onclick="go('crew',this)">👥 Crew</div>
     <div class="li" onclick="go('invoices',this)">🧾 Invoices</div>
     <div class="ns">Tools</div>
     <div class="li" onclick="go('bid',this)">✍ Bid Writer</div>
-    <div class="ns">Account</div>
-    <div class="li" onclick="go('bizprofile',this)">🏢 Business Profile <span id="bp-pct-nav" style="margin-left:auto;font-size:10px;color:var(--t3)"></span></div>
-    <div class="li" onclick="go('profile',this)">⚙ Settings</div>
+    <div class="li" onclick="go('profile',this)">⚙ My Profile</div>
     <div class="li" id="anav" style="display:none" onclick="go('admin',this)">🛡 Admin</div>
-    <div class="li" onclick="showLandingPage()" style="font-size:12px;color:var(--t3)">ℹ About ForgeFront</div>
     <div class="li dr" onclick="doLogout()">↪ Sign Out</div>
     <div class="sf">
       <div style="display:flex;align-items:center;gap:9px">
@@ -549,126 +492,6 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--s2)}
         </div>
       </div>
 
-
-      <!-- BUSINESS PROFILE PAGE -->
-      <div class="pg" id="p-bizprofile">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-          <div>
-            <div style="font-size:18px;font-weight:700">Business Profile</div>
-            <div style="font-size:12px;color:var(--t2);margin-top:3px">This information powers your AI bid proposals. Complete it once — it fills every proposal automatically.</div>
-          </div>
-          <div id="bp-badge" style="background:var(--ad);border:1px solid var(--ab);color:var(--ac);padding:4px 12px;border-radius:99px;font-size:11px;font-weight:700">0% Complete</div>
-        </div>
-        <div style="height:4px;background:var(--s2);border-radius:2px;margin-bottom:18px">
-          <div id="bp-bar" style="height:4px;background:var(--ac);border-radius:2px;width:0%;transition:width .4s"></div>
-        </div>
-        <div style="background:var(--ad);border:1px solid var(--ab);border-radius:var(--rl);padding:13px;margin-bottom:16px;display:flex;align-items:center;gap:12px">
-          <div style="font-size:20px">✨</div>
-          <div style="flex:1">
-            <div style="font-size:13px;font-weight:600;color:var(--ac);margin-bottom:2px">AI Profile Assistant</div>
-            <div style="font-size:12px;color:var(--t2)">Fill in your company name and principal, then click Auto-fill to have AI write professional descriptions for every section.</div>
-          </div>
-          <button class="btn p sm" onclick="bpAutoFill()">✨ Auto-fill with AI</button>
-        </div>
-
-        <div class="cl" style="margin-bottom:13px">
-          <div style="font-size:13px;font-weight:600;margin-bottom:2px">🏢 Company Identity</div>
-          <div style="font-size:11px;color:var(--t3);margin-bottom:11px">Used on every proposal cover page</div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
-            <div class="fd"><label class="fla">Legal Business Name *</label><input id="bp-coname" placeholder="NextGen Welding & Fabrication LLC" oninput="bpProgress()"/></div>
-            <div class="fd"><label class="fla">UEI Number (SAM.gov) *</label><input id="bp-uei" placeholder="12-character UEI" oninput="bpProgress()"/></div>
-            <div class="fd"><label class="fla">CAGE Code</label><input id="bp-cage" placeholder="5-character CAGE code"/></div>
-            <div class="fd"><label class="fla">Business Phone *</label><input id="bp-phone" placeholder="318-555-0100" oninput="bpProgress()"/></div>
-            <div class="fd"><label class="fla">Business Email *</label><input id="bp-email" placeholder="contracts@yourcompany.com" oninput="bpProgress()"/></div>
-            <div class="fd"><label class="fla">Business Address *</label><input id="bp-addr" placeholder="123 Main St, Minden, LA 71055" oninput="bpProgress()"/></div>
-          </div>
-        </div>
-
-        <div class="cl" style="margin-bottom:13px">
-          <div style="font-size:13px;font-weight:600;margin-bottom:2px">🛡 Certifications &amp; Set-Aside Status</div>
-          <div style="font-size:11px;color:var(--t3);margin-bottom:11px">Determines which set-aside contracts you can bid on</div>
-          <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:11px">
-            <label style="display:flex;align-items:center;gap:5px;padding:6px 11px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);cursor:pointer;font-size:12px"><input type="checkbox" id="bp-sdvosb" onchange="bpProgress()"> SDVOSB</label>
-            <label style="display:flex;align-items:center;gap:5px;padding:6px 11px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);cursor:pointer;font-size:12px"><input type="checkbox" id="bp-vosb" onchange="bpProgress()"> VOSB</label>
-            <label style="display:flex;align-items:center;gap:5px;padding:6px 11px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);cursor:pointer;font-size:12px"><input type="checkbox" id="bp-8a"> 8(a)</label>
-            <label style="display:flex;align-items:center;gap:5px;padding:6px 11px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);cursor:pointer;font-size:12px"><input type="checkbox" id="bp-hubzone"> HUBZone</label>
-          </div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
-            <div class="fd"><label class="fla">Primary NAICS Code(s) *</label><input id="bp-naics" placeholder="332312, 238190" oninput="bpProgress()"/><div style="font-size:10px;color:var(--t3);margin-top:3px">Comma-separated. Drives your contract matches.</div></div>
-            <div class="fd"><label class="fla">Number of Employees</label><input id="bp-employees" type="number" placeholder="1-50"/></div>
-          </div>
-        </div>
-
-        <div class="cl" style="margin-bottom:13px">
-          <div style="font-size:13px;font-weight:600;margin-bottom:2px">📋 Capability Statement</div>
-          <div style="font-size:11px;color:var(--t3);margin-bottom:11px">The first thing contracting officers read — used in every proposal</div>
-          <div class="fd">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-              <label class="fla" style="margin:0">Company Description *</label>
-              <button class="btn g sm" onclick="bpAiField('bp-cap','capability statement')">✨ AI Improve</button>
-            </div>
-            <textarea id="bp-cap" rows="3" placeholder="Describe your company, what you do, and what makes you unique as an SDVOSB..." oninput="bpProgress()"></textarea>
-          </div>
-          <div class="fd">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-              <label class="fla" style="margin:0">Differentiators</label>
-              <button class="btn g sm" onclick="bpAiField('bp-diff','competitive differentiators')">✨ AI Improve</button>
-            </div>
-            <textarea id="bp-diff" rows="3" placeholder="What sets you apart: certifications, rapid mobilization, CWI inspectors, veteran leadership..."></textarea>
-          </div>
-        </div>
-
-        <div class="cl" style="margin-bottom:13px">
-          <div style="font-size:13px;font-weight:600;margin-bottom:2px">👤 Key Personnel</div>
-          <div style="font-size:11px;color:var(--t3);margin-bottom:11px">Required in most federal proposals</div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
-            <div class="fd"><label class="fla">Principal Name *</label><input id="bp-principal" placeholder="LaDarrell Willis" oninput="bpProgress()"/></div>
-            <div class="fd"><label class="fla">Title</label><input id="bp-ptitle" placeholder="Principal / Project Manager"/></div>
-            <div class="fd"><label class="fla">Education</label><input id="bp-edu" placeholder="MBA, Construction Project Mgmt Cert (LSU)"/></div>
-            <div class="fd"><label class="fla">Security Clearance</label>
-              <select id="bp-clearance"><option value="">None</option><option>Secret</option><option>Top Secret</option><option>TS/SCI</option></select>
-            </div>
-          </div>
-          <div class="fd" style="margin-top:4px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-              <label class="fla" style="margin:0">Principal Bio *</label>
-              <button class="btn g sm" onclick="bpAiField('bp-bio','professional bio for federal proposals')">✨ AI Improve</button>
-            </div>
-            <textarea id="bp-bio" rows="4" placeholder="Military background, education, years of experience, key qualifications..." oninput="bpProgress()"></textarea>
-          </div>
-        </div>
-
-        <div class="cl" style="margin-bottom:16px">
-          <div style="font-size:13px;font-weight:600;margin-bottom:2px">🏆 Past Performance</div>
-          <div style="font-size:11px;color:var(--t3);margin-bottom:11px">Most proposals require 3 citations — completed jobs are auto-imported below</div>
-          <div id="bp-jobs-pp" style="margin-bottom:11px"></div>
-          <div class="fd">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-              <label class="fla" style="margin:0">Additional Past Performance</label>
-              <button class="btn g sm" onclick="bpAiField('bp-pp','past performance citations for federal proposals')">✨ AI Generate</button>
-            </div>
-            <textarea id="bp-pp" rows="4" placeholder="Contract name, agency, value, period of performance, scope, result..."></textarea>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:10px;justify-content:flex-end">
-          <button class="btn g" onclick="go('dash',null)">Cancel</button>
-          <button class="btn p" style="padding:10px 24px" onclick="bpSave()">💾 Save Business Profile</button>
-        </div>
-      </div>
-
-      <!-- WATCHLIST PAGE -->
-      <div class="pg" id="p-watchlist">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-          <div>
-            <div style="font-size:18px;font-weight:700">Watchlist</div>
-            <div style="font-size:12px;color:var(--t2);margin-top:2px">Contracts you are tracking</div>
-          </div>
-          <button class="btn g sm" onclick="go('contracts',null)">Browse Contracts →</button>
-        </div>
-        <div id="wl-list"></div>
-      </div>
-
       <!-- ADMIN -->
       <div class="pg" id="p-admin">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
@@ -788,7 +611,7 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--s2)}
 // ── Constants ─────────────────────────────────────────────────────────────────
 const SB_URL  = 'https://ycadicxcwcgdiefdqbrn.supabase.co';
 const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InljYWRpY3hjd2NnZGllZmRxYnJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0OTgyNDQsImV4cCI6MjA5NTA3NDI0NH0.u661TiExg1AE6RNWIOVdo5phaBQp9Us-eOEEDDJwQQk';
-const SAM_KEY_DEFAULT = '';
+const SAM_KEY_DEFAULT = 'SAM-f65fe6c1-4ac7-4244-ab06-2cf3fd0af73e';
 const SAM_BASE = 'https://api.sam.gov/opportunities/v2/search';
 
 // State/local contract sources (free scrapers via CORS proxy)
@@ -839,32 +662,7 @@ function dateFrom(days) {
   return `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${d.getFullYear()}`;
 }
 
-async function fetchFederalContracts(filters) {
-  filters = filters || {};
-  try {
-    const params = new URLSearchParams();
-    if(filters.naics)    params.set('naics',    filters.naics);
-    if(filters.state)    params.set('state',    filters.state);
-    if(filters.setaside) params.set('setaside', filters.setaside);
-    if(filters.days)     params.set('days',     String(filters.days || 90));
-    if(filters.keyword)  params.set('keyword',  filters.keyword);
-    const controller = new AbortController();
-    const tid = setTimeout(function() { controller.abort(); }, 12000);
-    const res = await fetch('/.netlify/functions/contracts?' + params.toString(), {signal: controller.signal});
-    clearTimeout(tid);
-    if(!res.ok) throw new Error('Function error ' + res.status);
-    const data = await res.json();
-    if(data.error) throw new Error(data.error);
-    const el = document.getElementById('sam-status');
-    if(el) el.textContent = data.contracts.length + ' federal contracts loaded' + (data.source === 'cache' ? ' (cached)' : ' from SAM.gov');
-    return data.contracts || [];
-  } catch(e) {
-    console.warn('Federal contracts:', e.message);
-    const el = document.getElementById('sam-status');
-    if(el) el.textContent = 'Using backup contract data';
-    return getFederalMockData(filters);
-  }
-}) {
+async function fetchFederalContracts(filters={}) {
   const key = getSamKey();
   const params = new URLSearchParams({
     api_key: key,
@@ -1051,26 +849,21 @@ async function fetchContracts() {
     $('sam-status').textContent = `${fed.length} federal contracts loaded from SAM.gov`;
   }
 
-  // State/Local — via Netlify function
+  // State/Local — scraped / mock data per state
   if(filters.source==='all'||filters.source==='state_local') {
-    try {
-      const p2 = new URLSearchParams();
-      if(filters.state)   p2.set('state',   filters.state);
-      if(filters.naics)   p2.set('naics',   filters.naics);
-      if(filters.keyword) p2.set('keyword', filters.keyword);
-      const r2 = await fetch('/.netlify/functions/state-contracts?' + p2);
-      if(r2.ok) { const d2 = await r2.json(); contracts.push(...(d2.contracts || [])); }
-    } catch(e) { console.warn('State contracts:', e.message); }
+    const states = filters.state ? [filters.state] :
+      ['LA','TX','VA','MD','DC','NC','GA','MS','AL','AR'];
+    for(const st of states) {
+      contracts.push(...getStateMockData(st, filters.naics));
+    }
   }
-  // Subcontracts — via Netlify function
+
+  // Subcontracts — SBA SubNet style data
   if(filters.source==='all'||filters.source==='subcontract') {
-    try {
-      const p3 = new URLSearchParams();
-      if(filters.state)   p3.set('state',   filters.state);
-      if(filters.keyword) p3.set('keyword', filters.keyword);
-      const r3 = await fetch('/.netlify/functions/subcontracts?' + p3);
-      if(r3.ok) { const d3 = await r3.json(); contracts.push(...(d3.contracts || [])); }
-    } catch(e) { console.warn('Subcontracts:', e.message); }
+    const states = filters.state ? [filters.state] : ['LA','TX','VA','MD','NC'];
+    for(const st of states) {
+      contracts.push(...getSubcontractData(st));
+    }
   }
 
   // Keyword filter (client-side)
@@ -1374,263 +1167,6 @@ function forgot() {
 }
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
-// ═══════════════════════════════════════════════════
-// ForgeFront v5 — New Feature Functions
-// Clean, standalone, no dependencies on execution order
-// ═══════════════════════════════════════════════════
-
-// ── Landing page functions ──────────────────────────
-function showLandingPage() {
-  var el = document.getElementById('landing');
-  if (el) el.style.display = 'block';
-  document.getElementById('app').style.display = 'none';
-}
-
-function hideLandingPage(mode) {
-  var el = document.getElementById('landing');
-  if (el) el.style.display = 'none';
-  document.getElementById('ls').style.display = 'flex';
-  if (mode === 'register') {
-    setMode('register');
-  }
-}
-
-// ── Watchlist ───────────────────────────────────────
-function wlGet() {
-  try { return JSON.parse(localStorage.getItem('ff_wl') || '[]'); }
-  catch(e) { return []; }
-}
-
-function wlSet(list) {
-  try { localStorage.setItem('ff_wl', JSON.stringify(list)); }
-  catch(e) {}
-}
-
-function wlHas(id) {
-  return wlGet().some(function(c) { return c.id === id; });
-}
-
-function wlToggle(id) {
-  var list = wlGet();
-  var contract = A.contracts.find(function(c) { return c.id === id; });
-  var exists = list.some(function(c) { return c.id === id; });
-  if (exists) {
-    wlSet(list.filter(function(c) { return c.id !== id; }));
-    toast('Removed from watchlist');
-  } else if (contract) {
-    list.push(contract);
-    wlSet(list);
-    toast('Saved to watchlist');
-  }
-  wlUpdateBadge();
-}
-
-function wlUpdateBadge() {
-  var badge = document.getElementById('wl-badge');
-  if (!badge) return;
-  var n = wlGet().length;
-  badge.textContent = n;
-  badge.style.display = n > 0 ? 'inline-block' : 'none';
-}
-
-function renderWatchlist() {
-  var el = document.getElementById('wl-list');
-  if (!el) return;
-  var list = wlGet();
-  if (!list.length) {
-    el.innerHTML = '<div style="text-align:center;padding:60px;color:var(--t3)">'
-      + '<div style="font-size:40px;margin-bottom:10px">🔖</div>'
-      + '<div style="font-size:14px;font-weight:500;color:var(--t2)">No saved contracts</div>'
-      + '<div style="font-size:12px;margin-top:6px">Browse contracts and click Save to track them here</div>'
-      + '<button class="btn p" style="margin-top:16px" onclick="go('contracts',null)">Browse Contracts</button>'
-      + '</div>';
-    return;
-  }
-  el.innerHTML = list.map(function(c) {
-    var dl = c.deadline ? Math.ceil((new Date(c.deadline).getTime() - Date.now()) / 86400000) : null;
-    var dlColor = dl !== null ? (dl <= 7 ? 'var(--dn)' : dl <= 14 ? 'var(--go)' : 'var(--t3)') : 'var(--t3)';
-    var dlText = dl !== null ? (dl < 0 ? 'Closed' : dl === 0 ? 'Due today' : dl + 'd left') : '—';
-    return '<div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--r);padding:14px;margin-bottom:9px">'
-      + '<div style="font-size:14px;font-weight:600;margin-bottom:4px">' + c.title + '</div>'
-      + '<div style="font-size:12px;color:var(--t3);margin-bottom:9px">' + c.agency + '</div>'
-      + '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">'
-      + '<div style="font-size:14px;font-weight:700">' + (c.value ? fmt(c.value) : '—') + '</div>'
-      + '<div style="font-size:12px;font-weight:600;color:' + dlColor + '">' + dlText + '</div>'
-      + '<div style="margin-left:auto;display:flex;gap:7px">'
-      + '<button class="btn go2 sm" onclick="preFillBid('' + c.id + '');go('bid',null)">✍ Write Bid</button>'
-      + '<button class="btn g sm" onclick="wlToggle('' + c.id + '')">Remove</button>'
-      + '</div></div></div>';
-  }).join('');
-}
-
-// ── Business Profile ────────────────────────────────
-var BP_IDS = ['bp-coname','bp-uei','bp-phone','bp-email','bp-addr',
-              'bp-naics','bp-cap','bp-principal','bp-bio','bp-pp'];
-
-function bpProgress() {
-  var filled = BP_IDS.filter(function(id) {
-    var el = document.getElementById(id);
-    return el && el.value.trim().length > 0;
-  }).length;
-  var sdvosb = document.getElementById('bp-sdvosb');
-  var vosb   = document.getElementById('bp-vosb');
-  if ((sdvosb && sdvosb.checked) || (vosb && vosb.checked)) filled++;
-  var pct  = Math.round((filled / (BP_IDS.length + 1)) * 100);
-  var bar  = document.getElementById('bp-bar');
-  var badge= document.getElementById('bp-badge');
-  var nav  = document.getElementById('bp-pct-nav');
-  if (bar)   bar.style.width   = pct + '%';
-  if (badge) badge.textContent = pct + '% Complete';
-  if (nav)   nav.textContent   = pct + '%';
-  return pct;
-}
-
-function bpLoad() {
-  try {
-    var saved = JSON.parse(localStorage.getItem('ff_bp') || '{}');
-    BP_IDS.forEach(function(id) {
-      var el = document.getElementById(id);
-      if (el && saved[id] !== undefined) el.value = saved[id];
-    });
-    ['bp-sdvosb','bp-vosb','bp-8a','bp-hubzone'].forEach(function(id) {
-      var el = document.getElementById(id);
-      if (el && saved[id]) el.checked = true;
-    });
-  } catch(e) {}
-
-  // Auto-import completed jobs as past performance
-  var ppEl = document.getElementById('bp-jobs-pp');
-  if (ppEl) {
-    var done = A.jobs.filter(function(j) { return j.status === 'complete'; });
-    if (done.length) {
-      ppEl.innerHTML = done.map(function(j) {
-        return '<div style="background:var(--ad);border:1px solid var(--ab);border-radius:var(--rs);'
-          + 'padding:9px 13px;margin-bottom:6px;font-size:12px">'
-          + '<div style="font-weight:600;color:var(--t)">' + j.name + '</div>'
-          + '<div style="color:var(--t2)">' + j.client + ' &middot; ' + fmt(j.value) + '</div></div>';
-      }).join('');
-    } else {
-      ppEl.innerHTML = '<div style="font-size:12px;color:var(--t3);padding:6px 0">'
-        + 'Complete jobs in Job Tracker — they auto-appear here as past performance citations.</div>';
-    }
-  }
-  bpProgress();
-}
-
-function bpSave() {
-  try {
-    var data = {};
-    BP_IDS.forEach(function(id) {
-      var el = document.getElementById(id);
-      if (el) data[id] = el.value;
-    });
-    ['bp-sdvosb','bp-vosb','bp-8a','bp-hubzone'].forEach(function(id) {
-      var el = document.getElementById(id);
-      if (el) data[id] = el.checked;
-    });
-    localStorage.setItem('ff_bp', JSON.stringify(data));
-    // Sync key fields to Supabase profile
-    if (A.user && sb) {
-      var nameEl = document.getElementById('bp-principal');
-      var coEl   = document.getElementById('bp-coname');
-      var phEl   = document.getElementById('bp-phone');
-      sb.from('profiles').update({
-        name:    nameEl ? nameEl.value : (A.profile && A.profile.name),
-        company: coEl   ? coEl.value   : (A.profile && A.profile.company),
-        phone:   phEl   ? phEl.value   : (A.profile && A.profile.phone),
-      }).eq('id', A.user.id).then(function() {});
-    }
-    bpProgress();
-    toast('Business profile saved ✅');
-  } catch(e) {
-    toast('Save failed: ' + e.message, 'e');
-  }
-}
-
-function bpTemplate(id, name, naics, certs) {
-  if (id === 'bp-cap') {
-    return name + ' is a ' + certs + ' specializing in structural steel fabrication and welding services under NAICS ' + naics
-      + '. We bring military-grade precision and proven federal performance to every project.';
-  }
-  if (id === 'bp-diff') {
-    return 'Veteran-led with military precision and zero-defect accountability standards
-'
-      + 'Rapid mobilization — on-site within 48 hours of notice-to-proceed
-'
-      + 'All personnel hold current OSHA 10/30 certifications
-'
-      + 'AWS Certified Welding Inspectors (CWI) on every federal project';
-  }
-  if (id === 'bp-bio') {
-    return 'Veteran leader with 24+ years of military service and construction project management expertise. '
-      + 'Holds advanced degrees and maintains active security clearance. Applies military discipline, '
-      + 'rigorous quality standards, and mission-focused execution to every federal contract.';
-  }
-  if (id === 'bp-pp') {
-    return 'Contract: [Project Name]
-Value: $[Amount] | Period: [Start] to [End]
-'
-      + 'Agency: [Agency Name], [City, State]
-Scope: [Description of work]
-Result: Completed on time and within budget.';
-  }
-  return '';
-}
-
-async function bpAiField(fieldId, fieldType) {
-  var el = document.getElementById(fieldId);
-  if (!el) return;
-  var btn = event.target;
-  btn.disabled = true;
-  btn.textContent = '...';
-  var name  = (document.getElementById('bp-coname')  || {value:''}).value || (A.profile && A.profile.company) || 'My Company';
-  var naics = (document.getElementById('bp-naics')   || {value:''}).value || '332312';
-  var certs = (document.getElementById('bp-sdvosb')  && document.getElementById('bp-sdvosb').checked) ? 'SDVOSB' : 'Small Business';
-  var existing = el.value.trim();
-  try {
-    var prompt = existing
-      ? 'Improve this ' + fieldType + ' for federal contractor "' + name + '", NAICS ' + naics + ', ' + certs + ' certified. Professional, concise, compelling for contracting officers. Current text: "' + existing.slice(0, 300) + '"'
-      : 'Write a professional ' + fieldType + ' for federal contractor "' + name + '", NAICS ' + naics + ', ' + certs + ' certified. Under 150 words.';
-    var res = await fetch('/.netlify/functions/ai-assist', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({prompt: prompt, field: fieldType})
-    });
-    if (res.ok) {
-      var data = await res.json();
-      el.value = data.text || bpTemplate(fieldId, name, naics, certs);
-    } else {
-      el.value = el.value || bpTemplate(fieldId, name, naics, certs);
-    }
-  } catch(e) {
-    el.value = el.value || bpTemplate(fieldId, name, naics, certs);
-  }
-  btn.disabled = false;
-  btn.innerHTML = '✨ AI Improve';
-  bpProgress();
-  toast('Field updated');
-}
-
-function bpAutoFill() {
-  var nameEl = document.getElementById('bp-coname');
-  var prinEl = document.getElementById('bp-principal');
-  if (!nameEl || !nameEl.value.trim() || !prinEl || !prinEl.value.trim()) {
-    toast('Fill in Company Name and Principal Name first', 'e');
-    return;
-  }
-  var name  = nameEl.value;
-  var naics = (document.getElementById('bp-naics') || {value:'332312'}).value || '332312';
-  var certs = (document.getElementById('bp-sdvosb') && document.getElementById('bp-sdvosb').checked) ? 'SDVOSB' : 'Small Business';
-  ['bp-cap','bp-diff','bp-bio','bp-pp'].forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el && !el.value.trim()) el.value = bpTemplate(id, name, naics, certs);
-  });
-  bpProgress();
-  toast('Profile sections filled — review and customize each one');
-}
-
-// ═══════════════════════════════════════════════════
-
 async function boot() {
   try {
     A.samKey = localStorage.getItem('ff_sam_key') || SAM_KEY_DEFAULT;
@@ -1648,15 +1184,7 @@ async function boot() {
       showApp();
     } else {
       $('lo').style.display = 'none';
-      var _lv = localStorage.getItem('ff_visited');
-      var _ld = document.getElementById('landing');
-      if (!_lv && _ld) {
-        _ld.style.display = 'block';
-        localStorage.setItem('ff_visited', '1');
-      } else {
-        if (_ld) _ld.style.display = 'none';
-        $('ls').style.display = 'flex';
-      }
+      $('ls').style.display = 'flex';
     }
   } catch(err) {
     console.warn('[ForgeFront] Boot error:', err.message);
@@ -1674,8 +1202,6 @@ async function loadProfile() {
 function showApp() {
   $('lo').style.display='none';
   $('ls').style.display='none';
-  var _land = document.getElementById('landing');
-  if (_land) _land.style.display = 'none';
   $('app').style.display='flex';
   const init=(A.profile?.name||A.user.email).split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
   $('ava').textContent=init;
@@ -1727,7 +1253,6 @@ function showApp() {
   }
 
   loadAll();
-  wlUpdateBadge();
 }
 
 async function loadAll() {
@@ -1758,13 +1283,11 @@ function go(page,el) {
   const T={dash:'Dashboard',contracts:'Contracts',jobs:'Job Tracker',crew:'Crew',invoices:'Invoices',bid:'Bid Writer',profile:'My Profile',admin:'Admin'};
   $('pt').textContent=T[page]||page;
   closeSB();
-  if(page==='dash')          renderDashboard();
-  else if(page==='jobs')     renderJobs();
-  else if(page==='crew')     renderCrew();
-  else if(page==='invoices') renderInvoices();
-  else if(page==='admin')    renderAdmin();
-  else if(page==='bizprofile') bpLoad();
-  else if(page==='watchlist')  renderWatchlist();
+  if(page==='dash')        renderDashboard();
+  else if(page==='jobs')   renderJobs();
+  else if(page==='crew')   renderCrew();
+  else if(page==='invoices')renderInvoices();
+  else if(page==='admin')  renderAdmin();
 }
 
 // ── Renders ───────────────────────────────────────────────────────────────────
@@ -2018,31 +1541,7 @@ function toggleSB(){$('sb').classList.toggle('on');$('ov').classList.toggle('on'
 function closeSB(){$('sb').classList.remove('on');$('ov').classList.remove('on');}
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
-</script>
-
-<!-- Supabase loaded here so HTML/CSS renders first, then Supabase loads -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin="anonymous"></script>
-<script>
-// Boot runs after Supabase is guaranteed to be available
-if (typeof supabase !== 'undefined') {
-  boot();
-} else {
-  // Fallback: wait for supabase to be defined
-  var _bootInterval = setInterval(function() {
-    if (typeof supabase !== 'undefined') {
-      clearInterval(_bootInterval);
-      boot();
-    }
-  }, 50);
-  // Hard fallback at 5 seconds — show login no matter what
-  setTimeout(function() {
-    clearInterval(_bootInterval);
-    var lo = document.getElementById('lo');
-    var ls = document.getElementById('ls');
-    if (lo) lo.style.display = 'none';
-    if (ls) ls.style.display = 'flex';
-  }, 5000);
-}
+boot();
 </script>
 </body>
 </html>

@@ -11,17 +11,3 @@
   for = "/*"
   [headers.values]
     Cache-Control = "no-cache, no-store, must-revalidate"
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
-
-# ── Environment variables ──────────────────────────────────────────────────────
-# Set these in Netlify UI → Site Settings → Environment Variables
-# DO NOT put actual values here — this file is committed to git
-#
-# Required:
-#   SAM_GOV_API_KEY          = SAM-f65fe6c1-4ac7-4244-ab06-2cf3fd0af73e
-#   SUPABASE_URL             = https://ycadicxcwcgdiefdqbrn.supabase.co
-#   SUPABASE_SERVICE_ROLE_KEY = your service role key
-#
-# The SAM.gov key never appears in your HTML or JavaScript.
-# It lives only in Netlify's encrypted environment variable store.
