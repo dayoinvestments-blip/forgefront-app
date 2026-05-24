@@ -5,7 +5,176 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>ForgeFront · SDVOSB Command Center</title>
 <meta name="theme-color" content="#00E5A0"/>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+// Inline minimal Supabase client - no CDN dependency
+(function() {
+  function createClient(url, key, options) {
+    var headers = { 'apikey': key, 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key };
+    
+    function authHeaders(token) {
+      return Object.assign({}, headers, token ? {'Authorization': 'Bearer ' + token} : {});
+    }
+    
+    var _session = null;
+    var _listeners = [];
+    
+    var auth = {
+      getSession: async function() {
+        var token = localStorage.getItem('sb_token');
+        var user  = localStorage.getItem('sb_user');
+        if(token && user) {
+          try {
+            _session = { access_token: token, user: JSON.parse(user) };
+            return { data: { session: _session }, error: null };
+          } catch(e) {}
+        }
+        return { data: { session: null }, error: null };
+      },
+      signInWithPassword: async function(creds) {
+        var r = await fetch(url + '/auth/v1/token?grant_type=password', {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(creds)
+        });
+        var d = await r.json();
+        if(!r.ok) return { data: null, error: { message: d.error_description || d.msg || 'Invalid credentials' } };
+        localStorage.setItem('sb_token', d.access_token);
+        localStorage.setItem('sb_user', JSON.stringify(d.user));
+        _session = { access_token: d.access_token, user: d.user };
+        _listeners.forEach(function(fn) { fn('SIGNED_IN', _session); });
+        return { data: { session: _session, user: d.user }, error: null };
+      },
+      signUp: async function(creds) {
+        var body = { email: creds.email, password: creds.password };
+        if(creds.options && creds.options.data) body.data = creds.options.data;
+        var r = await fetch(url + '/auth/v1/signup', {
+          method: 'POST', headers: headers, body: JSON.stringify(body)
+        });
+        var d = await r.json();
+        if(!r.ok || d.error) return { data: null, error: { message: d.msg || d.error || 'Signup failed' } };
+        return { data: { user: d }, error: null };
+      },
+      signOut: async function() {
+        var token = localStorage.getItem('sb_token');
+        localStorage.removeItem('sb_token');
+        localStorage.removeItem('sb_user');
+        _session = null;
+        _listeners.forEach(function(fn) { fn('SIGNED_OUT', null); });
+        if(token) {
+          await fetch(url + '/auth/v1/logout', {
+            method: 'POST',
+            headers: authHeaders(token)
+          }).catch(function(){});
+        }
+      },
+      resetPasswordForEmail: async function(email, opts) {
+        await fetch(url + '/auth/v1/recover', {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({ email: email, gotrue_meta_security: {} })
+        }).catch(function(){});
+      },
+      onAuthStateChange: function(fn) {
+        _listeners.push(fn);
+        return { data: { subscription: { unsubscribe: function() {
+          _listeners = _listeners.filter(function(l){ return l !== fn; });
+        }}}};
+      },
+      getUser: async function(token) {
+        var t = token || localStorage.getItem('sb_token');
+        if(!t) return { data: { user: null }, error: null };
+        var r = await fetch(url + '/auth/v1/user', { headers: authHeaders(t) });
+        if(!r.ok) return { data: { user: null }, error: { message: 'Invalid token' } };
+        var d = await r.json();
+        return { data: { user: d }, error: null };
+      }
+    };
+    
+    function from(table) {
+      var _table  = table;
+      var _select = '*';
+      var _filters= [];
+      var _order  = null;
+      var _limit  = null;
+      var _single = false;
+      var _method = 'GET';
+      var _body   = null;
+      var _prefer = '';
+      
+      function getToken() { return localStorage.getItem('sb_token') || key; }
+      
+      function buildUrl() {
+        var q = url + '/rest/v1/' + _table;
+        var params = [];
+        if(_select && _select !== '*') params.push('select=' + encodeURIComponent(_select));
+        else params.push('select=*');
+        _filters.forEach(function(f) { params.push(f); });
+        if(_order) params.push('order=' + _order);
+        if(_limit)  params.push('limit=' + _limit);
+        return q + (params.length ? '?' + params.join('&') : '');
+      }
+      
+      var obj = {
+        select: function(cols) { _select = cols || '*'; return obj; },
+        eq: function(col, val) {
+          _filters.push(encodeURIComponent(col) + '=eq.' + encodeURIComponent(val));
+          return obj;
+        },
+        in: function(col, vals) {
+          _filters.push(encodeURIComponent(col) + '=in.(' + vals.map(function(v){ return encodeURIComponent(v); }).join(',') + ')');
+          return obj;
+        },
+        order: function(col, opts) {
+          _order = col + (opts && opts.ascending === false ? '.desc' : '.asc');
+          return obj;
+        },
+        limit: function(n) { _limit = n; return obj; },
+        single: function() { _single = true; return obj; },
+        insert: function(data) {
+          _method = 'POST';
+          _body = JSON.stringify(Array.isArray(data) ? data : [data]);
+          _prefer = 'return=representation';
+          return obj;
+        },
+        update: function(data) {
+          _method = 'PATCH';
+          _body = JSON.stringify(data);
+          _prefer = 'return=representation';
+          return obj;
+        },
+        delete: function() { _method = 'DELETE'; return obj; },
+        then: async function(resolve, reject) {
+          try {
+            var token = getToken();
+            var h = Object.assign({}, { 'apikey': key, 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' });
+            if(_prefer) h['Prefer'] = _prefer;
+            if(_single) h['Accept'] = 'application/vnd.pgrst.object+json';
+            var r = await fetch(buildUrl(), { method: _method, headers: h, body: _body });
+            if(r.status === 204) { resolve({ data: null, error: null }); return; }
+            var text = await r.text();
+            var d = text ? JSON.parse(text) : null;
+            if(!r.ok) {
+              var err = { message: (d && (d.message || d.hint || d.details)) || ('HTTP ' + r.status) };
+              resolve({ data: null, error: err });
+            } else {
+              if(_single) resolve({ data: d, error: null });
+              else resolve({ data: Array.isArray(d) ? d : (d ? [d] : []), error: null });
+            }
+          } catch(e) {
+            if(reject) reject(e);
+            else resolve({ data: null, error: { message: e.message } });
+          }
+        }
+      };
+      return obj;
+    }
+    
+    return { auth: auth, from: from };
+  }
+  
+  window.supabase = { createClient: createClient };
+})();
+</script>
 <style>
 :root{--bg:#0A0C0F;--s:#111418;--s2:#181C22;--s3:#1F242C;--bd:#232830;--ac:#00E5A0;--ad:rgba(0,229,160,.10);--ab:rgba(0,229,160,.22);--go:#FFB830;--gd:rgba(255,184,48,.10);--gb:rgba(255,184,48,.22);--bl:#4F8EF7;--bld:rgba(79,142,247,.10);--dn:#FF5A5A;--t:#F0F2F5;--t2:#A8B3C0;--t3:#7A8494;--r:12px;--rs:8px;--rl:16px}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
@@ -776,13 +945,7 @@ const STATE_SOURCES = {
   GA: 'https://ssl.doas.state.ga.us/PRSapp/PR_index.jsp',
 };
 
-// Safe Supabase init — handles CDN load timing
-let sb;
-try {
-  sb = supabase.createClient(SB_URL, SB_ANON);
-} catch(e) {
-  console.warn('Supabase init failed:', e.message);
-}
+const sb = supabase.createClient(SB_URL, SB_ANON);
 
 // ── App State ─────────────────────────────────────────────────────────────────
 const A = {
@@ -1538,13 +1701,6 @@ function runProfileAI() {
 async function boot() {
   try {
     A.samKey = localStorage.getItem('ff_sam_key') || SAM_KEY_DEFAULT;
-
-    // If Supabase CDN didn't load, show login immediately
-    if(!sb) {
-      $('lo').style.display = 'none';
-      $('ls').style.display = 'flex';
-      return;
-    }
 
     // Hard 6-second timeout so loading screen never hangs
     const sessionResult = await Promise.race([
