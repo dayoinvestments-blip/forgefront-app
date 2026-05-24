@@ -1445,6 +1445,348 @@ function go(page, el) {
   else if(page==='watchlist')  renderWatchlist();
 }
 
+
+// ── Landing page ─────────────────────────────────────────────────────────────
+function showLanding() {
+  const ld = document.getElementById('landing');
+  if(ld) ld.style.display = 'block';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('lo').style.display = 'none';
+  document.getElementById('ls').style.display = 'none';
+}
+function showLogin(mode) {
+  const ld = document.getElementById('landing');
+  if(ld) ld.style.display = 'none';
+  document.getElementById('ls').style.display = 'flex';
+  if(mode) setMode(mode);
+}
+
+// ── Auth mode toggle ──────────────────────────────────────────────────────────
+function setMode(m) {
+  A.mode = m;
+  document.querySelectorAll('.mta').forEach((t,i) =>
+    t.classList.toggle('on', (i===0&&m==='login')||(i===1&&m==='register')));
+  document.getElementById('rf').style.display = m==='register' ? 'block' : 'none';
+  document.getElementById('lb2').textContent = m==='login' ? 'Sign In' : 'Create Account';
+  const em = document.getElementById('em');
+  if(em) em.style.display = 'none';
+}
+
+async function doLogin() {
+  const email = ((document.getElementById('le')||{}).value||'').trim();
+  const pass  = (document.getElementById('lp')||{}).value||'';
+  if(!email||!pass) { showErr('Email and password required'); return; }
+  const btn = document.getElementById('lb2');
+  if(btn) { btn.disabled=true; btn.innerHTML='<span class="sp"></span>'; }
+  const em = document.getElementById('em');
+  if(em) em.style.display='none';
+  try {
+    if(A.mode==='register') {
+      const name = ((document.getElementById('rn')||{}).value||'').trim();
+      const co   = ((document.getElementById('rc')||{}).value||'').trim();
+      if(!name||!co) {
+        showErr('Name and company required');
+        if(btn){btn.disabled=false;btn.textContent='Create Account';}
+        return;
+      }
+      const {error} = await sb.auth.signUp({email,password:pass,options:{data:{name,company:co}}});
+      if(error) throw error;
+      toast('Account created - signing you in...','i');
+    }
+    const {data,error} = await sb.auth.signInWithPassword({email,password:pass});
+    if(error) throw error;
+    A.user = data.user;
+    await Promise.race([loadProfile(), new Promise(function(r){setTimeout(r,4000);})]);
+    showApp();
+  } catch(e) {
+    showErr(e.message||'Sign in failed. Check your credentials.');
+    if(btn){btn.disabled=false;btn.textContent=A.mode==='login'?'Sign In':'Create Account';}
+  }
+}
+
+function showErr(m) {
+  const e = document.getElementById('em');
+  if(e){e.textContent=m;e.style.display='block';}
+}
+
+async function doLogout() {
+  await sb.auth.signOut();
+  location.reload();
+}
+
+function forgot() {
+  const e = ((document.getElementById('le')||{}).value||'').trim();
+  if(!e){showErr('Enter your email first');return;}
+  sb.auth.resetPasswordForEmail(e,{redirectTo:location.origin});
+  toast('Reset email sent - check your inbox','i');
+}
+
+function toggleSB(){
+  document.getElementById('sb').classList.toggle('on');
+  document.getElementById('ov').classList.toggle('on');
+}
+function closeSB(){
+  document.getElementById('sb').classList.remove('on');
+  document.getElementById('ov').classList.remove('on');
+}
+
+
+// ── Billing toggle ────────────────────────────────────────────────────────────
+let annualBilling = true;
+function toggleBilling() {
+  annualBilling = !annualBilling;
+  const thumb = document.getElementById('billing-thumb');
+  const basePrice = document.getElementById('base-price');
+  const proPrice  = document.getElementById('pro-price');
+  const baseNote  = document.getElementById('base-annual-note');
+  const proNote   = document.getElementById('pro-annual-note');
+  const annLbl    = document.getElementById('toggle-annual-lbl');
+  const monLbl    = document.getElementById('toggle-monthly-lbl');
+  if(annualBilling) {
+    if(thumb) thumb.style.left = '23px';
+    if(basePrice) basePrice.textContent = '$22';
+    if(proPrice)  proPrice.textContent  = '$59';
+    if(baseNote)  baseNote.style.display  = 'block';
+    if(proNote)   proNote.style.display   = 'block';
+    if(annLbl)    annLbl.style.color  = 'var(--ac)';
+    if(monLbl)    monLbl.style.color  = 'var(--t2)';
+  } else {
+    if(thumb) thumb.style.left = '3px';
+    if(basePrice) basePrice.textContent = '$29';
+    if(proPrice)  proPrice.textContent  = '$79';
+    if(baseNote)  baseNote.style.display  = 'none';
+    if(proNote)   proNote.style.display   = 'none';
+    if(annLbl)    annLbl.style.color  = 'var(--t2)';
+    if(monLbl)    monLbl.style.color  = 'var(--ac)';
+  }
+}
+
+// ── Watchlist ─────────────────────────────────────────────────────────────────
+function isWatchlisted(contractId) {
+  try {
+    const wl = JSON.parse(localStorage.getItem('ff_watchlist')||'[]');
+    return wl.some(function(c) { return c.id === contractId; });
+  } catch(e) { return false; }
+}
+function toggleWatchlist(contractId) {
+  try {
+    let wl = JSON.parse(localStorage.getItem('ff_watchlist')||'[]');
+    const contract = A.contracts.find(function(c) { return c.id === contractId; });
+    if(!contract) return;
+    const exists = wl.some(function(c) { return c.id === contractId; });
+    if(exists) {
+      wl = wl.filter(function(c) { return c.id !== contractId; });
+      toast('Removed from watchlist');
+    } else {
+      wl.push(contract);
+      toast('Saved to watchlist');
+    }
+    localStorage.setItem('ff_watchlist', JSON.stringify(wl));
+    updateWatchlistCount();
+    fetchContracts();
+  } catch(e) { console.warn('Watchlist error:', e.message); }
+}
+function updateWatchlistCount() {
+  try {
+    const wl = JSON.parse(localStorage.getItem('ff_watchlist')||'[]');
+    const badge = document.getElementById('wl-count');
+    if(badge) {
+      badge.textContent = wl.length;
+      badge.style.display = wl.length > 0 ? 'inline-block' : 'none';
+    }
+  } catch(e) {}
+}
+function renderWatchlist() {
+  const el = document.getElementById('watchlist-list');
+  if(!el) return;
+  let wl = [];
+  try { wl = JSON.parse(localStorage.getItem('ff_watchlist')||'[]'); } catch(e) {}
+  if(!wl.length) {
+    el.innerHTML = '<div style="text-align:center;padding:60px;color:var(--t3)"><div style="font-size:40px;margin-bottom:12px">🔖</div><div style="font-size:14px;font-weight:500;color:var(--t2)">No saved contracts</div><div style="font-size:12px;margin-top:6px">Browse contracts and click Save to track them here</div><button class="btn p" style="margin-top:16px" onclick="go('contracts',null)">Browse Contracts</button></div>';
+    return;
+  }
+  el.innerHTML = wl.map(function(c) {
+    const dl = c.deadline ? Math.ceil((new Date(c.deadline).getTime()-Date.now())/86400000) : null;
+    const dlColor = dl!==null ? (dl<=7?'var(--dn)':dl<=14?'var(--go)':'var(--t3)') : 'var(--t3)';
+    const dlText  = dl!==null ? (dl<0?'Closed':dl===0?'Due today':dl+'d left') : '-';
+    return '<div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--r);padding:14px;margin-bottom:9px">'
+      + '<div style="font-size:14px;font-weight:600;margin-bottom:4px">' + c.title + '</div>'
+      + '<div style="font-size:12px;color:var(--t3);margin-bottom:10px">' + c.agency + '</div>'
+      + '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">'
+      + '<div style="font-size:15px;font-weight:700">' + (c.value ? fmt(c.value) : '-') + '</div>'
+      + '<div style="font-size:12px;font-weight:600;color:' + dlColor + '">' + dlText + '</div>'
+      + '<div style="margin-left:auto;display:flex;gap:7px">'
+      + '<button class="btn go2 sm" onclick="preFillBid('' + c.id + '');go('bid',null)">Write Bid</button>'
+      + '<button class="btn g sm" onclick="toggleWatchlist('' + c.id + '')">Remove</button>'
+      + '</div></div></div>';
+  }).join('');
+}
+
+// ── Business Profile ──────────────────────────────────────────────────────────
+const BP_FIELDS = ['bp-name','bp-uei','bp-phone','bp-email','bp-address',
+                   'bp-naics','bp-capability','bp-principal','bp-bio','bp-pastperf'];
+
+function updateProfileProgress() {
+  let filled = 0;
+  BP_FIELDS.forEach(function(id) {
+    const el = document.getElementById(id);
+    if(el && el.value.trim()) filled++;
+  });
+  const sdv = document.getElementById('cert-sdvosb');
+  const vos = document.getElementById('cert-vosb');
+  if((sdv && sdv.checked) || (vos && vos.checked)) filled++;
+  const pct = Math.round((filled / (BP_FIELDS.length + 1)) * 100);
+  const bar   = document.getElementById('profile-progress-bar');
+  const badge = document.getElementById('profile-complete-badge');
+  const navPct= document.getElementById('biz-profile-pct');
+  if(bar)    bar.style.width = pct + '%';
+  if(badge)  badge.textContent = pct + '% Complete';
+  if(navPct) navPct.textContent = pct + '%';
+  return pct;
+}
+
+function loadBizProfile() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('ff_bizprofile')||'{}');
+    BP_FIELDS.forEach(function(id) {
+      const el = document.getElementById(id);
+      if(el && saved[id]) el.value = saved[id];
+    });
+    ['cert-sdvosb','cert-vosb','cert-8a','cert-hubzone'].forEach(function(id) {
+      const el = document.getElementById(id);
+      if(el && saved[id]) el.checked = true;
+    });
+  } catch(e) {}
+  // Populate past performance from completed jobs
+  const ppEl = document.getElementById('pp-from-jobs');
+  if(ppEl) {
+    const jobs = A.jobs.filter(function(j) { return j.status === 'complete'; });
+    ppEl.innerHTML = jobs.length
+      ? jobs.map(function(j) {
+          return '<div style="background:var(--ad);border:1px solid var(--ab);border-radius:var(--rs);padding:10px 14px;margin-bottom:6px;font-size:12px;color:var(--t2)">'
+            + '<div style="font-weight:600;color:var(--t);margin-bottom:2px">&#10003; ' + j.name + '</div>'
+            + '<div>Client: ' + j.client + ' &middot; Value: ' + fmt(j.value) + ' &middot; Auto-imported from Job Tracker</div>'
+            + '</div>';
+        }).join('')
+      : '<div style="font-size:12px;color:var(--t3);padding:8px 0">Complete jobs in Job Tracker - they will auto-appear here as past performance citations.</div>';
+  }
+  updateProfileProgress();
+}
+
+function saveBizProfile() {
+  try {
+    const data = {};
+    BP_FIELDS.forEach(function(id) {
+      const el = document.getElementById(id);
+      if(el) data[id] = el.value;
+    });
+    ['cert-sdvosb','cert-vosb','cert-8a','cert-hubzone'].forEach(function(id) {
+      const el = document.getElementById(id);
+      if(el) data[id] = el.checked;
+    });
+    localStorage.setItem('ff_bizprofile', JSON.stringify(data));
+    if(A.user) {
+      const naicsEl = document.getElementById('bp-naics');
+      const nameEl  = document.getElementById('bp-principal');
+      const coEl    = document.getElementById('bp-name');
+      const phEl    = document.getElementById('bp-phone');
+      sb.from('profiles').update({
+        name:        nameEl ? nameEl.value : A.profile.name,
+        company:     coEl   ? coEl.value   : A.profile.company,
+        phone:       phEl   ? phEl.value   : A.profile.phone,
+        naics_codes: naicsEl ? naicsEl.value.split(',').map(function(s){return s.trim();}).filter(Boolean) : A.profile.naics_codes,
+      }).eq('id', A.user.id).then(function(){});
+    }
+    updateProfileProgress();
+    toast('Business profile saved');
+  } catch(e) {
+    toast('Save failed - ' + e.message, 'e');
+  }
+}
+
+async function aiImproveField(fieldId, fieldType) {
+  const el = document.getElementById(fieldId);
+  if(!el) return;
+  const btn = event.target;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="sp"></span>';
+  const name  = (document.getElementById('bp-name')  || {}).value || A.profile.company || 'My Company';
+  const naics = (document.getElementById('bp-naics') || {}).value || '332312';
+  const certs = document.getElementById('cert-sdvosb') && document.getElementById('cert-sdvosb').checked ? 'SDVOSB' : 'Small Business';
+  const existing = el.value.trim();
+  try {
+    const res = await fetch('/.netlify/functions/ai-assist', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ prompt: (existing
+        ? 'Improve this ' + fieldType + ' for federal contractor "' + name + '", NAICS ' + naics + ', ' + certs + ' certified. Make it professional and compelling. Current: "' + existing + '"'
+        : 'Write a professional ' + fieldType + ' for federal contractor "' + name + '", NAICS ' + naics + ', ' + certs + ' certified. Keep under 150 words.'), field: fieldType })
+    });
+    if(res.ok) {
+      const data = await res.json();
+      if(data.text) el.value = data.text;
+    } else {
+      el.value = generateFieldTemplate(fieldId, name, naics, certs, existing);
+    }
+  } catch(e) {
+    el.value = generateFieldTemplate(fieldId, name, naics, certs, existing);
+  }
+  btn.disabled = false;
+  btn.innerHTML = 'AI Improve';
+  updateProfileProgress();
+  toast('Field improved');
+}
+
+function generateFieldTemplate(fieldId, name, naics, certs, existing) {
+  if(fieldId === 'bp-capability') return name + ' is a ' + certs + ' specializing in structural steel fabrication and welding services under NAICS ' + naics + '. We deliver military-grade precision and proven federal performance to every project.';
+  if(fieldId === 'bp-competencies') return 'Structural steel fabrication and welding (AWS D1.1)
+Custom metal fabrication and powder coating
+On-site field welding and emergency repair
+Project management and quality control (CWI certified)
+OSHA 30 compliant safety programs';
+  if(fieldId === 'bp-differentiators') return 'Veteran-led with military precision and zero-defect accountability
+Rapid mobilization - on-site within 48 hours of NTP
+All personnel hold current OSHA 10/30 certifications
+AWS Certified Welding Inspectors (CWI) on every project';
+  if(fieldId === 'bp-bio') return 'Experienced veteran leader with federal contracting expertise. Background in military operations and construction project management. Applies disciplined processes and rigorous quality standards to deliver results that exceed contracting officer expectations.';
+  return existing || '';
+}
+
+async function runProfileAI() {
+  const nameEl = document.getElementById('bp-name');
+  const prinEl = document.getElementById('bp-principal');
+  if(!nameEl || !nameEl.value || !prinEl || !prinEl.value) {
+    toast('Fill in Company Name and Principal Name first', 'e');
+    return;
+  }
+  const name  = nameEl.value;
+  const naics = (document.getElementById('bp-naics')||{}).value || '332312';
+  const certs = document.getElementById('cert-sdvosb') && document.getElementById('cert-sdvosb').checked ? 'SDVOSB' : 'Small Business';
+  const capEl  = document.getElementById('bp-capability');
+  const compEl = document.getElementById('bp-competencies');
+  const diffEl = document.getElementById('bp-differentiators');
+  const bioEl  = document.getElementById('bp-bio');
+  if(capEl  && !capEl.value)  capEl.value  = generateFieldTemplate('bp-capability',     name, naics, certs, '');
+  if(compEl && !compEl.value) compEl.value = generateFieldTemplate('bp-competencies',   name, naics, certs, '');
+  if(diffEl && !diffEl.value) diffEl.value = generateFieldTemplate('bp-differentiators',name, naics, certs, '');
+  if(bioEl  && !bioEl.value)  bioEl.value  = generateFieldTemplate('bp-bio',            name, naics, certs, '');
+  updateProfileProgress();
+  toast('Profile sections filled - review and customize each one');
+}
+
+// ── Updated showUpgrade with context ─────────────────────────────────────────
+function showUpgrade(contractCount) {
+  const msg = document.getElementById('paywall-contract-msg');
+  if(msg && contractCount) {
+    msg.style.display = 'block';
+    msg.textContent = 'You are missing ' + contractCount + ' contracts matched to your NAICS code. Upgrade to see all of them.';
+  } else if(msg) {
+    msg.style.display = 'none';
+  }
+  openM('upgrade-modal');
+}
+
+
 async function boot() {
   try {
     A.samKey = localStorage.getItem('ff_sam_key') || SAM_KEY_DEFAULT;
