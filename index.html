@@ -776,7 +776,13 @@ const STATE_SOURCES = {
   GA: 'https://ssl.doas.state.ga.us/PRSapp/PR_index.jsp',
 };
 
-const sb = supabase.createClient(SB_URL, SB_ANON);
+// Safe Supabase init — handles CDN load timing
+let sb;
+try {
+  sb = supabase.createClient(SB_URL, SB_ANON);
+} catch(e) {
+  console.warn('Supabase init failed:', e.message);
+}
 
 // ── App State ─────────────────────────────────────────────────────────────────
 const A = {
@@ -1533,6 +1539,13 @@ async function boot() {
   try {
     A.samKey = localStorage.getItem('ff_sam_key') || SAM_KEY_DEFAULT;
 
+    // If Supabase CDN didn't load, show login immediately
+    if(!sb) {
+      $('lo').style.display = 'none';
+      $('ls').style.display = 'flex';
+      return;
+    }
+
     // Hard 6-second timeout so loading screen never hangs
     const sessionResult = await Promise.race([
       sb.auth.getSession(),
@@ -1920,7 +1933,24 @@ function toggleSB(){$('sb').classList.toggle('on');$('ov').classList.toggle('on'
 function closeSB(){$('sb').classList.remove('on');$('ov').classList.remove('on');}
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
-boot();
+// Wait for DOM + all scripts to load before booting
+if(document.readyState === 'complete') {
+  boot();
+} else {
+  window.addEventListener('load', boot);
+}
+
+// Emergency fallback — if loading screen still showing after 8 seconds, show login
+setTimeout(function() {
+  const lo = document.getElementById('lo');
+  const ls = document.getElementById('ls');
+  const app = document.getElementById('app');
+  if(lo && lo.style.display !== 'none' && (!app || app.style.display === 'none')) {
+    console.warn('ForgeFront: Emergency fallback triggered');
+    lo.style.display = 'none';
+    if(ls) ls.style.display = 'flex';
+  }
+}, 8000);
 </script>
 </body>
 </html>
