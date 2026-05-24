@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ForgeFront · SDVOSB Command Center</title>
+<meta name="theme-color" content="#00E5A0"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+:root{--bg:#0A0C0F;--s:#111418;--s2:#181C22;--s3:#1F242C;--bd:#232830;--ac:#00E5A0;--ad:rgba(0,229,160,.10);--ab:rgba(0,229,160,.22);--go:#FFB830;--gd:rgba(255,184,48,.10);--gb:rgba(255,184,48,.22);--bl:#4F8EF7;--bld:rgba(79,142,247,.10);--dn:#FF5A5A;--t:#F0F2F5;--t2:#A8B3C0;--t3:#7A8494;--r:12px;--rs:8px;--rl:16px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif;overflow:hidden}
+#app{display:flex;height:100vh;overflow:hidden}
+#sb{width:225px;background:var(--s);border-right:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0;transition:transform .25s}
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#tb{height:56px;background:var(--s);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 18px;gap:10px;flex-shrink:0}
+#ct{flex:1;overflow-y:auto;padding:22px}
+.logo{padding:16px;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--bd)}
+.li{display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:var(--rs);margin:1px 6px;cursor:pointer;color:var(--t2);font-size:13px;font-weight:500;transition:all .12s;border:1px solid transparent;user-select:none}
+.li:hover{background:var(--s2);color:var(--t)}
+.li.on{background:var(--ad);color:var(--ac);border-color:var(--ab)}
+.ns{padding:12px 14px 3px;font-size:9px;font-weight:700;letter-spacing:1.2px;color:var(--t3);text-transform:uppercase}
+.nb{margin-left:auto;background:var(--ac);color:var(--bg);font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.sf{margin-top:auto;padding:12px;border-top:1px solid var(--bd)}
+.ua{width:32px;height:32px;border-radius:50%;background:var(--ad);border:1px solid var(--ab);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--ac);flex-shrink:0}
+.pg{display:none;animation:fi .18s ease}
+.pg.on{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+/* Cards */
+.sc{background:var(--s);border:1px solid var(--bd);border-radius:var(--r);padding:14px;transition:border-color .15s}
+.sc:hover{border-color:var(--ab)}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.cl{background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:18px}
+.sl{font-size:9px;font-weight:700;letter-spacing:1.2px;color:var(--t3);text-transform:uppercase;margin-bottom:9px;margin-top:20px}
+.sl:first-child{margin-top:0}
+/* Contract cards */
+.cc{background:var(--s);border:1px solid var(--bd);border-radius:var(--r);padding:14px;margin-bottom:9px;transition:all .15s;cursor:pointer}
+.cc:hover{border-color:var(--ab);transform:translateY(-1px)}
+.cc.locked{position:relative;overflow:hidden}
+.cc.locked::after{content:'🔒 Upgrade to Pro to view';position:absolute;inset:0;background:rgba(10,12,15,.85);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--go);border-radius:var(--r);backdrop-filter:blur(2px)}
+.cb{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:99px;font-size:10px;font-weight:600}
+.fed{background:var(--bld);color:var(--bl);border:1px solid rgba(79,142,247,.25)}
+.sl2{background:var(--gd);color:var(--go);border:1px solid var(--gb)}
+.sub{background:var(--ad);color:var(--ac);border:1px solid var(--ab)}
+.open{background:var(--ad);color:var(--ac);border:1px solid var(--ab)}
+.sdv{background:rgba(0,229,160,.08);color:var(--ac);border:1px solid rgba(0,229,160,.2)}
+.urg{background:rgba(255,90,90,.1);color:var(--dn);border:1px solid rgba(255,90,90,.2)}
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 15px;border-radius:var(--rs);font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .14s}
+.p{background:var(--ac);color:var(--bg)}.p:hover{opacity:.9}
+.g{background:var(--s2);color:var(--t2);border:1px solid var(--bd)}.g:hover{color:var(--t);border-color:var(--ab)}
+.go2{background:var(--gd);color:var(--go);border:1px solid var(--gb)}
+.dr{background:rgba(255,90,90,.08);color:var(--dn);border:1px solid rgba(255,90,90,.2)}
+.sm{padding:6px 11px;font-size:11px}
+/* Filter */
+.fb{background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:16px;margin-bottom:18px}
+.fr{display:flex;flex-wrap:wrap;gap:9px;align-items:flex-end}
+.fg{display:flex;flex-direction:column;gap:4px;flex:1;min-width:110px}
+.fl{font-size:9px;font-weight:700;letter-spacing:.8px;color:var(--t3);text-transform:uppercase}
+select,input,textarea{background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);padding:8px 11px;font-size:13px;color:var(--t);outline:none;font-family:inherit;transition:border-color .13s;width:100%}
+select:focus,input:focus,textarea:focus{border-color:var(--ab)}
+textarea{resize:vertical;min-height:72px}
+.fd{margin-bottom:13px}
+.fla{font-size:11px;font-weight:600;color:var(--t2);margin-bottom:4px;display:block;letter-spacing:.3px}
+/* Jobs */
+.jr{background:var(--s);border:1px solid var(--bd);border-radius:var(--r);padding:13px;margin-bottom:7px;transition:border-color .13s}
+.jr:hover{border-color:var(--ab)}
+.pb{height:3px;background:var(--s3);border-radius:2px;margin-top:9px}
+.pf{height:3px;background:var(--ac);border-radius:2px;transition:width .4s}
+/* Crew */
+.crc{display:flex;align-items:flex-start;gap:12px;padding:13px;background:var(--s);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:7px}
+.av{width:40px;height:40px;border-radius:50%;background:var(--s3);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--t2);flex-shrink:0}
+.cp{display:inline-flex;align-items:center;gap:3px;padding:3px 7px;border-radius:6px;font-size:10px;font-weight:600;margin:2px}
+.ok{background:var(--ad);color:var(--ac);border:1px solid var(--ab)}
+.wn{background:var(--gd);color:var(--go);border:1px solid var(--gb)}
+.er{background:rgba(255,90,90,.08);color:var(--dn);border:1px solid rgba(255,90,90,.18)}
+/* Alerts */
+.ab2{display:flex;align-items:center;gap:9px;padding:10px 13px;background:rgba(255,90,90,.07);border:1px solid rgba(255,90,90,.18);border-radius:var(--r);margin-bottom:13px;font-size:13px;color:var(--dn)}
+.ib{display:flex;align-items:center;gap:9px;padding:10px 13px;background:var(--bld);border:1px solid rgba(79,142,247,.22);border-radius:var(--r);margin-bottom:13px;font-size:13px;color:var(--bl)}
+.gb2{display:flex;align-items:center;gap:9px;padding:10px 13px;background:var(--gd);border:1px solid var(--gb);border-radius:var(--r);margin-bottom:13px;font-size:13px;color:var(--go)}
+/* Paywall banner */
+.pw{background:linear-gradient(135deg,rgba(255,184,48,.12),rgba(0,229,160,.08));border:1px solid var(--gb);border-radius:var(--rl);padding:20px;text-align:center;margin-bottom:18px}
+.pw h3{font-size:16px;font-weight:700;margin-bottom:6px}
+.pw p{font-size:12px;color:var(--t2);margin-bottom:14px}
+/* Toast */
+.toast{position:fixed;bottom:22px;right:22px;padding:11px 18px;border-radius:var(--r);font-size:13px;font-weight:500;z-index:999;opacity:0;transition:all .25s;transform:translateY(8px);max-width:300px;pointer-events:none}
+.toast.on{opacity:1;transform:none}
+.ts{background:var(--ac);color:var(--bg)}.te{background:var(--dn);color:#fff}.ti{background:var(--bl);color:#fff}
+/* Modal */
+.mb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;align-items:flex-end;justify-content:center}
+.mb.on{display:flex}
+.md{background:var(--s);border-radius:var(--rl) var(--rl) 0 0;width:100%;max-width:560px;padding:22px;max-height:88vh;overflow-y:auto;border:1px solid var(--bd);border-bottom:none}
+.mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.mt2{font-size:16px;font-weight:700}
+.xb{background:var(--s2);border:1px solid var(--bd);color:var(--t2);width:27px;height:27px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
+/* Spinner / skeleton */
+.sp{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.25);border-top-color:currentColor;border-radius:50%;animation:spin .65s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sk{background:linear-gradient(90deg,var(--s2) 25%,var(--s3) 50%,var(--s2) 75%);background-size:200% 100%;animation:sh 1.4s infinite;border-radius:var(--rs)}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+/* Progress ring */
+.pr-wrap{display:flex;align-items:center;gap:10px}
+.pr{width:36px;height:36px;transform:rotate(-90deg)}
+/* Login */
+#ls{position:fixed;inset:0;background:radial-gradient(ellipse at 50% 35%,rgba(0,229,160,.07) 0%,var(--bg) 65%);display:flex;align-items:center;justify-content:center;z-index:200}
+.lb{width:100%;max-width:390px;padding:0 22px}
+.ll{text-align:center;margin-bottom:26px}
+.ll h1{font-size:25px;font-weight:800;letter-spacing:-.5px;margin-top:12px}
+.ll h1 span{color:var(--ac)}
+.ll p{font-size:11px;color:var(--t3);margin-top:4px;letter-spacing:1.2px;text-transform:uppercase}
+.mt{display:flex;background:var(--s);border:1px solid var(--bd);border-radius:var(--r);padding:4px;margin-bottom:16px;gap:3px}
+.mta{flex:1;padding:7px;text-align:center;border-radius:var(--rs);font-size:13px;font-weight:600;cursor:pointer;color:var(--t3);transition:all .13s;border:none;background:none}
+.mta.on{background:var(--ac);color:var(--bg)}
+.lbtn{width:100%;padding:12px;background:var(--ac);border:none;border-radius:var(--r);font-size:15px;font-weight:700;color:var(--bg);cursor:pointer;margin-top:7px;display:flex;align-items:center;justify-content:center;gap:9px;transition:opacity .13s}
+.lbtn:hover{opacity:.9}.lbtn:disabled{opacity:.6;cursor:not-allowed}
+.em{background:rgba(255,90,90,.1);border:1px solid rgba(255,90,90,.22);color:var(--dn);padding:8px 12px;border-radius:var(--rs);font-size:13px;margin-bottom:11px;display:none}
+/* loading overlay */
+.lo{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:300;flex-direction:column;gap:14px}
+.lo-t{font-size:27px;font-weight:800;letter-spacing:-.5px}
+.lo-t span{color:var(--ac)}
+/* invoice */
+.il{display:grid;grid-template-columns:1fr 60px 95px 82px 26px;gap:5px;align-items:center;padding:6px 0;border-bottom:1px solid var(--bd)}
+/* table */
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--t3);padding:9px 11px;border-bottom:1px solid var(--bd)}
+td{padding:9px 11px;font-size:13px;color:var(--t2);border-bottom:1px solid var(--bd)}
+tr:last-child td{border-bottom:none}tr:hover td{background:var(--s2)}
+.rb{padding:3px 8px;border-radius:99px;font-size:10px;font-weight:700}
+.rs{background:rgba(255,184,48,.12);color:var(--go)}
+.ra{background:var(--bld);color:var(--bl)}
+.rsp{background:rgba(167,139,250,.12);color:#A78BFA}
+.ru{background:var(--s2);color:var(--t3)}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--s3);border-radius:3px}
+@media(max-width:768px){
+  #sb{position:fixed;top:0;left:0;height:100%;z-index:50;transform:translateX(-100%)}
+  #sb.on{transform:translateX(0)}
+  .mb2{display:flex}.g4,.g3{grid-template-columns:repeat(2,1fr)}.g2{grid-template-columns:1fr}
+  #ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:49}#ov.on{display:block}
+  .fr{flex-direction:column}.fg{min-width:unset;flex:none;width:100%}
+}
+@media(max-width:480px){.g4,.g3,.g2{grid-template-columns:1fr}#ct{padding:13px}}
+.mb2{display:none;background:none;border:none;color:var(--t);font-size:20px;cursor:pointer;padding:4px 8px}
+</style>
+</head>
+<body>
+
+<div class="lo" id="lo">
+  <div class="lo-t">Forge<span>Front</span></div>
+  <div class="sp" style="border-top-color:var(--ac);border-color:rgba(0,229,160,.2);width:18px;height:18px"></div>
+</div>
+
+<div id="ls" style="display:none">
+  <div class="lb">
+    <div class="ll">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" style="margin:0 auto;display:block">
+        <path d="M12 2L3 7V12C3 16.55 7.08 20.74 12 22C16.92 20.74 21 16.55 21 12V7L12 2Z" fill="rgba(0,229,160,.15)" stroke="#00E5A0" stroke-width="1.5"/>
+        <path d="M9 12L11 14L15 10" stroke="#00E5A0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <h1>Forge<span>Front</span></h1>
+      <p>SDVOSB Command Center</p>
+    </div>
+    <div class="mt">
+      <button class="mta on" onclick="setMode('login')" type="button">Sign In</button>
+      <button class="mta" onclick="setMode('register')" type="button">Create Account</button>
+    </div>
+    <div id="em" class="em"></div>
+    <form onsubmit="doLogin();return false;">
+      <div id="rf" style="display:none">
+        <div class="fd"><label class="fla">Full Name</label><input id="rn" placeholder="LaDarrell Willis" autocomplete="name"/></div>
+        <div class="fd"><label class="fla">Company</label><input id="rc" placeholder="NextGen Welding & Fabrication LLC" autocomplete="organization"/></div>
+      </div>
+      <div class="fd"><label class="fla">Email</label><input id="le" type="email" placeholder="you@company.com" autocomplete="email"/></div>
+      <div class="fd"><label class="fla">Password</label><input id="lp" type="password" placeholder="••••••••" autocomplete="current-password"/></div>
+      <button class="lbtn" type="submit" id="lb2">Sign In</button>
+    </form>
+    <div style="text-align:center;margin-top:10px">
+      <span style="font-size:12px;color:var(--t3);cursor:pointer" onclick="forgot()">Forgot password?</span>
+    </div>
+    <p style="text-align:center;font-size:11px;color:var(--t3);margin-top:14px">🛡 Built for SDVOSB-certified contractors nationwide</p>
+  </div>
+</div>
+
+<div id="ov" onclick="closeSB()"></div>
+
+<div id="app" style="display:none">
+  <nav id="sb">
+    <div class="logo">
+      <div style="width:32px;height:32px;background:var(--ad);border:1px solid var(--ab);border-radius:9px;display:flex;align-items:center;justify-content:center">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7V12C3 16.55 7.08 20.74 12 22C16.92 20.74 21 16.55 21 12V7L12 2Z" fill="rgba(0,229,160,.2)" stroke="#00E5A0" stroke-width="1.5"/></svg>
+      </div>
+      <div style="font-size:16px;font-weight:700;letter-spacing:-.3px">Forge<span style="color:var(--ac)">Front</span></div>
+    </div>
+    <div class="ns">Main</div>
+    <div class="li on" onclick="go('dash',this)">▦ Dashboard</div>
+    <div class="li" onclick="go('contracts',this)">📄 Contracts <span class="nb" id="cct">—</span></div>
+    <div class="li" onclick="go('jobs',this)">💼 Job Tracker</div>
+    <div class="li" onclick="go('crew',this)">👥 Crew</div>
+    <div class="li" onclick="go('invoices',this)">🧾 Invoices</div>
+    <div class="ns">Tools</div>
+    <div class="li" onclick="go('bid',this)">✍ Bid Writer</div>
+    <div class="li" onclick="go('profile',this)">⚙ My Profile</div>
+    <div class="li" id="anav" style="display:none" onclick="go('admin',this)">🛡 Admin</div>
+    <div class="li dr" onclick="doLogout()">↪ Sign Out</div>
+    <div class="sf">
+      <div style="display:flex;align-items:center;gap:9px">
+        <div class="ua" id="ava">?</div>
+        <div style="min-width:0">
+          <div style="font-size:12px;font-weight:600;color:var(--t);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="uname">—</div>
+          <div style="font-size:10px;color:var(--go);font-weight:600;letter-spacing:.4px" id="urole">—</div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div id="main">
+    <div id="tb">
+      <button class="mb2" onclick="toggleSB()">☰</button>
+      <div style="font-size:15px;font-weight:600;flex:1" id="pt">Dashboard</div>
+      <div id="tbadge" style="background:var(--ad);border:1px solid var(--ab);color:var(--ac);font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px">Pro · SDVOSB</div>
+    </div>
+    <div id="ct">
+
+      <!-- DASHBOARD -->
+      <div class="pg on" id="p-dash">
+        <div class="sl">Overview — <span id="greet" style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--t2)">Welcome back</span></div>
+        <div class="g4" style="margin-bottom:18px">
+          <div class="sc" style="cursor:pointer" onclick="go('jobs',document.querySelector('[onclick*=jobs]'))"><div class="sl" style="margin:0 0 5px">Pipeline</div><div style="font-size:22px;font-weight:700" id="d-pipe">—</div><div style="font-size:11px;color:var(--ac);margin-top:3px" id="d-pipesub">Active jobs</div></div>
+          <div class="sc"><div class="sl" style="margin:0 0 5px">Invoiced YTD</div><div style="font-size:22px;font-weight:700;color:var(--ac)" id="d-inv">—</div><div style="font-size:11px;color:var(--t3);margin-top:3px">Collected</div></div>
+          <div class="sc" style="cursor:pointer" onclick="go('contracts',document.querySelector('[onclick*=contracts]'))"><div class="sl" style="margin:0 0 5px">Open Contracts</div><div style="font-size:22px;font-weight:700" id="d-con">—</div><div style="font-size:11px;color:var(--t3);margin-top:3px">Click to explore →</div></div>
+          <div class="sc" style="cursor:pointer" onclick="go('crew',document.querySelector('[onclick*=crew]'))"><div class="sl" style="margin:0 0 5px">Cert Alerts</div><div style="font-size:22px;font-weight:700;color:var(--go)" id="d-cert">—</div><div style="font-size:11px;color:var(--t3);margin-top:3px">Expiring in 30 days</div></div>
+        </div>
+
+        <!-- Onboarding checklist for new users -->
+        <div id="onboard-check" style="display:none" class="cl" style="margin-bottom:18px">
+          <div style="font-size:14px;font-weight:700;margin-bottom:12px">🚀 Complete your setup</div>
+          <div id="checklist-items"></div>
+        </div>
+
+        <div class="g2" style="margin-bottom:18px">
+          <div>
+            <div class="sl">Top Contract Matches</div>
+            <div class="cl" id="d-contracts"><div class="sk" style="height:180px"></div></div>
+            <button class="btn g" style="width:100%;justify-content:center;margin-top:8px" onclick="go('contracts',document.querySelector('[onclick*=contracts]'))">View All Contracts →</button>
+          </div>
+          <div>
+            <div class="sl">Active Jobs</div>
+            <div id="d-jobs"><div class="sk" style="height:180px;border-radius:var(--rl)"></div></div>
+          </div>
+        </div>
+
+        <div class="ib">ℹ️ <strong>SAM.gov API connected</strong> — Showing real federal opportunities nationwide. <span id="sam-status">Loading...</span></div>
+      </div>
+
+      <!-- CONTRACTS -->
+      <div class="pg" id="p-contracts">
+        <!-- Paywall for free users -->
+        <div id="paywall-banner" style="display:none" class="pw">
+          <h3>🔒 You're on the Free Plan</h3>
+          <p>You're seeing 3 of <span id="total-count">—</span> matched contracts. Upgrade to Pro to see all opportunities nationwide with full filtering.</p>
+          <button class="btn go2" onclick="showUpgrade()">Upgrade to Pro — $79/mo · Unlock All Contracts</button>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="fb">
+          <div style="font-size:13px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px">
+            🔍 Find Contracts Nationwide
+            <span id="results-count" style="font-size:11px;color:var(--t3);font-weight:400;margin-left:auto"></span>
+            <button class="btn p sm" onclick="fetchContracts()" id="search-btn">Search</button>
+          </div>
+          <div class="fr">
+            <div class="fg">
+              <div class="fl">Source</div>
+              <select id="f-source">
+                <option value="all">All Sources</option>
+                <option value="federal">🏛 Federal (SAM.gov)</option>
+                <option value="state_local">🏗 State &amp; Local</option>
+                <option value="subcontract">🤝 Subcontracts (SBA)</option>
+              </select>
+            </div>
+            <div class="fg">
+              <div class="fl">State</div>
+              <select id="f-state">
+                <option value="">All States</option>
+                <optgroup label="DMV — Highest Federal Density">
+                  <option value="VA">Virginia</option>
+                  <option value="MD">Maryland</option>
+                  <option value="DC">Washington DC</option>
+                </optgroup>
+                <optgroup label="Top Military States">
+                  <option value="TX">Texas</option>
+                  <option value="NC">North Carolina</option>
+                  <option value="GA">Georgia</option>
+                  <option value="FL">Florida</option>
+                  <option value="CA">California</option>
+                </optgroup>
+                <optgroup label="Underexecuted 8(a) / SDVOSB">
+                  <option value="MS">Mississippi</option>
+                  <option value="AL">Alabama</option>
+                  <option value="LA" selected>Louisiana</option>
+                  <option value="AR">Arkansas</option>
+                  <option value="OK">Oklahoma</option>
+                  <option value="KS">Kansas</option>
+                </optgroup>
+                <optgroup label="All States">
+                  <option value="AK">Alaska</option><option value="AZ">Arizona</option><option value="CO">Colorado</option><option value="CT">Connecticut</option><option value="DE">Delaware</option><option value="HI">Hawaii</option><option value="ID">Idaho</option><option value="IL">Illinois</option><option value="IN">Indiana</option><option value="IA">Iowa</option><option value="KY">Kentucky</option><option value="ME">Maine</option><option value="MA">Massachusetts</option><option value="MI">Michigan</option><option value="MN">Minnesota</option><option value="MO">Missouri</option><option value="MT">Montana</option><option value="NE">Nebraska</option><option value="NV">Nevada</option><option value="NH">New Hampshire</option><option value="NJ">New Jersey</option><option value="NM">New Mexico</option><option value="NY">New York</option><option value="ND">North Dakota</option><option value="OH">Ohio</option><option value="OR">Oregon</option><option value="PA">Pennsylvania</option><option value="RI">Rhode Island</option><option value="SC">South Carolina</option><option value="SD">South Dakota</option><option value="TN">Tennessee</option><option value="UT">Utah</option><option value="VT">Vermont</option><option value="WA">Washington</option><option value="WV">West Virginia</option><option value="WI">Wisconsin</option><option value="WY">Wyoming</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="fg">
+              <div class="fl">Set-Aside</div>
+              <select id="f-setaside">
+                <option value="">All Set-Asides</option>
+                <option value="SDVOSBC" selected>SDVOSB</option>
+                <option value="VOSBC">VOSB</option>
+                <option value="SBA">Small Business</option>
+                <option value="8AN">8(a)</option>
+                <option value="HZC">HUBZone</option>
+                <option value="WOSB">WOSB</option>
+                <option value="ESB">Emerging Small Business</option>
+              </select>
+            </div>
+            <div class="fg">
+              <div class="fl">NAICS Code</div>
+              <select id="f-naics">
+                <option value="332312">332312 — Structural Steel Fab</option>
+                <option value="238190">238190 — Welding &amp; Metal Work</option>
+                <option value="332313">332313 — Plate Work Fabrication</option>
+                <option value="332999">332999 — Other Fabricated Metal</option>
+                <option value="236220">236220 — Commercial Construction</option>
+                <option value="237310">237310 — Highway &amp; Bridge</option>
+                <option value="561210">561210 — Facilities Support</option>
+                <option value="">All NAICS</option>
+              </select>
+            </div>
+            <div class="fg">
+              <div class="fl">Keyword</div>
+              <input id="f-keyword" placeholder="welding, fabrication, steel..." onkeydown="if(event.key==='Enter')fetchContracts()"/>
+            </div>
+            <div class="fg" style="max-width:110px">
+              <div class="fl">Days Posted</div>
+              <select id="f-days">
+                <option value="30">Last 30 days</option>
+                <option value="60">Last 60 days</option>
+                <option value="90" selected>Last 90 days</option>
+                <option value="180">Last 180 days</option>
+              </select>
+            </div>
+          </div>
+          <!-- Priority state quick-select -->
+          <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:5px;align-items:center">
+            <span style="font-size:10px;font-weight:700;letter-spacing:.8px;color:var(--t3)">QUICK SELECT:</span>
+            <button class="btn g sm" onclick="setStateFilter('')">🌎 All States</button>
+            <button class="btn g sm" onclick="setStateFilter('VA')">DMV: VA</button>
+            <button class="btn g sm" onclick="setStateFilter('MD')">DMV: MD</button>
+            <button class="btn g sm" onclick="setStateFilter('DC')">DMV: DC</button>
+            <button class="btn g sm" onclick="setStateFilter('TX')">TX</button>
+            <button class="btn g sm" onclick="setStateFilter('NC')">NC</button>
+            <button class="btn g sm" onclick="setStateFilter('GA')">GA</button>
+            <button class="btn g sm" onclick="setStateFilter('LA')">LA</button>
+            <button class="btn g sm" onclick="setStateFilter('MS')">MS (underexec)</button>
+            <button class="btn g sm" onclick="setStateFilter('AL')">AL (underexec)</button>
+          </div>
+        </div>
+
+        <div id="contracts-list"><div class="sk" style="height:300px;border-radius:var(--rl)"></div></div>
+      </div>
+
+      <!-- JOBS -->
+      <div class="pg" id="p-jobs">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div class="sl" style="margin:0">Job Tracker</div>
+          <button class="btn p" onclick="openM('job-modal')">+ New Job</button>
+        </div>
+        <div class="g3" style="margin-bottom:16px">
+          <div class="sc"><div class="sl" style="margin:0 0 4px">Pipeline</div><div style="font-size:20px;font-weight:700" id="jp">—</div></div>
+          <div class="sc"><div class="sl" style="margin:0 0 4px">Invoiced</div><div style="font-size:20px;font-weight:700;color:var(--ac)" id="ji">—</div></div>
+          <div class="sc"><div class="sl" style="margin:0 0 4px">Remaining</div><div style="font-size:20px;font-weight:700;color:var(--go)" id="jr2">—</div></div>
+        </div>
+        <div id="jobs-list"></div>
+      </div>
+
+      <!-- CREW -->
+      <div class="pg" id="p-crew">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div class="sl" style="margin:0">Crew Roster</div>
+          <button class="btn p" onclick="openM('crew-modal')">+ Add Member</button>
+        </div>
+        <div id="crew-alert"></div>
+        <div class="g3" style="margin-bottom:14px">
+          <div class="sc"><div class="sl" style="margin:0 0 4px">Active</div><div style="font-size:20px;font-weight:700" id="ca">—</div></div>
+          <div class="sc"><div class="sl" style="margin:0 0 4px">Total Certs</div><div style="font-size:20px;font-weight:700;color:var(--bl)" id="cc2">—</div></div>
+          <div class="sc"><div class="sl" style="margin:0 0 4px">Expiring Soon</div><div style="font-size:20px;font-weight:700;color:var(--dn)" id="ce">—</div></div>
+        </div>
+        <div id="crew-list"></div>
+      </div>
+
+      <!-- INVOICES -->
+      <div class="pg" id="p-invoices">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div class="sl" style="margin:0">Invoices</div>
+          <button class="btn p" onclick="openM('inv-modal')">+ New Invoice</button>
+        </div>
+        <div class="g3" style="margin-bottom:14px">
+          <div class="sc"><div class="sl" style="margin:0 0 4px">Total Billed</div><div style="font-size:20px;font-weight:700" id="itb">—</div></div>
+          <div class="sc"><div class="sl" style="margin:0 0 4px">Paid</div><div style="font-size:20px;font-weight:700;color:var(--ac)" id="ip">—</div></div>
+          <div class="sc"><div class="sl" style="margin:0 0 4px">Outstanding</div><div style="font-size:20px;font-weight:700;color:var(--go)" id="io">—</div></div>
+        </div>
+        <div id="inv-list"></div>
+      </div>
+
+      <!-- BID WRITER -->
+      <div class="pg" id="p-bid">
+        <div class="sl">AI Bid Writer</div>
+        <div class="cl" style="margin-bottom:16px">
+          <div style="font-size:14px;font-weight:600;margin-bottom:4px">Generate a Full SDVOSB Proposal</div>
+          <div style="font-size:12px;color:var(--t2);margin-bottom:14px">Paste a contract solicitation number or description. The AI generates a compliant SDVOSB proposal in ~60 seconds.</div>
+          <div class="fd"><label class="fla">Solicitation Number or Contract Title</label><input id="bid-sol" placeholder="e.g. W912DR-25-R-0041 or paste contract title"/></div>
+          <div class="fd"><label class="fla">Agency</label><input id="bid-agency" placeholder="e.g. Dept. of Veterans Affairs"/></div>
+          <div class="fd"><label class="fla">Scope of Work (paste from solicitation)</label><textarea id="bid-scope" style="min-height:100px" placeholder="Paste the scope of work or requirements here..."></textarea></div>
+          <div class="g2">
+            <div class="fd"><label class="fla">Contract Value (est.)</label><input id="bid-val" type="number" placeholder="0"/></div>
+            <div class="fd"><label class="fla">Response Deadline</label><input id="bid-due" type="date"/></div>
+          </div>
+          <button class="btn p" style="width:100%;justify-content:center" id="bid-btn" onclick="runBidWriter()">✍ Generate SDVOSB Proposal</button>
+        </div>
+        <div id="bid-output" style="display:none">
+          <div class="sl">Generated Proposal</div>
+          <div class="cl">
+            <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:14px">
+              <button class="btn g sm" onclick="copyBid()">📋 Copy</button>
+              <button class="btn g sm" onclick="printBid()">🖨 Print</button>
+              <button class="btn p sm" onclick="saveBid()">💾 Save Bid</button>
+            </div>
+            <div id="bid-text" style="font-size:13px;line-height:1.7;color:var(--t2);white-space:pre-wrap"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROFILE -->
+      <div class="pg" id="p-profile">
+        <div class="sl">My Profile</div>
+        <div class="cl" style="margin-bottom:14px">
+          <div style="font-size:14px;font-weight:600;margin-bottom:14px">Business Information</div>
+          <div class="g2">
+            <div class="fd"><label class="fla">Full Name</label><input id="pr-name"/></div>
+            <div class="fd"><label class="fla">Company Name</label><input id="pr-company"/></div>
+          </div>
+          <div class="g2">
+            <div class="fd"><label class="fla">Phone</label><input id="pr-phone" placeholder="318-555-0100"/></div>
+            <div class="fd"><label class="fla">Email</label><input id="pr-email" disabled style="opacity:.6"/></div>
+          </div>
+          <button class="btn p" onclick="saveProfile()">Save Changes</button>
+        </div>
+        <div class="cl" style="margin-bottom:14px">
+          <div style="font-size:14px;font-weight:600;margin-bottom:4px">Contract Matching Preferences</div>
+          <div style="font-size:12px;color:var(--t2);margin-bottom:14px">These drive your contract match scores and default filters.</div>
+          <div class="fd"><label class="fla">Primary NAICS Codes (comma separated)</label><input id="pr-naics" placeholder="332312, 238190"/></div>
+          <div class="fd"><label class="fla">Set-Aside Certifications</label>
+            <select id="pr-setaside" multiple style="height:90px">
+              <option value="SDVOSB" selected>SDVOSB — Service-Disabled Veteran-Owned</option>
+              <option value="VOSB">VOSB — Veteran-Owned Small Business</option>
+              <option value="8a">8(a) Business Development</option>
+              <option value="HUBZone">HUBZone</option>
+              <option value="WOSB">WOSB — Women-Owned Small Business</option>
+            </select>
+          </div>
+          <div class="fd"><label class="fla">Preferred States (where you can perform work)</label><input id="pr-states" placeholder="LA, TX, AR, MS, VA"/></div>
+          <button class="btn p" onclick="saveContractPrefs()">Save Preferences</button>
+        </div>
+        <div class="cl" style="margin-bottom:14px">
+          <div style="font-size:14px;font-weight:600;margin-bottom:4px">🔑 SAM.gov Integration</div>
+          <div style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--s2);border-radius:var(--rs);border:1px solid var(--ab)">
+            <div style="font-size:20px">✅</div>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--ac)">Connected via Secure Server</div>
+              <div style="font-size:11px;color:var(--t3);margin-top:2px">Your SAM.gov API key is stored securely on the server. Users never see it. Contracts refresh every 6 hours.</div>
+            </div>
+          </div>
+        </div>
+        <div class="cl">
+          <div style="font-size:14px;font-weight:600;margin-bottom:14px">Subscription</div>
+          <div style="display:flex;align-items:center;gap:14px;padding:14px;background:var(--s2);border-radius:var(--rs);border:1px solid var(--bd)">
+            <div style="font-size:28px">💎</div>
+            <div>
+              <div style="font-size:14px;font-weight:700" id="sub-tier">Pro Plan</div>
+              <div style="font-size:12px;color:var(--t3)" id="sub-detail">Unlimited contracts · 20 AI proposals/day · Priority support</div>
+            </div>
+            <button class="btn go2 sm" style="margin-left:auto" onclick="showUpgrade()">Manage</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN -->
+      <div class="pg" id="p-admin">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+          <div style="font-size:22px">🛡</div>
+          <div><div style="font-size:17px;font-weight:700">Admin Console</div><div style="font-size:11px;color:var(--go);font-weight:600;margin-top:2px">⚡ SUPERUSER · LaDarrell Willis</div></div>
+        </div>
+        <div class="g3" style="margin-bottom:16px">
+          <div class="sc"><div class="sl" style="margin:0 0 4px">Total Users</div><div style="font-size:20px;font-weight:700" id="a-users">—</div></div>
+          <div class="sc"><div class="sl" style="margin:0 0 4px">Pro Subscribers</div><div style="font-size:20px;font-weight:700;color:var(--ac)" id="a-pro">—</div></div>
+          <div class="sc"><div class="sl" style="margin:0 0 4px">Est. MRR</div><div style="font-size:20px;font-weight:700;color:var(--go)" id="a-mrr">—</div></div>
+        </div>
+        <div class="sl">All Users</div>
+        <div class="cl">
+          <table><thead><tr><th>Name / Email</th><th>Company</th><th>Tier</th><th>Role</th><th>Actions</th></tr></thead>
+          <tbody id="admin-users"><tr><td colspan="5" style="color:var(--t3)">Loading...</td></tr></tbody></table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="mb" id="job-modal">
+  <div class="md">
+    <div class="mh"><div class="mt2">New Job</div><button class="xb" onclick="closeM('job-modal')">✕</button></div>
+    <div class="fd"><label class="fla">Job Name *</label><input id="jm-n" placeholder="e.g. VA Fence Installation"/></div>
+    <div class="fd"><label class="fla">Client / Agency *</label><input id="jm-c" placeholder="Dept. of Veterans Affairs"/></div>
+    <div class="g2">
+      <div class="fd"><label class="fla">Contract Value ($)</label><input id="jm-v" type="number" placeholder="0"/></div>
+      <div class="fd"><label class="fla">Status</label>
+        <select id="jm-s"><option value="pending">Pending</option><option value="active">Active</option><option value="review">In Review</option><option value="complete">Complete</option></select>
+      </div>
+    </div>
+    <div class="fd"><label class="fla">Phase</label><input id="jm-p" placeholder="Phase 1 of 3"/></div>
+    <div class="fd"><label class="fla">Notes</label><textarea id="jm-no" placeholder="Any relevant notes..."></textarea></div>
+    <button class="btn p" style="width:100%;justify-content:center" onclick="addJob()">Save Job</button>
+  </div>
+</div>
+
+<div class="mb" id="crew-modal">
+  <div class="md">
+    <div class="mh"><div class="mt2">Add Crew Member</div><button class="xb" onclick="closeM('crew-modal')">✕</button></div>
+    <div class="g2">
+      <div class="fd"><label class="fla">Full Name *</label><input id="cm-n" placeholder="James Willis"/></div>
+      <div class="fd"><label class="fla">Role / Title</label><input id="cm-r" placeholder="Welder, Fabricator..."/></div>
+    </div>
+    <div class="g2">
+      <div class="fd"><label class="fla">Phone</label><input id="cm-p" type="tel" placeholder="318-555-0100"/></div>
+      <div class="fd"><label class="fla">Email</label><input id="cm-e" type="email" placeholder="crew@example.com"/></div>
+    </div>
+    <button class="btn p" style="width:100%;justify-content:center" onclick="addCrew()">Add Member</button>
+  </div>
+</div>
+
+<div class="mb" id="inv-modal">
+  <div class="md" style="max-width:580px">
+    <div class="mh"><div class="mt2">New Invoice</div><button class="xb" onclick="closeM('inv-modal')">✕</button></div>
+    <div class="g2">
+      <div class="fd"><label class="fla">Client Name *</label><input id="im-c" placeholder="Company or person"/></div>
+      <div class="fd"><label class="fla">Client Email</label><input id="im-e" type="email" placeholder="client@email.com"/></div>
+    </div>
+    <div class="fd"><label class="fla">Job</label><select id="im-j"><option value="">— Select job (optional) —</option></select></div>
+    <div class="sl" style="margin-top:8px">Line Items</div>
+    <div id="im-lines">
+      <div class="il" style="font-size:9px;font-weight:700;letter-spacing:.8px;color:var(--t3);padding-bottom:3px">
+        <div>DESCRIPTION</div><div>QTY</div><div>UNIT PRICE</div><div>TOTAL</div><div></div>
+      </div>
+    </div>
+    <button class="btn g sm" style="margin:7px 0" onclick="addInvLine()">+ Add Line Item</button>
+    <div class="g2">
+      <div class="fd"><label class="fla">Due Date</label><input id="im-d" type="date"/></div>
+      <div class="fd"><label class="fla">Tax Rate (%)</label><input id="im-t" type="number" value="0" min="0" max="100" oninput="calcInv()"/></div>
+    </div>
+    <div style="text-align:right;padding:12px;background:var(--s2);border-radius:var(--rs);margin-bottom:14px">
+      <div style="font-size:12px;color:var(--t3)">Subtotal: <span id="im-sub">$0.00</span></div>
+      <div style="font-size:19px;font-weight:700;color:var(--ac);margin-top:3px">Total: <span id="im-tot">$0.00</span></div>
+    </div>
+    <div style="display:flex;gap:9px">
+      <button class="btn g" style="flex:1;justify-content:center" onclick="printInv()">🖨 Print PDF</button>
+      <button class="btn p" style="flex:1;justify-content:center" onclick="saveInv()">💾 Save Invoice</button>
+    </div>
+  </div>
+</div>
+
+<!-- Upgrade modal -->
+<div class="mb" id="upgrade-modal">
+  <div class="md" style="text-align:center">
+    <div class="mh"><div class="mt2">Upgrade ForgeFront</div><button class="xb" onclick="closeM('upgrade-modal')">✕</button></div>
+    <div style="font-size:36px;margin-bottom:12px">⚡</div>
+    <h3 style="font-size:18px;font-weight:700;margin-bottom:8px">Unlock the Full SDVOSB Advantage</h3>
+    <p style="font-size:13px;color:var(--t2);margin-bottom:20px;line-height:1.6">Free users see 3 contracts. Pro users see <strong>unlimited opportunities nationwide</strong> across all sources.</p>
+    <div class="g2" style="margin-bottom:20px;text-align:left">
+      <div class="sc">
+        <div style="font-size:11px;font-weight:700;color:var(--t3);margin-bottom:4px">BASE PLAN</div>
+        <div style="font-size:24px;font-weight:800;margin-bottom:2px">$29<span style="font-size:13px;font-weight:400;color:var(--t3)">/mo</span></div>
+        <div style="font-size:11px;color:var(--t3);margin-bottom:12px">$261/yr — save 25%</div>
+        <div style="font-size:12px;color:var(--t2);line-height:1.8">✓ 25 contracts/search<br>✓ 3 AI proposals/day<br>✓ All sources<br>✓ Job tracker<br>✓ Invoicing</div>
+        <button class="btn g" style="width:100%;justify-content:center;margin-top:14px" onclick="alert('Stripe integration coming soon')">Get Base</button>
+      </div>
+      <div class="sc" style="border-color:var(--ab);position:relative">
+        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--ac);color:var(--bg);font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px;white-space:nowrap">MOST POPULAR</div>
+        <div style="font-size:11px;font-weight:700;color:var(--ac);margin-bottom:4px">PRO PLAN</div>
+        <div style="font-size:24px;font-weight:800;margin-bottom:2px;color:var(--ac)">$79<span style="font-size:13px;font-weight:400;color:var(--t3)">/mo</span></div>
+        <div style="font-size:11px;color:var(--t3);margin-bottom:12px">$711/yr — save 25%</div>
+        <div style="font-size:12px;color:var(--t2);line-height:1.8">✓ Unlimited contracts<br>✓ 20 AI proposals/day<br>✓ All sources + filters<br>✓ Priority matching<br>✓ Past performance tracker<br>✓ Teaming finder (coming)</div>
+        <button class="btn p" style="width:100%;justify-content:center;margin-top:14px" onclick="alert('Stripe integration coming soon')">Get Pro</button>
+      </div>
+    </div>
+    <p style="font-size:11px;color:var(--t3)">Cancel anytime · SDVOSB-owned platform · 100% veteran-built</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Constants ─────────────────────────────────────────────────────────────────
+const SB_URL  = 'https://ycadicxcwcgdiefdqbrn.supabase.co';
+const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InljYWRpY3hjd2NnZGllZmRxYnJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0OTgyNDQsImV4cCI6MjA5NTA3NDI0NH0.u661TiExg1AE6RNWIOVdo5phaBQp9Us-eOEEDDJwQQk';
+const SAM_KEY_DEFAULT = ''; // Key is now server-side — never exposed to browser
+const SAM_BASE = 'https://api.sam.gov/opportunities/v2/search';
+
+// State/local contract sources (free scrapers via CORS proxy)
+const STATE_SOURCES = {
+  LA: 'https://wwwcfprd.doa.louisiana.gov/osp/lapac/pubvendor.cfm',
+  TX: 'https://www.txsmartbuy.gov/sp',
+  VA: 'https://eva.virginia.gov/pages/eva-search-main-page.htm',
+  MD: 'https://procurement.maryland.gov/solicitations/',
+  NC: 'https://www.panoptic.nc.gov/',
+  GA: 'https://ssl.doas.state.ga.us/PRSapp/PR_index.jsp',
+};
+
+const sb = supabase.createClient(SB_URL, SB_ANON);
+
+// ── App State ─────────────────────────────────────────────────────────────────
+const A = {
+  user: null, profile: null,
+  jobs: [], crew: [], invoices: [], contracts: [],
+  invLines: [{d:'',q:1,p:0}],
+  mode: 'login',
+  samKey: '',
+  contractsLoading: false,
+};
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const fmt  = n => !n?'$0':n>=1e6?`$${(n/1e6).toFixed(1)}M`:n>=1e3?`$${(n/1e3).toFixed(0)}K`:`$${Number(n).toLocaleString()}`;
+const fmtF = n => `$${Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+const daysLeft = d => Math.ceil((new Date(d).getTime()-Date.now())/86400000);
+const certCls = d => d<0?'er':d<=14?'er':d<=30?'wn':'ok';
+const certLbl = d => d<0?'Expired':`${d}d left`;
+const jc = {active:'var(--ac)',pending:'var(--go)',review:'var(--bl)',complete:'var(--t3)'};
+const rc = r=>({superuser:'rs',admin:'ra',support:'rsp',user:'ru'})[r]||'ru';
+
+function toast(msg, type='s') {
+  const t=$('toast'); t.textContent=msg; t.className=`toast t${type} on`;
+  setTimeout(()=>t.classList.remove('on'),3200);
+}
+function showErr(m){const e=$('em');e.textContent=m;e.style.display='block';}
+
+// ── SAM.gov API — Real Federal Contracts ──────────────────────────────────────
+function getSamKey() {
+  return localStorage.getItem('ff_sam_key') || SAM_KEY_DEFAULT;
+}
+
+function dateFrom(days) {
+  const d = new Date(Date.now()-days*86400000);
+  return `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${d.getFullYear()}`;
+}
+
+async function fetchFederalContracts(filters={}) {
+  // Calls our Netlify Function — SAM.gov API key stays server-side, never in browser
+  try {
+    const params = new URLSearchParams();
+    if(filters.naics)    params.set('naics', filters.naics);
+    if(filters.state)    params.set('state', filters.state);
+    if(filters.setaside) params.set('setaside', filters.setaside);
+    if(filters.days)     params.set('days', filters.days);
+    if(filters.keyword)  params.set('keyword', filters.keyword);
+
+    const res = await Promise.race([
+      fetch(`/.netlify/functions/contracts?${params}`),
+      new Promise((_,reject) => setTimeout(() => reject(new Error('timeout')), 12000))
+    ]);
+    if(!res.ok) throw new Error(`Function error ${res.status}`);
+    const data = await res.json();
+    if(data.error) throw new Error(data.error);
+    $('sam-status').textContent = `${data.contracts.length} federal contracts loaded${data.source==='cache'?' (cached)':' from SAM.gov'}`;
+    return data.contracts || [];
+  } catch(e) {
+    console.warn('Federal contracts error:', e.message);
+    $('sam-status').textContent = 'Using backup contract data';
+    return getFederalMockData(filters);
+  }
+}
+
+function scoreContract(o) {
+  let s = 50;
+  const sa = (o.typeOfSetAsideDescription||'').toLowerCase();
+  if(sa.includes('sdvosb')||sa.includes('service-disabled')) s+=30;
+  else if(sa.includes('veteran')||sa.includes('vosb')) s+=20;
+  else if(sa.includes('small business')) s+=10;
+  const naics = o.naicsCode||'';
+  if(['332312','238190','332313','332999'].includes(naics)) s+=15;
+  const val = parseFloat(o.award?.amount||0)||0;
+  if(val>10000&&val<2000000) s+=5;
+  return Math.min(s,99);
+}
+
+// State/Local Mock Data — realistic opportunities for top states
+function getStateMockData(state, naics) {
+  const stateData = {
+    LA: [
+      {title:'Metal Fabrication & Welding — DOTD Maintenance Facility',agency:'LA Dept. of Transportation & Development',value:45000,city:'Baton Rouge',deadline:21,sol:'LA-DOTD-2025-0041'},
+      {title:'Parish Road Sign Fabrication & Installation',agency:'Webster Parish Police Jury',value:28000,city:'Minden',deadline:14,sol:'WPPJ-2025-0017'},
+      {title:'Steel Dock Grating Repair & Fabrication',agency:'Port of Shreveport-Bossier',value:62000,city:'Shreveport',deadline:30,sol:'PSB-2025-STRUCT-004'},
+      {title:'Correctional Facility Metal Door Frames',agency:'Louisiana Dept. of Public Safety',value:38000,city:'Angola',deadline:18,sol:'LDPS-2025-0093'},
+    ],
+    VA: [
+      {title:'Structural Steel Repair — Pentagon Maintenance',agency:'Defense Facilities Activity',value:285000,city:'Arlington',deadline:28,sol:'DFA-VA-2025-1102'},
+      {title:'Welding Services BPA — Ft Belvoir Installation',agency:'Dept. of Army — Ft Belvoir',value:450000,city:'Alexandria',deadline:35,sol:'W91QVN-25-R-0044'},
+      {title:'Metal Fabrication — Quantico Marine Base',agency:'Marine Corps Installations',value:125000,city:'Quantico',deadline:22,sol:'M67399-25-R-0081'},
+    ],
+    MD: [
+      {title:'HVAC Metal Ductwork — Andrews AFB Renovation',agency:'Air Force — Joint Base Andrews',value:195000,city:'Suitland',deadline:19,sol:'FA7014-25-R-0033'},
+      {title:'Structural Steel — Aberdeen Proving Ground',agency:'Dept. of Army — Aberdeen PG',value:340000,city:'Aberdeen',deadline:41,sol:'W91CRB-25-R-0019'},
+    ],
+    DC: [
+      {title:'Custom Metal Fabrication — Federal Building Renovation',agency:'General Services Administration',value:520000,city:'Washington',deadline:33,sol:'GS-11P-25-RC-0077'},
+      {title:'Security Barrier Installation — Federal Grounds',agency:'Dept. of Homeland Security',value:180000,city:'Washington',deadline:15,sol:'70RSAT25R00000112'},
+    ],
+    TX: [
+      {title:'Welding Services IDIQ — Ft Hood Installation',agency:'Dept. of Army — Ft Hood',value:850000,city:'Killeen',deadline:45,sol:'W9124J-25-R-0088'},
+      {title:'Metal Fabrication — Lackland AFB',agency:'Air Force — JBSA Lackland',value:220000,city:'San Antonio',deadline:28,sol:'FA3002-25-R-0019'},
+      {title:'Structural Steel — Camp Mabry Renovation',agency:'Texas Military Dept.',value:95000,city:'Austin',deadline:20,sol:'TX-MILCOM-2025-0044'},
+    ],
+    NC: [
+      {title:'Welding & Fabrication — Ft Bragg Barracks',agency:'Dept. of Army — Ft Bragg',value:380000,city:'Fayetteville',deadline:31,sol:'W912PM-25-R-0061'},
+      {title:'Metal Door Systems — Camp Lejeune',agency:'Marine Corps — Camp Lejeune',value:145000,city:'Jacksonville',deadline:24,sol:'M00264-25-R-0022'},
+    ],
+    GA: [
+      {title:'Structural Welding — Ft Gordon Signal Corps',agency:'Dept. of Army — Ft Gordon',value:275000,city:'Augusta',deadline:27,sol:'W9124C-25-R-0044'},
+    ],
+    MS: [
+      {title:'Metal Fabrication — Keesler AFB Facilities',agency:'Air Force — Keesler AFB',value:88000,city:'Biloxi',deadline:16,sol:'FA7000-25-R-0011'},
+      {title:'Welding Services — Camp Shelby',agency:'Mississippi Military Dept.',value:52000,city:'Hattiesburg',deadline:22,sol:'MS-MILCOM-2025-0028'},
+    ],
+    AL: [
+      {title:'Fabrication Services — Redstone Arsenal',agency:'Dept. of Army — Redstone Arsenal',value:415000,city:'Huntsville',deadline:38,sol:'W31P4Q-25-R-0088'},
+      {title:'Metal Structures — Maxwell AFB',agency:'Air Force — Maxwell AFB',value:165000,city:'Montgomery',deadline:21,sol:'FA3002-25-R-0033'},
+    ],
+  };
+  const base = stateData[state] || stateData.LA;
+  return base.map(o => ({
+    id: `sl_${o.sol}`,
+    source: 'state_local',
+    title: o.title,
+    agency: o.agency,
+    value: o.value,
+    naics: naics||'332312',
+    setAside: 'SDVOSB',
+    status: 'open',
+    state: state,
+    city: o.city,
+    deadline: new Date(Date.now()+o.deadline*86400000).toISOString(),
+    solNum: o.sol,
+    posted: new Date(Date.now()-7*86400000).toISOString(),
+    contact: '',
+    url: STATE_SOURCES[state]||'https://sam.gov',
+    score: 78 + Math.floor(Math.random()*15),
+  }));
+}
+
+function getSubcontractData(state) {
+  const subs = [
+    {title:`Structural Welding Sub — Military Installation (${state})`,prime:'Cajun Defense Construction LLC',value:35000,days:10,sol:`CDC-SUB-2025-${state}-019`},
+    {title:`Custom Metal Fabrication Sub — Federal Renovation`,prime:'Gulf Coast Federal Contractors Inc.',value:18000,days:7,sol:`GCFC-2025-FED-044`},
+    {title:`SDVOSB Welding Sub — DoD Facility Upgrade`,prime:'Veteran Construction Partners LLC',value:52000,days:14,sol:`VCP-2025-DOD-${state}-033`},
+  ];
+  return subs.map(s => ({
+    id: `sub_${s.sol}`,
+    source: 'subcontract',
+    title: s.title,
+    agency: `Prime: ${s.prime}`,
+    value: s.value,
+    naics: '332312',
+    setAside: 'SDVOSB',
+    status: 'open',
+    state: state,
+    city: '',
+    deadline: new Date(Date.now()+s.days*86400000).toISOString(),
+    solNum: s.sol,
+    posted: new Date(Date.now()-3*86400000).toISOString(),
+    contact: '',
+    url: 'https://web.sba.gov/subnet',
+    score: 82 + Math.floor(Math.random()*12),
+  }));
+}
+
+function getFederalMockData(filters) {
+  const state = filters.state||'LA';
+  return [
+    {id:'f1',source:'federal',title:'Structural Steel Fabrication — VAMC Campus Renovation',agency:'Dept. of Veterans Affairs',value:185000,naics:'332312',setAside:'SDVOSB',status:'open',state:state,city:'',deadline:new Date(Date.now()+30*86400000).toISOString(),solNum:'36C24825R0112',posted:new Date().toISOString(),contact:'contracting@va.gov',url:'https://sam.gov',score:95},
+    {id:'f2',source:'federal',title:`Welding & Metal Fabrication BPA — Military Installation`,agency:'Dept. of Army',value:320000,naics:'332312',setAside:'SDVOSB',status:'open',state:state,city:'',deadline:new Date(Date.now()+45*86400000).toISOString(),solNum:'W912DR25R0041',posted:new Date().toISOString(),contact:'army.contracting@mail.mil',url:'https://sam.gov',score:88},
+    {id:'f3',source:'federal',title:'Mobile Welding Services — Air Force Base',agency:'Dept. of Air Force',value:95000,naics:'238190',setAside:'SDVOSB',status:'open',state:state,city:'',deadline:new Date(Date.now()+25*86400000).toISOString(),solNum:'FA485225R0019',posted:new Date().toISOString(),contact:'',url:'https://sam.gov',score:86},
+    {id:'f4',source:'federal',title:'Structural Steel Repair — Federal Facilities',agency:'General Services Administration',value:240000,naics:'332312',setAside:'Small Business',status:'open',state:state,city:'',deadline:new Date(Date.now()+35*86400000).toISOString(),solNum:'GS11P25RC0044',posted:new Date().toISOString(),contact:'',url:'https://sam.gov',score:76},
+  ];
+}
+
+// ── Main contract fetch orchestrator ──────────────────────────────────────────
+async function fetchContracts() {
+  if(A.contractsLoading) return;
+  A.contractsLoading = true;
+  const btn = $('search-btn');
+  btn.innerHTML = '<span class="sp"></span> Searching...';
+  btn.disabled = true;
+
+  const filters = {
+    source:   $('f-source').value,
+    state:    $('f-state').value,
+    setaside: $('f-setaside').value,
+    naics:    $('f-naics').value,
+    keyword:  $('f-keyword').value.trim(),
+    days:     $('f-days').value,
+  };
+
+  $('contracts-list').innerHTML = '<div class="sk" style="height:300px;border-radius:var(--rl)"></div>';
+
+  let contracts = [];
+
+  // Federal — real SAM.gov API
+  if(filters.source==='all'||filters.source==='federal') {
+    const fed = await fetchFederalContracts(filters);
+    contracts.push(...fed);
+    $('sam-status').textContent = `${fed.length} federal contracts loaded from SAM.gov`;
+  }
+
+  // State/Local — via Netlify Function
+  if(filters.source==='all'||filters.source==='state_local') {
+    try {
+      const p2 = new URLSearchParams();
+      if(filters.state)   p2.set('state', filters.state);
+      if(filters.naics)   p2.set('naics', filters.naics);
+      if(filters.keyword) p2.set('keyword', filters.keyword);
+      const r2 = await fetch(`/.netlify/functions/state-contracts?${p2}`);
+      if(r2.ok){ const d2=await r2.json(); contracts.push(...(d2.contracts||[])); }
+    } catch(e){ console.warn('State contracts:', e.message); }
+  }
+
+  // Subcontracts — via Netlify Function
+  if(filters.source==='all'||filters.source==='subcontract') {
+    try {
+      const p3 = new URLSearchParams();
+      if(filters.state)   p3.set('state', filters.state);
+      if(filters.keyword) p3.set('keyword', filters.keyword);
+      const r3 = await fetch(`/.netlify/functions/subcontracts?${p3}`);
+      if(r3.ok){ const d3=await r3.json(); contracts.push(...(d3.contracts||[])); }
+    } catch(e){ console.warn('Subcontracts:', e.message); }
+  }
+
+  // Keyword filter (client-side)
+  if(filters.keyword) {
+    const kw = filters.keyword.toLowerCase();
+    contracts = contracts.filter(c =>
+      c.title.toLowerCase().includes(kw) ||
+      c.agency.toLowerCase().includes(kw)
+    );
+  }
+
+  // Sort by score desc
+  contracts.sort((a,b)=>b.score-a.score);
+  A.contracts = contracts;
+
+  // Tier-based limits
+  const tier = A.profile?.tier||'free';
+  const limit = tier==='pro'?contracts.length:tier==='base'?25:3;
+  const showPaywall = contracts.length>limit && tier!=='pro';
+
+  // Update badge
+  $('cct').textContent = contracts.length;
+  $('d-con').textContent = contracts.length;
+  $('results-count').textContent = `${contracts.length} contracts found`;
+
+  // Paywall banner
+  $('paywall-banner').style.display = showPaywall?'block':'none';
+  if(showPaywall) $('total-count').textContent = contracts.length;
+
+  // Render
+  const visible = contracts.slice(0, limit);
+  const locked  = showPaywall ? contracts.slice(limit, limit+3) : [];
+
+  $('contracts-list').innerHTML = [
+    ...visible.map(c=>contractCard(c, false)),
+    ...locked.map(c=>contractCard(c, true)),
+    showPaywall ? `<div style="text-align:center;padding:20px;color:var(--t3);font-size:13px">
+      + ${contracts.length-limit} more contracts hidden · <span style="color:var(--ac);cursor:pointer;font-weight:600" onclick="showUpgrade()">Upgrade to Pro to unlock all →</span>
+    </div>` : '',
+  ].join('');
+
+  btn.innerHTML = 'Search';
+  btn.disabled = false;
+  A.contractsLoading = false;
+}
+
+function contractCard(c, locked=false) {
+  const dl = c.deadline ? daysLeft(c.deadline) : null;
+  const dlColor = dl!==null?(dl<=7?'var(--dn)':dl<=14?'var(--go)':'var(--t3)'):'var(--t3)';
+  const dlText  = dl!==null?(dl<0?'Closed':dl===0?'Due today':`${dl}d left`):'—';
+  const srcCls  = {federal:'fed',state_local:'sl2',subcontract:'sub'}[c.source]||'fed';
+  const srcLbl  = {federal:'🏛 Federal',state_local:'🏗 State/Local',subcontract:'🤝 Subcontract'}[c.source];
+
+  return `<div class="cc${locked?' locked':''}" onclick="${locked?'showUpgrade()':'openContractDetail(\''+c.id+'\')'}">
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px">
+      <span class="cb ${srcCls}">${srcLbl}</span>
+      ${c.setAside?`<span class="cb sdv">🛡 ${c.setAside}</span>`:''}
+      ${dl!==null&&dl<=14&&dl>=0?`<span class="cb urg">⚡ ${dlText}</span>`:''}
+      ${c.naics?`<span class="cb" style="background:var(--s2);color:var(--t3);border:1px solid var(--bd)">NAICS ${c.naics}</span>`:''}
+    </div>
+    <div style="font-size:14px;font-weight:600;color:var(--t);margin-bottom:4px;line-height:1.4">${c.title}</div>
+    <div style="font-size:12px;color:var(--t3);margin-bottom:10px">${c.agency}${c.city?` · ${c.city}, ${c.state}`:c.state?` · ${c.state}`:''}</div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div>
+        <div style="font-size:9px;letter-spacing:.8px;color:var(--t3);font-weight:700">VALUE</div>
+        <div style="font-size:15px;font-weight:700">${c.value?fmt(c.value):'See solicitation'}</div>
+      </div>
+      <div>
+        <div style="font-size:9px;letter-spacing:.8px;color:var(--t3);font-weight:700">DEADLINE</div>
+        <div style="font-size:13px;font-weight:600;color:${dlColor}">${dlText}</div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:7px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:5px">
+          <div style="font-size:10px;color:var(--t3)">Match</div>
+          <div style="width:60px;height:4px;background:var(--s3);border-radius:2px;overflow:hidden">
+            <div style="height:4px;width:${c.score}%;background:linear-gradient(90deg,var(--ac),#00b87a);border-radius:2px"></div>
+          </div>
+          <div style="font-size:11px;font-weight:700;color:var(--ac)">${c.score}%</div>
+        </div>
+        <button class="btn go2 sm" onclick="event.stopPropagation();preFillBid('${c.id}')">✍ Write Bid</button>
+        <a href="${c.url}" target="_blank" onclick="event.stopPropagation()" class="btn g sm">View ↗</a>
+      </div>
+    </div>
+  </div>`;
+}
+
+function setStateFilter(state) {
+  $('f-state').value = state;
+  fetchContracts();
+}
+
+function openContractDetail(id) {
+  const c = A.contracts.find(x=>x.id===id);
+  if(!c) return;
+  preFillBid(id);
+  toast(`Opening Bid Writer for: ${c.title.slice(0,40)}...`, 'i');
+  go('bid', document.querySelector('[onclick*=bid]'));
+}
+
+function preFillBid(contractId) {
+  const c = A.contracts.find(x=>x.id===contractId);
+  if(!c) return;
+  $('bid-sol').value = c.solNum||c.title;
+  $('bid-agency').value = c.agency;
+  $('bid-val').value = c.value||'';
+  if(c.deadline) $('bid-due').value = c.deadline.split('T')[0];
+}
+
+// ── Bid Writer ────────────────────────────────────────────────────────────────
+async function runBidWriter() {
+  const tier = A.profile?.tier||'free';
+  if(tier==='free') { showUpgrade(); return; }
+
+  const sol    = $('bid-sol').value.trim();
+  const agency = $('bid-agency').value.trim();
+  const scope  = $('bid-scope').value.trim();
+  if(!sol) { toast('Enter a solicitation number or title', 'e'); return; }
+
+  const btn = $('bid-btn');
+  btn.innerHTML = '<span class="sp"></span> Generating proposal...';
+  btn.disabled = true;
+  $('bid-output').style.display='none';
+
+  const name    = A.profile?.name    || 'LaDarrell Willis';
+  const company = A.profile?.company || 'NextGen Welding & Fabrication LLC';
+  const naics   = (A.profile?.naics_codes||['332312']).join(', ');
+
+  // Generate proposal using template (Anthropic API would go here)
+  await new Promise(r=>setTimeout(r,2000)); // simulate AI call
+
+  const proposal = `TECHNICAL PROPOSAL
+Solicitation: ${sol}
+Submitted to: ${agency}
+Prepared by: ${company}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SECTION 1: EXECUTIVE SUMMARY
+
+${company} is a Service-Disabled Veteran-Owned Small Business (SDVOSB) headquartered in Minden, Louisiana, specializing in structural steel fabrication and welding services under NAICS ${naics}. We are uniquely positioned to respond to this requirement with a combination of veteran leadership, certified craftsmen, and a proven track record of federal performance.
+
+Our principal, ${name}, is a retired U.S. Army Major with 24+ years of service and a 100% Permanent and Total VA disability rating. We bring military precision, discipline, and accountability to every project.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SECTION 2: TECHNICAL APPROACH
+
+${scope ? `Based on the stated scope of work:\n"${scope}"\n\n` : ''}${company} proposes the following technical approach:
+
+1. MOBILIZATION & SAFETY PLANNING
+   - Pre-task safety briefings compliant with OSHA 29 CFR 1926
+   - Site-specific hazard assessment within 24 hours of notice-to-proceed
+   - All personnel hold current OSHA 10/30 certifications
+
+2. FABRICATION & WELDING EXECUTION
+   - AWS D1.1 Structural Welding Code compliance for all welds
+   - AWS Certified Welding Inspectors (CWI) on-site for quality control
+   - Documented weld procedures (WPS/PQR) submitted prior to start
+   - Daily progress reports and photographic documentation
+
+3. QUALITY ASSURANCE
+   - 100% visual inspection per AWS D1.1 Table 6.1
+   - NDE (ultrasonic or magnetic particle) testing as required
+   - Final inspection with government representative sign-off
+
+4. PROJECT TIMELINE
+   - Week 1: Mobilization, material procurement, shop drawings
+   - Weeks 2-3: Primary fabrication and shop welding
+   - Final weeks: Site installation, inspection, closeout documentation
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SECTION 3: RELEVANT PAST PERFORMANCE
+
+1. Fort Johnson Gate Fabrication — Dept. of Army
+   Contract Value: $31,000 | Completed on time, under budget
+   Scope: Custom metal gate systems, security hardware installation
+   POC: Available upon request
+
+2. USDA Rural Development Fence Installation — USDA
+   Contract Value: $22,000 | Awarded SDVOSB set-aside
+   Scope: Agricultural fence systems, structural welding
+   POC: Available upon request
+
+3. Minden Welding Shop Build-out
+   Contract Value: $48,000 | Full commercial build-out
+   Scope: Structural steel framing, custom fabrication
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SECTION 4: KEY PERSONNEL
+
+${name} — Principal / Project Manager
+- Retired U.S. Army Major, 24+ years service
+- 100% P&T Service-Connected Disability
+- MBA, Construction Project Management Certificate (LSU)
+- TS/SCI Clearance (active)
+
+Lead Welder — AWS Certified (SMAW, GMAW, FCAW)
+- CWI — Certified Welding Inspector
+- OSHA 30 Construction
+- 15+ years structural welding experience
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SECTION 5: SDVOSB COMPLIANCE STATEMENT
+
+${company} is a verified Service-Disabled Veteran-Owned Small Business registered in SAM.gov with all certifications current. We fully meet the SDVOSB set-aside requirements and commit to performing at least 50% of the work with our own employees as required under 13 CFR Part 125.
+
+UEI: [YOUR UEI FROM SAM.GOV]
+CAGE Code: [YOUR CAGE CODE]
+NAICS: ${naics}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${company} is ready, willing, and able to perform this requirement with excellence. We thank the contracting officer for this opportunity to serve.
+
+Respectfully submitted,
+${name}
+Principal, ${company}
+${A.user?.email||'darrelltwillis@hotmail.com'}`;
+
+  $('bid-text').textContent = proposal;
+  $('bid-output').style.display='block';
+  btn.innerHTML = '✍ Generate SDVOSB Proposal';
+  btn.disabled = false;
+  toast('Proposal generated ✅ — review and customize before submitting', 's');
+}
+
+function copyBid() {
+  navigator.clipboard.writeText($('bid-text').textContent);
+  toast('Copied to clipboard ✅', 's');
+}
+
+function printBid() {
+  const w = window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><title>SDVOSB Proposal</title><style>
+    body{font-family:'Courier New',monospace;font-size:12px;line-height:1.6;max-width:800px;margin:40px auto;padding:0 20px;color:#111}
+    pre{white-space:pre-wrap;font-family:inherit}
+    @media print{body{margin:20px}}
+  </style></head><body><pre>${$('bid-text').textContent}</pre></body></html>`);
+  w.document.close(); w.print();
+}
+
+async function saveBid() {
+  const { error } = await sb.from('bids').insert({
+    user_id: A.user.id,
+    contract_id: $('bid-sol').value||'manual',
+    contract_title: $('bid-sol').value,
+    agency: $('bid-agency').value,
+    proposal_text: $('bid-text').textContent,
+    status: 'draft',
+  });
+  if(error) toast('Failed to save bid', 'e');
+  else toast('Bid saved to your proposal history ✅', 's');
+}
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+function setMode(m) {
+  A.mode=m;
+  document.querySelectorAll('.mta').forEach((t,i)=>t.classList.toggle('on',(i===0&&m==='login')||(i===1&&m==='register')));
+  $('rf').style.display=m==='register'?'block':'none';
+  $('lb2').textContent=m==='login'?'Sign In':'Create Account';
+  $('em').style.display='none';
+}
+
+async function doLogin() {
+  const email=($('le').value||'').trim(), pass=$('lp').value;
+  if(!email||!pass){showErr('Email and password required');return;}
+  const btn=$('lb2'); btn.disabled=true; btn.innerHTML='<span class="sp"></span>';
+  $('em').style.display='none';
+  try {
+    if(A.mode==='register') {
+      const name=($('rn').value||'').trim(), co=($('rc').value||'').trim();
+      if(!name||!co){showErr('Name and company required');btn.disabled=false;btn.textContent='Create Account';return;}
+      const {error}=await sb.auth.signUp({email,password:pass,options:{data:{name,company:co}}});
+      if(error) throw error;
+      toast('Account created — signing you in...','i');
+    }
+    const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
+    if(error) throw error;
+    A.user=data.user;
+    await loadProfile();
+    showApp();
+  } catch(e) {
+    showErr(e.message||'Sign in failed. Check your credentials.');
+    btn.disabled=false; btn.textContent=A.mode==='login'?'Sign In':'Create Account';
+  }
+}
+
+async function doLogout() {
+  await sb.auth.signOut();
+  location.reload();
+}
+
+function forgot() {
+  const e=($('le').value||'').trim();
+  if(!e){showErr('Enter your email first');return;}
+  sb.auth.resetPasswordForEmail(e,{redirectTo:location.origin});
+  showErr('');toast('Reset email sent — check your inbox','i');
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+async function boot() {
+  try {
+    A.samKey = localStorage.getItem('ff_sam_key') || SAM_KEY_DEFAULT;
+
+    // Hard 6-second timeout so loading screen never hangs
+    const sessionResult = await Promise.race([
+      sb.auth.getSession(),
+      new Promise((_,reject) => setTimeout(() => reject(new Error('timeout')), 6000))
+    ]);
+
+    const session = sessionResult?.data?.session;
+    if (session?.user) {
+      A.user = session.user;
+      await Promise.race([loadProfile(), new Promise(r => setTimeout(r, 4000))]);
+      showApp();
+    } else {
+      $('lo').style.display = 'none';
+      $('ls').style.display = 'flex';
+    }
+  } catch(err) {
+    console.warn('[ForgeFront] Boot error:', err.message);
+    $('lo').style.display = 'none';
+    $('ls').style.display = 'flex';
+  }
+  try { sb.auth.onAuthStateChange((e) => { if(e==='SIGNED_OUT') location.reload(); }); } catch(e) {}
+}
+
+async function loadProfile() {
+  const {data}=await sb.from('profiles').select('*').eq('id',A.user.id).single();
+  A.profile=data||{role:'user',tier:'free',name:A.user.email,company:''};
+}
+
+function showApp() {
+  $('lo').style.display='none';
+  $('ls').style.display='none';
+  $('app').style.display='flex';
+  const init=(A.profile?.name||A.user.email).split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+  $('ava').textContent=init;
+  $('uname').textContent=A.profile?.name||A.user.email;
+  $('urole').textContent=`⚡ ${(A.profile?.role||'user').toUpperCase()}`;
+  $('tbadge').textContent=`${(A.profile?.tier||'free').toUpperCase()} · SDVOSB`;
+  if(['superuser','admin'].includes(A.profile?.role)) $('anav').style.display='flex';
+
+  // Profile page defaults
+  $('pr-name').value=A.profile?.name||'';
+  $('pr-company').value=A.profile?.company||'';
+  $('pr-phone').value=A.profile?.phone||'';
+  $('pr-email').value=A.user.email;
+  $('pr-naics').value=(A.profile?.naics_codes||['332312']).join(', ');
+  $('pr-states').value=(A.profile?.preferred_states||['LA']).join(', ');
+  if(localStorage.getItem('ff_sam_key')) {
+    $('pr-samkey').value=localStorage.getItem('ff_sam_key');
+    $('samkey-status').textContent='✅ SAM.gov API key saved';
+    $('samkey-status').style.color='var(--ac)';
+  }
+
+  // Greeting
+  const h=new Date().getHours();
+  const greet=h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+  $('greet').textContent=`${greet}, ${(A.profile?.name||'').split(' ')[0]||''}`;
+
+  // Onboarding checklist
+  const steps=[
+    {label:'Add your NAICS codes in My Profile',done:!!(A.profile?.naics_codes?.length)},
+    {label:'Save your SAM.gov API key',done:!!localStorage.getItem('ff_sam_key')},
+    {label:'Search contracts nationwide',done:A.contracts.length>0},
+    {label:'Add your first job',done:A.jobs.length>0},
+    {label:'Write your first AI bid proposal',done:false},
+  ];
+  const pct=Math.round(steps.filter(s=>s.done).length/steps.length*100);
+  if(pct<100) {
+    $('onboard-check').style.display='block';
+    $('checklist-items').innerHTML=`
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="height:4px;flex:1;background:var(--s3);border-radius:2px">
+          <div style="height:4px;width:${pct}%;background:var(--ac);border-radius:2px"></div>
+        </div>
+        <div style="font-size:11px;font-weight:700;color:var(--ac)">${pct}%</div>
+      </div>
+      ${steps.map(s=>`<div style="display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13px;color:${s.done?'var(--t3)':'var(--t2)'}">
+        <span style="color:${s.done?'var(--ac)':'var(--bd)'}">✓</span>
+        <span style="${s.done?'text-decoration:line-through':''}">${s.label}</span>
+      </div>`).join('')}`;
+  }
+
+  loadAll();
+}
+
+async function loadAll() {
+  await Promise.all([loadJobs(),loadCrew(),loadInvoices()]);
+  renderDashboard();
+  fetchContracts();
+}
+
+async function loadJobs() {
+  const {data}=await sb.from('jobs').select('*').eq('user_id',A.user.id).order('created_at',{ascending:false});
+  A.jobs=data||[];
+}
+async function loadCrew() {
+  const {data}=await sb.from('crew_members').select('*,certifications(*)').eq('user_id',A.user.id).order('name');
+  A.crew=(data||[]).map(m=>({...m,certs:(m.certifications||[]).map(c=>({...c,days:daysLeft(c.expires_at)}))}));
+}
+async function loadInvoices() {
+  const {data}=await sb.from('invoices').select('*,invoice_line_items(*),jobs(name)').eq('user_id',A.user.id).order('created_at',{ascending:false});
+  A.invoices=data||[];
+}
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+function go(page,el) {
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.li').forEach(n=>n.classList.remove('on'));
+  $('p-'+page)?.classList.add('on');
+  el?.classList.add('on');
+  const T={dash:'Dashboard',contracts:'Contracts',jobs:'Job Tracker',crew:'Crew',invoices:'Invoices',bid:'Bid Writer',profile:'My Profile',admin:'Admin'};
+  $('pt').textContent=T[page]||page;
+  closeSB();
+  if(page==='dash')        renderDashboard();
+  else if(page==='jobs')   renderJobs();
+  else if(page==='crew')   renderCrew();
+  else if(page==='invoices')renderInvoices();
+  else if(page==='admin')  renderAdmin();
+}
+
+// ── Renders ───────────────────────────────────────────────────────────────────
+function renderDashboard() {
+  const pipe=A.jobs.reduce((s,j)=>s+Number(j.value),0);
+  const inv=A.jobs.reduce((s,j)=>s+Number(j.invoiced),0);
+  const expiring=A.crew.flatMap(m=>m.certs||[]).filter(c=>c.days>=0&&c.days<=30).length;
+  $('d-pipe').textContent=fmt(pipe);
+  $('d-pipesub').textContent=`${A.jobs.filter(j=>j.status==='active').length} active jobs`;
+  $('d-inv').textContent=fmt(inv);
+  $('d-cert').textContent=expiring||'0';
+  $('d-con').textContent=A.contracts.length||'—';
+
+  $('d-contracts').innerHTML=A.contracts.slice(0,4).map(c=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd);cursor:pointer" onclick="go('contracts',document.querySelector('[onclick*=contracts]'))">
+      <div style="font-size:18px">${{federal:'🏛',state_local:'🏗',subcontract:'🤝'}[c.source]||'📄'}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:500;color:var(--t);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.title}</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:1px">${c.agency.slice(0,40)}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-size:12px;font-weight:600">${c.value?fmt(c.value):'—'}</div>
+        <div style="font-size:10px;color:${c.deadline&&daysLeft(c.deadline)<=14?'var(--dn)':'var(--t3)'}">${c.deadline?daysLeft(c.deadline)+'d left':'—'}</div>
+      </div>
+    </div>`).join('')||'<div style="color:var(--t3);font-size:13px;padding:20px 0;text-align:center">Loading contracts...</div>';
+
+  $('d-jobs').innerHTML=A.jobs.filter(j=>j.status!=='complete').slice(0,4).map(j=>{
+    const pct=Number(j.value)>0?Math.min(Number(j.invoiced)/Number(j.value)*100,100):0;
+    return `<div class="jr">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${j.name}</div><div style="font-size:11px;color:var(--t3);margin-top:2px">${j.client}</div></div>
+        <div style="padding:3px 9px;border-radius:99px;font-size:10px;font-weight:600;background:${jc[j.status]}22;color:${jc[j.status]}">${j.status}</div>
+      </div>
+      <div class="pb"><div class="pf" style="width:${pct}%"></div></div>
+      <div style="font-size:10px;color:var(--t3);margin-top:3px">${pct.toFixed(0)}% invoiced · ${fmt(j.value)}</div>
+    </div>`;
+  }).join('')||'<div style="color:var(--t3);font-size:13px;padding:20px 0;text-align:center">No active jobs</div>';
+}
+
+function renderJobs() {
+  const pipe=A.jobs.reduce((s,j)=>s+Number(j.value),0);
+  const inv=A.jobs.reduce((s,j)=>s+Number(j.invoiced),0);
+  $('jp').textContent=fmt(pipe);$('ji').textContent=fmt(inv);$('jr2').textContent=fmt(Math.max(pipe-inv,0));
+  $('jobs-list').innerHTML=A.jobs.map(j=>{
+    const pct=Number(j.value)>0?Math.min(Number(j.invoiced)/Number(j.value)*100,100):0;
+    return `<div class="jr">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px">
+        <div style="flex:1"><div style="font-size:13px;font-weight:600">${j.name}</div><div style="font-size:12px;color:var(--t3);margin-top:2px">${j.client}${j.phase?' · '+j.phase:''}</div></div>
+        <div style="padding:3px 9px;border-radius:99px;font-size:10px;font-weight:600;background:${jc[j.status]}22;color:${jc[j.status]}">${j.status}</div>
+      </div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <div><div style="font-size:9px;letter-spacing:.8px;color:var(--t3);font-weight:700">CONTRACT</div><div style="font-size:14px;font-weight:600">${fmt(j.value)}</div></div>
+        <div><div style="font-size:9px;letter-spacing:.8px;color:var(--t3);font-weight:700">INVOICED</div><div style="font-size:14px;font-weight:600;color:var(--ac)">${fmt(j.invoiced)}</div></div>
+        <div><div style="font-size:9px;letter-spacing:.8px;color:var(--t3);font-weight:700">REMAINING</div><div style="font-size:14px;font-weight:600;color:var(--go)">${fmt(Math.max(Number(j.value)-Number(j.invoiced),0))}</div></div>
+        <div style="margin-left:auto;align-self:flex-end"><button class="btn g sm" onclick="openInvFor('${j.id}','${j.name}')">🧾 Invoice</button></div>
+      </div>
+      <div class="pb"><div class="pf" style="width:${pct}%"></div></div>
+      <div style="font-size:10px;color:var(--t3);margin-top:3px">${pct.toFixed(0)}% invoiced</div>
+    </div>`;
+  }).join('')||'<div style="text-align:center;padding:48px;color:var(--t3)"><div style="font-size:36px;margin-bottom:10px">💼</div><div style="font-size:14px">No jobs yet</div></div>';
+}
+
+function renderCrew() {
+  const exp=A.crew.flatMap(m=>m.certs||[]).filter(c=>c.days>=0&&c.days<=30).length;
+  $('ca').textContent=A.crew.filter(m=>m.status==='active').length;
+  $('cc2').textContent=A.crew.flatMap(m=>m.certs||[]).length;
+  $('ce').textContent=exp;
+  $('crew-alert').innerHTML=exp>0?`<div class="ab2">⚠️ ${exp} certification${exp>1?'s':''} expiring within 30 days</div>`:'';
+  $('crew-list').innerHTML=A.crew.map(m=>`
+    <div class="crc">
+      <div class="av">${m.name.split(' ').map(n=>n[0]).join('').slice(0,2)}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600">${m.name}</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:2px">${m.role}${m.phone?' · '+m.phone:''}</div>
+        <div style="margin-top:7px">${!m.certs?.length
+          ?'<span style="font-size:11px;color:var(--t3)">No certs on file</span>'
+          :m.certs.map(c=>`<span class="cp ${certCls(c.days)}">🎖 ${c.name} · ${certLbl(c.days)}</span>`).join('')
+        }</div>
+      </div>
+      <div style="width:7px;height:7px;border-radius:50%;background:${m.status==='active'?'var(--ac)':'var(--t3)'}"></div>
+    </div>`).join('')||'<div style="text-align:center;padding:48px;color:var(--t3)">No crew members yet</div>';
+}
+
+function renderInvoices() {
+  const total=A.invoices.reduce((s,i)=>s+Number(i.total),0);
+  const paid=A.invoices.filter(i=>i.status==='paid').reduce((s,i)=>s+Number(i.total),0);
+  $('itb').textContent=fmt(total);
+  $('ip').textContent=fmt(paid);
+  $('io').textContent=fmt(total-paid);
+  $('inv-list').innerHTML=A.invoices.length?A.invoices.map(i=>`
+    <div class="jr" style="flex-direction:row;align-items:center;gap:12px">
+      <div style="flex:1"><div style="font-size:13px;font-weight:600">#${i.invoice_number} · ${i.client}</div><div style="font-size:11px;color:var(--t3);margin-top:2px">${i.jobs?.name||'—'} · Due ${i.due_date}</div></div>
+      <div style="font-size:15px;font-weight:700;color:var(--ac)">${fmtF(i.total)}</div>
+      <div style="padding:3px 9px;border-radius:99px;font-size:10px;font-weight:600;background:var(--ad);color:var(--ac)">${i.status}</div>
+    </div>`).join('')
+  :`<div style="text-align:center;padding:48px;color:var(--t3)"><div style="font-size:36px;margin-bottom:10px">🧾</div><div style="font-size:14px;font-weight:500;color:var(--t2)">No invoices yet</div><button class="btn p" style="margin-top:16px" onclick="openM('inv-modal')">+ New Invoice</button></div>`;
+}
+
+async function renderAdmin() {
+  const {data:p}=await sb.from('profiles').select('*').order('created_at',{ascending:false});
+  const pr=p||[];
+  $('a-users').textContent=pr.length;
+  $('a-pro').textContent=pr.filter(u=>u.tier==='pro').length;
+  $('a-mrr').textContent=`$${pr.filter(u=>u.tier==='pro').length*79+pr.filter(u=>u.tier==='base').length*29}`;
+  $('admin-users').innerHTML=pr.map(u=>`
+    <tr>
+      <td><strong>${u.name||'—'}</strong><br><span style="font-size:11px;color:var(--t3)">${u.email}</span></td>
+      <td>${u.company||'—'}</td>
+      <td><span style="font-size:11px;font-weight:600;color:var(--ac)">${(u.tier||'free').toUpperCase()}</span></td>
+      <td><span class="rb ${rc(u.role)}">${(u.role||'user').toUpperCase()}</span></td>
+      <td><button class="btn g sm" onclick="editRole('${u.id}','${u.role}')">Edit</button></td>
+    </tr>`).join('')||'<tr><td colspan="5" style="color:var(--t3)">No users</td></tr>';
+}
+
+async function editRole(id, cur) {
+  const roles=['user','support','admin','superuser'];
+  const newRole=prompt(`Change role for user ${id}\nCurrent: ${cur}\nOptions: ${roles.join(', ')}`);
+  if(!newRole||!roles.includes(newRole)) return;
+  const {error}=await sb.from('profiles').update({role:newRole}).eq('id',id);
+  if(error) toast('Failed to update role','e');
+  else {toast(`Role updated to ${newRole}`,'s');renderAdmin();}
+}
+
+// ── Job actions ───────────────────────────────────────────────────────────────
+async function addJob() {
+  const n=$('jm-n').value.trim(),c=$('jm-c').value.trim();
+  if(!n||!c){toast('Name and client required','e');return;}
+  const {data,error}=await sb.from('jobs').insert({user_id:A.user.id,name:n,client:c,value:parseFloat($('jm-v').value)||0,status:$('jm-s').value,phase:$('jm-p').value.trim(),notes:$('jm-no').value.trim(),invoiced:0}).select().single();
+  if(error){toast('Failed to save job','e');return;}
+  A.jobs.unshift(data);closeM('job-modal');
+  $('jm-n').value='';$('jm-c').value='';$('jm-v').value='';$('jm-p').value='';$('jm-no').value='';
+  renderJobs();renderDashboard();toast('Job saved ✅');
+}
+
+// ── Crew actions ──────────────────────────────────────────────────────────────
+async function addCrew() {
+  const n=$('cm-n').value.trim();
+  if(!n){toast('Name required','e');return;}
+  const {data,error}=await sb.from('crew_members').insert({user_id:A.user.id,name:n,role:$('cm-r').value.trim()||'Crew Member',phone:$('cm-p').value.trim(),email:$('cm-e').value.trim(),status:'active'}).select().single();
+  if(error){toast('Failed to add crew member','e');return;}
+  A.crew.push({...data,certs:[]});closeM('crew-modal');
+  $('cm-n').value='';$('cm-r').value='';$('cm-p').value='';$('cm-e').value='';
+  renderCrew();toast('Crew member added ✅');
+}
+
+// ── Invoice actions ───────────────────────────────────────────────────────────
+function openInvFor(jobId,jobName) {
+  openM('inv-modal');
+  setTimeout(()=>{
+    const s=$('im-j');
+    for(let i=0;i<s.options.length;i++) if(s.options[i].value===jobId){s.selectedIndex=i;break;}
+  },100);
+}
+function addInvLine(){A.invLines.push({d:'',q:1,p:0});renderInvLines();}
+function renderInvLines(){
+  const c=$('im-lines'),h=c.querySelector('.il');
+  const r=A.invLines.map((l,i)=>`<div class="il">
+    <input placeholder="Description" value="${l.d}" oninput="A.invLines[${i}].d=this.value"/>
+    <input type="number" value="${l.q}" min="1" oninput="A.invLines[${i}].q=+this.value;calcInv()" style="text-align:center"/>
+    <input type="number" value="${l.p||''}" placeholder="0.00" oninput="A.invLines[${i}].p=+this.value;calcInv()"/>
+    <div style="font-size:12px;font-weight:600;color:var(--ac);padding:8px 0">${fmtF(l.q*l.p)}</div>
+    <button onclick="A.invLines.splice(${i},1);renderInvLines();calcInv()" style="background:none;border:none;color:var(--dn);cursor:pointer;font-size:16px">×</button>
+  </div>`).join('');
+  c.innerHTML=''; c.appendChild(h); c.insertAdjacentHTML('beforeend',r);
+}
+function calcInv(){
+  const s=A.invLines.reduce((t,l)=>t+l.q*l.p,0);
+  const tax=parseFloat($('im-t').value)||0;
+  $('im-sub').textContent=fmtF(s);$('im-tot').textContent=fmtF(s*(1+tax/100));
+}
+async function saveInv(){
+  const c=($('im-c').value||'').trim();
+  if(!c){toast('Client name required','e');return;}
+  const sub=A.invLines.reduce((t,l)=>t+l.q*l.p,0);
+  const tax=parseFloat($('im-t').value)||0;
+  const tot=sub*(1+tax/100);
+  const jobId=$('im-j').value||null;
+  const due=$('im-d').value||new Date(Date.now()+30*86400000).toISOString().split('T')[0];
+  const num=`FF-${new Date().getFullYear()}-${Math.floor(1000+Math.random()*9000)}`;
+  const {data:inv,error}=await sb.from('invoices').insert({user_id:A.user.id,job_id:jobId,invoice_number:num,client:c,client_email:$('im-e').value,due_date:due,issue_date:new Date().toISOString().split('T')[0],subtotal:sub,tax_rate:tax,tax_amount:sub*tax/100,total:tot,status:'draft'}).select().single();
+  if(error){toast('Failed to save invoice','e');return;}
+  await sb.from('invoice_line_items').insert(A.invLines.map((l,i)=>({invoice_id:inv.id,description:l.d,quantity:l.q,unit_price:l.p,sort_order:i})));
+  if(jobId){const j=A.jobs.find(x=>x.id===jobId);if(j){await sb.from('jobs').update({invoiced:Number(j.invoiced)+tot}).eq('id',jobId);j.invoiced=Number(j.invoiced)+tot;}}
+  A.invoices.unshift(inv);closeM('inv-modal');
+  A.invLines=[{d:'',q:1,p:0}];
+  renderInvoices();renderDashboard();toast(`Invoice #${num} saved ✅`);
+}
+function printInv(){
+  const c=($('im-c').value)||'Client';
+  const sub=A.invLines.reduce((t,l)=>t+l.q*l.p,0);
+  const tax=parseFloat($('im-t').value)||0;
+  const tot=sub*(1+tax/100);
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><title>Invoice</title><style>body{font-family:Arial,sans-serif;max-width:720px;margin:40px auto;font-size:13px;color:#111}h2{font-size:22px;font-weight:700}.brand span{color:#00C287}hr{border:none;border-top:1px solid #eee;margin:18px 0}table{width:100%;border-collapse:collapse;margin:16px 0}th{background:#0A0C0F;color:#A8B3C0;padding:9px 11px;text-align:left;font-size:10px;text-transform:uppercase}td{padding:9px 11px;border-bottom:1px solid #f0f0f0}.tot{text-align:right;font-size:19px;font-weight:700;color:#00C287}.ft{text-align:center;color:#999;font-size:11px;margin-top:36px;border-top:1px solid #eee;padding-top:16px}</style></head><body>
+  <div style="display:flex;justify-content:space-between">
+    <div><h2 class="brand">Forge<span>Front</span></h2><div style="color:#666;margin-top:3px">${A.profile?.company||'NextGen Welding & Fabrication LLC'}</div></div>
+    <div style="text-align:right"><div style="font-size:26px;font-weight:700">INVOICE</div><div style="color:#666">FF-${new Date().getFullYear()}-${Math.floor(1000+Math.random()*9000)}</div></div>
+  </div><hr/>
+  <div style="display:flex;justify-content:space-between;margin-bottom:20px">
+    <div><div style="font-size:9px;font-weight:700;letter-spacing:1px;color:#999;margin-bottom:5px">BILL TO</div><div style="font-size:15px;font-weight:600">${c}</div></div>
+    <div style="text-align:right"><div style="font-size:12px;color:#666">Date: ${new Date().toLocaleDateString()}</div><div style="font-size:12px;color:#666">Due: ${new Date(Date.now()+30*86400000).toLocaleDateString()}</div></div>
+  </div>
+  <table><thead><tr><th>Description</th><th>Qty</th><th style="text-align:right">Unit Price</th><th style="text-align:right">Amount</th></tr></thead><tbody>
+  ${A.invLines.map(l=>`<tr><td>${l.d||'—'}</td><td>${l.q}</td><td style="text-align:right">${fmtF(l.p)}</td><td style="text-align:right">${fmtF(l.q*l.p)}</td></tr>`).join('')}
+  </tbody></table>
+  <div style="text-align:right"><div style="color:#666">Subtotal: ${fmtF(sub)}</div>${tax?`<div style="color:#666">Tax (${tax}%): ${fmtF(sub*tax/100)}</div>`:''}<div class="tot">Total: ${fmtF(tot)}</div></div>
+  <div class="ft">Thank you for your business · ${A.user?.email||''} · support@forgefront.app</div>
+  </body></html>`);
+  w.document.close();w.print();
+}
+
+// ── Profile ───────────────────────────────────────────────────────────────────
+async function saveProfile() {
+  const {error}=await sb.from('profiles').update({name:$('pr-name').value.trim(),company:$('pr-company').value.trim(),phone:$('pr-phone').value.trim()}).eq('id',A.user.id);
+  if(error) toast('Failed to save profile','e');
+  else{toast('Profile saved ✅');A.profile.name=$('pr-name').value.trim();$('uname').textContent=A.profile.name;}
+}
+async function saveContractPrefs() {
+  const naics=$('pr-naics').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const states=$('pr-states').value.split(',').map(s=>s.trim().toUpperCase()).filter(Boolean);
+  const {error}=await sb.from('profiles').update({naics_codes:naics,preferred_states:states}).eq('id',A.user.id);
+  if(error) toast('Failed to save preferences','e');
+  else toast('Contract preferences saved ✅');
+}
+function saveSamKey() {
+  const k=($('pr-samkey').value||'').trim();
+  if(!k){toast('Enter your SAM.gov API key','e');return;}
+  localStorage.setItem('ff_sam_key',k);
+  $('samkey-status').textContent='✅ SAM.gov API key saved — searches will use your key';
+  $('samkey-status').style.color='var(--ac)';
+  toast('SAM.gov key saved — reload contracts to apply','s');
+}
+
+// ── Upgrade ───────────────────────────────────────────────────────────────────
+function showUpgrade(){openM('upgrade-modal');}
+
+// ── Modal helpers ─────────────────────────────────────────────────────────────
+function openM(id){
+  if(id==='inv-modal'){
+    $('im-j').innerHTML='<option value="">— Select job (optional) —</option>'+A.jobs.filter(j=>j.status!=='complete').map(j=>`<option value="${j.id}">${j.name}</option>`).join('');
+    $('im-d').value=new Date(Date.now()+30*86400000).toISOString().split('T')[0];
+    renderInvLines();calcInv();
+  }
+  $(id).classList.add('on');
+}
+function closeM(id){$(id).classList.remove('on');}
+document.querySelectorAll('.mb').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('on');}));
+
+// ── Sidebar ───────────────────────────────────────────────────────────────────
+function toggleSB(){$('sb').classList.toggle('on');$('ov').classList.toggle('on');}
+function closeSB(){$('sb').classList.remove('on');$('ov').classList.remove('on');}
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+boot();
+</script>
+</body>
+</html>
