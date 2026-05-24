@@ -1,0 +1,14 @@
+# ─── ForgeFront npm config ────────────────────────────────────────────────────
+# legacy-peer-deps: fallback if any transitive dep has a loose peer constraint
+legacy-peer-deps=false
+
+# omit optional: skip native-only packages (expo-camera, stripe, revenuecat)
+# that are in optionalDependencies and will fail on the Netlify Linux build
+omit=optional
+
+# engine-strict: fail loudly if Node version doesn't match
+engine-strict=false
+
+# fund / audit: suppress noise in CI logs
+fund=false
+audit=false

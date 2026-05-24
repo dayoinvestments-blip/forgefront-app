@@ -1526,43 +1526,6 @@ function runProfileAI() {
   toast('Profile sections filled — review and customize each one');
 }
 
-// ── Extended go() with new pages ──────────────────────
-var _go_orig = go;
-function go(page, el) {
-  document.querySelectorAll('.pg').forEach(function(p){ p.classList.remove('on'); });
-  document.querySelectorAll('.li').forEach(function(n){ n.classList.remove('on'); });
-  var pg = document.getElementById('p-' + page);
-  if(pg) pg.classList.add('on');
-  if(el) el.classList.add('on');
-  var titles = {dash:'Dashboard',contracts:'Contracts',jobs:'Job Tracker',crew:'Crew',
-    invoices:'Invoices',bid:'Bid Writer',profile:'Settings',
-    bizprofile:'Business Profile',watchlist:'Watchlist',admin:'Admin'};
-  var pt = document.getElementById('pt');
-  if(pt) pt.textContent = titles[page] || page;
-  closeSB();
-  if(page === 'dash')        renderDashboard();
-  else if(page === 'jobs')   renderJobs();
-  else if(page === 'crew')   renderCrew();
-  else if(page === 'invoices') renderInvoices();
-  else if(page === 'admin')    renderAdmin();
-  else if(page === 'bizprofile') loadBizProfile();
-  else if(page === 'watchlist')  renderWatchlist();
-}
-
-// ── showApp additions ──────────────────────────────────
-var _showApp_orig = showApp;
-function showApp() {
-  var ld = document.getElementById('landing');
-  if(ld) ld.style.display = 'none';
-  _showApp_orig();
-  updateWatchlistCount();
-  setTimeout(function() {
-    var bp = {};
-    try { bp = JSON.parse(localStorage.getItem('ff_bizprofile') || '{}'); } catch(e) {}
-    var filled = Object.keys(bp).filter(function(k){ return bp[k]; }).length;
-    if(filled < 3) toast('Complete your Business Profile to generate stronger AI proposals', 'i');
-  }, 4000);
-}
 
 // ═══════════════════════════════════════════════════════
 
@@ -1609,6 +1572,8 @@ async function loadProfile() {
 function showApp() {
   $('lo').style.display='none';
   $('ls').style.display='none';
+  const _ld=document.getElementById('landing');
+  if(_ld) _ld.style.display='none';
   $('app').style.display='flex';
   const init=(A.profile?.name||A.user.email).split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
   $('ava').textContent=init;
@@ -1660,6 +1625,7 @@ function showApp() {
   }
 
   loadAll();
+  if(typeof updateWatchlistCount==='function') updateWatchlistCount();
 }
 
 async function loadAll() {
@@ -1685,16 +1651,22 @@ async function loadInvoices() {
 function go(page,el) {
   document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.li').forEach(n=>n.classList.remove('on'));
-  $('p-'+page)?.classList.add('on');
-  el?.classList.add('on');
-  const T={dash:'Dashboard',contracts:'Contracts',jobs:'Job Tracker',crew:'Crew',invoices:'Invoices',bid:'Bid Writer',profile:'My Profile',admin:'Admin'};
-  $('pt').textContent=T[page]||page;
+  const _pg=document.getElementById('p-'+page);
+  if(_pg) _pg.classList.add('on');
+  if(el&&el.classList) el.classList.add('on');
+  const T={dash:'Dashboard',contracts:'Contracts',jobs:'Job Tracker',crew:'Crew',
+    invoices:'Invoices',bid:'Bid Writer',profile:'Settings',
+    bizprofile:'Business Profile',watchlist:'Watchlist',admin:'Admin'};
+  const _pt=document.getElementById('pt');
+  if(_pt) _pt.textContent=T[page]||page;
   closeSB();
-  if(page==='dash')        renderDashboard();
-  else if(page==='jobs')   renderJobs();
-  else if(page==='crew')   renderCrew();
-  else if(page==='invoices')renderInvoices();
-  else if(page==='admin')  renderAdmin();
+  if(page==='dash')          renderDashboard();
+  else if(page==='jobs')     renderJobs();
+  else if(page==='crew')     renderCrew();
+  else if(page==='invoices') renderInvoices();
+  else if(page==='admin')    renderAdmin();
+  else if(page==='bizprofile') { if(typeof loadBizProfile==='function') loadBizProfile(); }
+  else if(page==='watchlist')  { if(typeof renderWatchlist==='function') renderWatchlist(); }
 }
 
 // ── Renders ───────────────────────────────────────────────────────────────────
