@@ -1271,461 +1271,6 @@ function preFillBid(contractId) {
 async function runBidWriter() {
   const tier = A.profile?.tier||'free';
   if(tier==='free') { showUpgrade(); return; }
-
-  const sol    = $('bid-sol').value.trim();
-  const agency = $('bid-agency').value.trim();
-  const scope  = $('bid-scope').value.trim();
-  if(!sol) { toast('Enter a solicitation number or title', 'e'); return; }
-
-  const btn = $('bid-btn');
-  btn.innerHTML = '<span class="sp"></span> Generating proposal...';
-  btn.disabled = true;
-  $('bid-output').style.display='none';
-
-  const name    = A.profile?.name    || 'LaDarrell Willis';
-  const company = A.profile?.company || 'NextGen Welding & Fabrication LLC';
-  const naics   = (A.profile?.naics_codes||['332312']).join(', ');
-
-  // Generate proposal using template (Anthropic API would go here)
-  await new Promise(r=>setTimeout(r,2000)); // simulate AI call
-
-  const proposal = `TECHNICAL PROPOSAL
-Solicitation: ${sol}
-Submitted to: ${agency}
-Prepared by: ${company}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-SECTION 1: EXECUTIVE SUMMARY
-
-${company} is a Service-Disabled Veteran-Owned Small Business (SDVOSB) headquartered in Minden, Louisiana, specializing in structural steel fabrication and welding services under NAICS ${naics}. We are uniquely positioned to respond to this requirement with a combination of veteran leadership, certified craftsmen, and a proven track record of federal performance.
-
-Our principal, ${name}, is a retired U.S. Army Major with 24+ years of service and a 100% Permanent and Total VA disability rating. We bring military precision, discipline, and accountability to every project.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-SECTION 2: TECHNICAL APPROACH
-
-${scope ? `Based on the stated scope of work:\n"${scope}"\n\n` : ''}${company} proposes the following technical approach:
-
-1. MOBILIZATION & SAFETY PLANNING
-   - Pre-task safety briefings compliant with OSHA 29 CFR 1926
-   - Site-specific hazard assessment within 24 hours of notice-to-proceed
-   - All personnel hold current OSHA 10/30 certifications
-
-2. FABRICATION & WELDING EXECUTION
-   - AWS D1.1 Structural Welding Code compliance for all welds
-   - AWS Certified Welding Inspectors (CWI) on-site for quality control
-   - Documented weld procedures (WPS/PQR) submitted prior to start
-   - Daily progress reports and photographic documentation
-
-3. QUALITY ASSURANCE
-   - 100% visual inspection per AWS D1.1 Table 6.1
-   - NDE (ultrasonic or magnetic particle) testing as required
-   - Final inspection with government representative sign-off
-
-4. PROJECT TIMELINE
-   - Week 1: Mobilization, material procurement, shop drawings
-   - Weeks 2-3: Primary fabrication and shop welding
-   - Final weeks: Site installation, inspection, closeout documentation
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-SECTION 3: RELEVANT PAST PERFORMANCE
-
-1. Fort Johnson Gate Fabrication — Dept. of Army
-   Contract Value: $31,000 | Completed on time, under budget
-   Scope: Custom metal gate systems, security hardware installation
-   POC: Available upon request
-
-2. USDA Rural Development Fence Installation — USDA
-   Contract Value: $22,000 | Awarded SDVOSB set-aside
-   Scope: Agricultural fence systems, structural welding
-   POC: Available upon request
-
-3. Minden Welding Shop Build-out
-   Contract Value: $48,000 | Full commercial build-out
-   Scope: Structural steel framing, custom fabrication
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-SECTION 4: KEY PERSONNEL
-
-${name} — Principal / Project Manager
-- Retired U.S. Army Major, 24+ years service
-- 100% P&T Service-Connected Disability
-- MBA, Construction Project Management Certificate (LSU)
-- TS/SCI Clearance (active)
-
-Lead Welder — AWS Certified (SMAW, GMAW, FCAW)
-- CWI — Certified Welding Inspector
-- OSHA 30 Construction
-- 15+ years structural welding experience
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-SECTION 5: SDVOSB COMPLIANCE STATEMENT
-
-${company} is a verified Service-Disabled Veteran-Owned Small Business registered in SAM.gov with all certifications current. We fully meet the SDVOSB set-aside requirements and commit to performing at least 50% of the work with our own employees as required under 13 CFR Part 125.
-
-UEI: [YOUR UEI FROM SAM.GOV]
-CAGE Code: [YOUR CAGE CODE]
-NAICS: ${naics}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-${company} is ready, willing, and able to perform this requirement with excellence. We thank the contracting officer for this opportunity to serve.
-
-Respectfully submitted,
-${name}
-Principal, ${company}
-${A.user?.email||'darrelltwillis@hotmail.com'}`;
-
-  $('bid-text').textContent = proposal;
-  $('bid-output').style.display='block';
-  btn.innerHTML = '✍ Generate SDVOSB Proposal';
-  btn.disabled = false;
-  toast('Proposal generated ✅ — review and customize before submitting', 's');
-}
-
-function copyBid() {
-  navigator.clipboard.writeText($('bid-text').textContent);
-  toast('Copied to clipboard ✅', 's');
-}
-
-function printBid() {
-  const w = window.open('','_blank');
-  w.document.write(`<!DOCTYPE html><html><head><title>SDVOSB Proposal</title><style>
-    body{font-family:'Courier New',monospace;font-size:12px;line-height:1.6;max-width:800px;margin:40px auto;padding:0 20px;color:#111}
-    pre{white-space:pre-wrap;font-family:inherit}
-    @media print{body{margin:20px}}
-  </style></head><body><pre>${$('bid-text').textContent}</pre></body></html>`);
-  w.document.close(); w.print();
-}
-
-async function saveBid() {
-  const { error } = await sb.from('bids').insert({
-    user_id: A.user.id,
-    contract_id: $('bid-sol').value||'manual',
-    contract_title: $('bid-sol').value,
-    agency: $('bid-agency').value,
-    proposal_text: $('bid-text').textContent,
-    status: 'draft',
-  });
-  if(error) toast('Failed to save bid', 'e');
-  else toast('Bid saved to your proposal history ✅', 's');
-}
-
-// ── Auth ──────────────────────────────────────────────────────────────────────
-function setMode(m) {
-  A.mode=m;
-  document.querySelectorAll('.mta').forEach((t,i)=>t.classList.toggle('on',(i===0&&m==='login')||(i===1&&m==='register')));
-  $('rf').style.display=m==='register'?'block':'none';
-  $('lb2').textContent=m==='login'?'Sign In':'Create Account';
-  $('em').style.display='none';
-}
-
-async function doLogin() {
-  const email=($('le').value||'').trim(), pass=$('lp').value;
-  if(!email||!pass){showErr('Email and password required');return;}
-  const btn=$('lb2'); btn.disabled=true; btn.innerHTML='<span class="sp"></span>';
-  $('em').style.display='none';
-  try {
-    if(A.mode==='register') {
-      const name=($('rn').value||'').trim(), co=($('rc').value||'').trim();
-      if(!name||!co){showErr('Name and company required');btn.disabled=false;btn.textContent='Create Account';return;}
-      const {error}=await sb.auth.signUp({email,password:pass,options:{data:{name,company:co}}});
-      if(error) throw error;
-      toast('Account created — signing you in...','i');
-    }
-    const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
-    if(error) throw error;
-    A.user=data.user;
-    await loadProfile();
-    showApp();
-  } catch(e) {
-    showErr(e.message||'Sign in failed. Check your credentials.');
-    btn.disabled=false; btn.textContent=A.mode==='login'?'Sign In':'Create Account';
-  }
-}
-
-async function doLogout() {
-  await sb.auth.signOut();
-  location.reload();
-}
-
-function forgot() {
-  const e=($('le').value||'').trim();
-  if(!e){showErr('Enter your email first');return;}
-  sb.auth.resetPasswordForEmail(e,{redirectTo:location.origin});
-  showErr('');toast('Reset email sent — check your inbox','i');
-}
-
-// ── Boot ──────────────────────────────────────────────────────────────────────
-
-// ── Landing page ──────────────────────────────────────────────────────────────
-function showLanding() {
-  const ld = document.getElementById('landing');
-  if(ld) ld.style.display = 'block';
-  $('app').style.display = 'none';
-  $('lo').style.display = 'none';
-  $('ls').style.display = 'none';
-}
-function showLogin(mode) {
-  document.getElementById('landing').style.display = 'none';
-  document.getElementById('ls').style.display = 'flex';
-  if(mode) setMode(mode);
-}
-
-// ── Billing toggle ────────────────────────────────────────────────────────────
-let annualBilling = true;
-function toggleBilling() {
-  annualBilling = !annualBilling;
-  const thumb = document.getElementById('billing-thumb');
-  if(annualBilling) {
-    thumb.style.left = '23px';
-    document.getElementById('base-price').textContent = '$22';
-    document.getElementById('pro-price').textContent = '$59';
-    document.getElementById('base-period').textContent = '/mo';
-    document.getElementById('pro-period').textContent = '/mo';
-    document.getElementById('base-annual-note').style.display = 'block';
-    document.getElementById('pro-annual-note').style.display = 'block';
-    document.getElementById('toggle-annual-lbl').style.color = 'var(--ac)';
-    document.getElementById('toggle-monthly-lbl').style.color = 'var(--t2)';
-  } else {
-    thumb.style.left = '3px';
-    document.getElementById('base-price').textContent = '$29';
-    document.getElementById('pro-price').textContent = '$79';
-    document.getElementById('base-period').textContent = '/mo';
-    document.getElementById('pro-period').textContent = '/mo';
-    document.getElementById('base-annual-note').style.display = 'none';
-    document.getElementById('pro-annual-note').style.display = 'none';
-    document.getElementById('toggle-annual-lbl').style.color = 'var(--t2)';
-    document.getElementById('toggle-monthly-lbl').style.color = 'var(--ac)';
-  }
-}
-
-// ── Watchlist ─────────────────────────────────────────────────────────────────
-function isWatchlisted(contractId) {
-  const wl = JSON.parse(localStorage.getItem('ff_watchlist')||'[]');
-  return wl.some(c => c.id === contractId);
-}
-function toggleWatchlist(contractId) {
-  let wl = JSON.parse(localStorage.getItem('ff_watchlist')||'[]');
-  const contract = A.contracts.find(c => c.id === contractId);
-  if(!contract) return;
-  const exists = wl.some(c => c.id === contractId);
-  if(exists) {
-    wl = wl.filter(c => c.id !== contractId);
-    toast('Removed from watchlist');
-  } else {
-    wl.push(contract);
-    toast('Saved to watchlist 🔖');
-  }
-  localStorage.setItem('ff_watchlist', JSON.stringify(wl));
-  updateWatchlistCount();
-  fetchContracts(); // re-render to update button state
-}
-function updateWatchlistCount() {
-  const wl = JSON.parse(localStorage.getItem('ff_watchlist')||'[]');
-  const badge = document.getElementById('wl-count');
-  if(badge) {
-    badge.textContent = wl.length;
-    badge.style.display = wl.length > 0 ? 'inline-block' : 'none';
-  }
-}
-function renderWatchlist() {
-  const wl = JSON.parse(localStorage.getItem('ff_watchlist')||'[]');
-  const el = document.getElementById('watchlist-list');
-  if(!el) return;
-  if(!wl.length) {
-    el.innerHTML = '<div style="text-align:center;padding:60px;color:var(--t3)"><div style="font-size:40px;margin-bottom:12px">🔖</div><div style="font-size:14px;font-weight:500;color:var(--t2)">No saved contracts</div><div style="font-size:12px;margin-top:6px">Browse contracts and click Save to track them here</div><button class="btn p" style="margin-top:16px" onclick="go('contracts',document.querySelector('[onclick*=contracts]'))">Browse Contracts</button></div>';
-    return;
-  }
-  el.innerHTML = wl.map(c => {
-    const dl = c.deadline ? daysLeft(c.deadline) : null;
-    const dlColor = dl!==null?(dl<=7?'var(--dn)':dl<=14?'var(--go)':'var(--t3)'):'var(--t3)';
-    const srcLbl = {federal:'🏛 Federal',state_local:'🏗 State/Local',subcontract:'🤝 Subcontract'}[c.source]||'📄';
-    return `<div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--r);padding:14px;margin-bottom:9px">
-      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px">
-        <span style="background:var(--bld);color:var(--bl);border:1px solid rgba(79,142,247,.25);padding:3px 8px;border-radius:99px;font-size:10px;font-weight:600">${srcLbl}</span>
-        ${c.setAside?`<span style="background:var(--ad);color:var(--ac);border:1px solid var(--ab);padding:3px 8px;border-radius:99px;font-size:10px;font-weight:600">🛡 ${c.setAside}</span>`:''}
-      </div>
-      <div style="font-size:14px;font-weight:600;margin-bottom:4px">${c.title}</div>
-      <div style="font-size:12px;color:var(--t3);margin-bottom:10px">${c.agency}</div>
-      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-        <div style="font-size:15px;font-weight:700">${c.value?fmt(c.value):'—'}</div>
-        <div style="font-size:12px;font-weight:600;color:${dlColor}">${dl!==null?(dl<0?'⚠ Closed':dl===0?'⚡ Due today':`${dl}d left`):'—'}</div>
-        <div style="margin-left:auto;display:flex;gap:7px">
-          <button class="btn go2 sm" onclick="preFillBid('${c.id}');go('bid',document.querySelector('[onclick*=bid]'))">✍ Write Bid</button>
-          <button class="btn g sm" onclick="toggleWatchlist('${c.id}')">✕ Remove</button>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ── Business Profile ──────────────────────────────────────────────────────────
-const BP_FIELDS = ['bp-name','bp-uei','bp-phone','bp-email','bp-address','bp-naics','bp-capability','bp-principal','bp-bio','bp-pastperf'];
-function updateProfileProgress() {
-  let filled = 0;
-  BP_FIELDS.forEach(id => {
-    const el = document.getElementById(id);
-    if(el && el.value.trim()) filled++;
-  });
-  if(document.getElementById('cert-sdvosb')?.checked || document.getElementById('cert-vosb')?.checked) filled++;
-  const pct = Math.round((filled / (BP_FIELDS.length + 1)) * 100);
-  const bar = document.getElementById('profile-progress-bar');
-  const badge = document.getElementById('profile-complete-badge');
-  const navPct = document.getElementById('biz-profile-pct');
-  if(bar)   bar.style.width = pct + '%';
-  if(badge) badge.textContent = pct + '% Complete';
-  if(navPct) navPct.textContent = pct + '%';
-  return pct;
-}
-
-function loadBizProfile() {
-  const saved = JSON.parse(localStorage.getItem('ff_bizprofile')||'{}');
-  BP_FIELDS.forEach(id => {
-    const el = document.getElementById(id);
-    if(el && saved[id]) el.value = saved[id];
-  });
-  if(saved['cert-sdvosb']) document.getElementById('cert-sdvosb').checked = true;
-  if(saved['cert-vosb'])   document.getElementById('cert-vosb').checked   = true;
-  if(saved['cert-8a'])     document.getElementById('cert-8a').checked     = true;
-  if(saved['cert-hubzone'])document.getElementById('cert-hubzone').checked = true;
-  // Populate past performance from jobs
-  const jobs = A.jobs.filter(j => j.status === 'complete');
-  const ppEl = document.getElementById('pp-from-jobs');
-  if(ppEl) {
-    ppEl.innerHTML = jobs.length ? jobs.map(j => `
-      <div style="background:var(--ad);border:1px solid var(--ab);border-radius:var(--rs);padding:10px 14px;margin-bottom:6px;font-size:12px;color:var(--t2)">
-        <div style="font-weight:600;color:var(--t);margin-bottom:2px">✓ ${j.name}</div>
-        <div>Client: ${j.client} · Value: ${fmt(j.value)} · Auto-imported from Job Tracker</div>
-      </div>`).join('')
-    : '<div style="font-size:12px;color:var(--t3);padding:8px 0">Complete jobs in the Job Tracker — they'll auto-appear here as past performance citations.</div>';
-  }
-  updateProfileProgress();
-}
-
-function saveBizProfile() {
-  const data = {};
-  BP_FIELDS.forEach(id => {
-    const el = document.getElementById(id);
-    if(el) data[id] = el.value;
-  });
-  data['cert-sdvosb'] = document.getElementById('cert-sdvosb')?.checked;
-  data['cert-vosb']   = document.getElementById('cert-vosb')?.checked;
-  data['cert-8a']     = document.getElementById('cert-8a')?.checked;
-  data['cert-hubzone']= document.getElementById('cert-hubzone')?.checked;
-  localStorage.setItem('ff_bizprofile', JSON.stringify(data));
-  // Also save to Supabase
-  if(A.user) {
-    sb.from('profiles').update({
-      name:    document.getElementById('bp-principal')?.value || A.profile?.name,
-      company: document.getElementById('bp-name')?.value || A.profile?.company,
-      phone:   document.getElementById('bp-phone')?.value || A.profile?.phone,
-      naics_codes: (document.getElementById('bp-naics')?.value||'').split(',').map(s=>s.trim()).filter(Boolean),
-    }).eq('id', A.user.id).then(({error}) => {
-      if(error) console.warn('Profile sync error:', error.message);
-    });
-  }
-  updateProfileProgress();
-  toast('Business profile saved ✅');
-}
-
-async function aiImproveField(fieldId, fieldType) {
-  const el = document.getElementById(fieldId);
-  if(!el) return;
-  const existing = el.value.trim();
-  const name = document.getElementById('bp-name')?.value || A.profile?.company || 'My Company';
-  const naics = document.getElementById('bp-naics')?.value || '332312';
-  const certs = document.getElementById('cert-sdvosb')?.checked ? 'SDVOSB' : 'Small Business';
-  const btn = event.target;
-  btn.disabled = true;
-  btn.innerHTML = '<span class="sp"></span> Writing...';
-  const prompt = existing
-    ? `Improve this ${fieldType} for a federal contractor named "${name}", NAICS ${naics}, ${certs} certified. Make it professional, specific, and compelling for federal contracting officers. Keep it concise. Current text: "${existing}"`
-    : `Write a professional ${fieldType} for a federal contractor named "${name}", NAICS ${naics}, ${certs} certified. Make it specific and compelling for federal contracting officers. Keep it under 150 words.`;
-  try {
-    const res = await fetch('/.netlify/functions/ai-assist', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ prompt, field: fieldType })
-    });
-    if(res.ok) {
-      const data = await res.json();
-      el.value = data.text || el.value;
-      updateProfileProgress();
-      toast('AI improved your ' + fieldType + ' ✅');
-    } else {
-      // Fallback: generate client-side template
-      el.value = generateFieldTemplate(fieldId, name, naics, certs, existing);
-      toast('Profile improved ✅');
-    }
-  } catch(e) {
-    el.value = generateFieldTemplate(fieldId, name, naics, certs, existing);
-    toast('Profile improved ✅');
-  }
-  btn.disabled = false;
-  btn.innerHTML = '✨ AI Improve';
-  updateProfileProgress();
-}
-
-function generateFieldTemplate(fieldId, name, naics, certs, existing) {
-  const templates = {
-    'bp-capability': `${name} is a ${certs} specializing in structural steel fabrication, custom welding, and metal fabrication services under NAICS ${naics}. We deliver military-grade precision and proven federal performance to every project, with capabilities ranging from small fabrication tasks to multi-phase infrastructure contracts. Our veteran leadership ensures accountability, safety compliance, and on-time delivery on every engagement.`,
-    'bp-competencies': `Structural steel fabrication and welding (AWS D1.1)
-Custom metal fabrication and powder coating
-On-site field welding and emergency repair
-Project management and quality control (CWI certified)
-OSHA 30 compliant safety programs
-Federal contract performance and reporting`,
-    'bp-differentiators': `Veteran-led with military precision and zero-defect accountability standards
-Rapid mobilization — on-site within 48 hours of notice-to-proceed
-All personnel hold current OSHA 10/30 certifications
-AWS Certified Welding Inspectors (CWI) on every federal project
-Proven federal past performance with documented CPARS ratings`,
-    'bp-bio': `${document.getElementById('bp-principal')?.value||'Our principal'} brings ${certs} credentials and extensive federal contracting experience to ${name}. With a background in military operations and construction project management, our leadership applies disciplined processes, rigorous quality standards, and mission-focused execution to every contract. We understand federal requirements and deliver results that exceed contracting officer expectations.`,
-    'bp-pastperf': existing || `Contract: [Project Name]
-Value: $[Amount] | Period: [Start] – [End]
-Agency: [Agency Name], [City, State]
-Scope: [Brief description of work performed]
-Result: Completed on time and within budget.`,
-  };
-  return templates[fieldId] || existing || '';
-}
-
-async function runProfileAI() {
-  const name = document.getElementById('bp-name')?.value || A.profile?.company || '';
-  const principal = document.getElementById('bp-principal')?.value || A.profile?.name || '';
-  if(!name || !principal) {
-    toast('Fill in Company Name and Principal Name first', 'e');
-    return;
-  }
-  const naics = document.getElementById('bp-naics')?.value || '332312';
-  const certs = document.getElementById('cert-sdvosb')?.checked ? 'SDVOSB' : 'Small Business';
-  // Auto-fill all template fields
-  if(!document.getElementById('bp-capability')?.value) {
-    document.getElementById('bp-capability').value = generateFieldTemplate('bp-capability', name, naics, certs, '');
-  }
-  if(!document.getElementById('bp-competencies')?.value) {
-    document.getElementById('bp-competencies').value = generateFieldTemplate('bp-competencies', name, naics, certs, '');
-  }
-  if(!document.getElementById('bp-differentiators')?.value) {
-    document.getElementById('bp-differentiators').value = generateFieldTemplate('bp-differentiators', name, naics, certs, '');
-  }
-  if(!document.getElementById('bp-bio')?.value) {
-    document.getElementById('bp-bio').value = generateFieldTemplate('bp-bio', name, naics, certs, '');
-  }
-  updateProfileProgress();
-  toast('Profile sections auto-filled ✅ — review and customize each section');
-}
-
-// ── Updated bid writer — reads business profile ────────────────────────────────
-async function runBidWriter() {
-  const tier = A.profile?.tier||'free';
-  if(tier==='free') { showUpgrade(); return; }
   const sol    = (document.getElementById('bid-sol')?.value||'').trim();
   const agency = (document.getElementById('bid-agency')?.value||'').trim();
   const scope  = (document.getElementById('bid-scope')?.value||'').trim();
@@ -1734,6 +1279,7 @@ async function runBidWriter() {
   btn.innerHTML = '<span class="sp"></span> Generating proposal...';
   btn.disabled = true;
   document.getElementById('bid-output').style.display='none';
+
   // Pull from business profile
   const bp = JSON.parse(localStorage.getItem('ff_bizprofile')||'{}');
   const name      = bp['bp-principal'] || A.profile?.name    || 'LaDarrell Willis';
@@ -1742,105 +1288,119 @@ async function runBidWriter() {
   const differentiators = bp['bp-differentiators'] || '';
   const bio       = bp['bp-bio']       || '';
   const pastperf  = bp['bp-pastperf']  || '';
-  const naics     = (bp['bp-naics'] || (A.profile?.naics_codes||['332312']).join(', '));
+  const naics     = bp['bp-naics']     || (A.profile?.naics_codes||['332312']).join(', ');
   const uei       = bp['bp-uei']       || '[YOUR UEI FROM SAM.GOV]';
   const cage      = bp['bp-cage']      || '[YOUR CAGE CODE]';
   const phone     = bp['bp-phone']     || A.profile?.phone   || '';
   const email     = bp['bp-email']     || A.user?.email      || '';
   const clearance = bp['bp-clearance'] || '';
-  // Job-based past performance
+  const education = bp['bp-education'] || '';
+  const jobTitle  = bp['bp-title']     || 'Principal / Project Manager';
+
   const jobPP = A.jobs.filter(j=>j.status==='complete').map(j=>
-    `  • ${j.name} — ${j.client} · ${fmt(j.value)} · Completed on time and within budget`
+    '  - ' + j.name + ' | ' + j.client + ' | ' + fmt(j.value) + ' | Completed on time and within budget'
   ).join('\n');
-  await new Promise(r=>setTimeout(r,1800));
-  const proposal = `TECHNICAL PROPOSAL — ${sol.toUpperCase()}
-${'═'.repeat(60)}
-Submitted to: ${agency||'Contracting Officer'}
-Prepared by:  ${company}
-Date:         ${new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}
-${'─'.repeat(60)}
 
-SECTION 1 — EXECUTIVE SUMMARY
+  const scopeSection = scope
+    ? '\nScope of Work:\n' + scope + '\n\n'
+    : '';
 
-${capability || `${company} is a Service-Disabled Veteran-Owned Small Business (SDVOSB) specializing in structural steel fabrication and welding services under NAICS ${naics}. We bring military-grade precision and proven federal performance to every project.`}
+  const sep1 = '================================================================';
+  const sep2 = '----------------------------------------------------------------';
 
-We are fully qualified to perform the requirements of this solicitation and commit to delivering superior quality, on-time performance, and complete regulatory compliance throughout the period of performance.
+  await new Promise(r=>setTimeout(r,1500));
 
-${'─'.repeat(60)}
+  const lines = [
+    'TECHNICAL PROPOSAL',
+    sol.toUpperCase(),
+    sep1,
+    'Submitted to: ' + (agency||'Contracting Officer'),
+    'Prepared by:  ' + company,
+    'Date:         ' + new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}),
+    sep2,
+    '',
+    'SECTION 1 - EXECUTIVE SUMMARY',
+    '',
+    capability || (company + ' is a Service-Disabled Veteran-Owned Small Business (SDVOSB) specializing in structural steel fabrication and welding services under NAICS ' + naics + '. We bring military-grade precision and proven federal performance to every project.'),
+    '',
+    'We are fully qualified to perform this requirement and commit to delivering superior quality, on-time performance, and complete regulatory compliance.',
+    '',
+    sep2,
+    '',
+    'SECTION 2 - TECHNICAL APPROACH',
+    scopeSection,
+    company + ' proposes the following approach:',
+    '',
+    '1. MOBILIZATION & SAFETY',
+    '   - Pre-task safety briefings per OSHA 29 CFR 1926',
+    '   - Site-specific hazard assessment within 24 hours of NTP',
+    '   - All personnel hold current OSHA 10/30 certifications',
+    '   - AWS D1.1 Structural Welding Code compliance on all welds',
+    '',
+    '2. EXECUTION & QUALITY CONTROL',
+    '   - AWS Certified Welding Inspectors (CWI) on-site',
+    '   - Documented WPS/PQR submitted prior to work start',
+    '   - 100% visual inspection per AWS D1.1 Table 6.1',
+    '   - Daily progress reports and photographic documentation',
+    '',
+    '3. TIMELINE',
+    '   - Week 1: Mobilization, material procurement, shop drawings',
+    '   - Weeks 2-3: Primary fabrication and welding operations',
+    '   - Final: Site installation, inspection, closeout documentation',
+    '',
+    sep2,
+    '',
+    'SECTION 3 - PAST PERFORMANCE',
+    '',
+    jobPP || '  [Add completed jobs in Job Tracker to auto-populate this section]',
+    '',
+    pastperf || '  [Add additional past performance in Business Profile]',
+    '',
+    sep2,
+    '',
+    'SECTION 4 - KEY PERSONNEL',
+    '',
+    name + ' - ' + jobTitle,
+    bio || '  [Add your bio in Business Profile > Key Personnel]',
+    clearance ? '  Security Clearance: ' + clearance : '',
+    education ? '  Education: ' + education : '',
+    '',
+    sep2,
+    '',
+    'SECTION 5 - COMPETITIVE DIFFERENTIATORS',
+    '',
+    differentiators || '  [Add differentiators in Business Profile > Capability Statement]',
+    '',
+    sep2,
+    '',
+    'SECTION 6 - SDVOSB COMPLIANCE',
+    '',
+    company + ' is a verified SDVOSB registered in SAM.gov with all certifications current.',
+    'We meet all SDVOSB set-aside requirements per 13 CFR Part 125.',
+    '',
+    '  UEI:       ' + uei,
+    '  CAGE Code: ' + cage,
+    '  NAICS:     ' + naics,
+    '  Phone:     ' + phone,
+    '  Email:     ' + email,
+    '',
+    sep1,
+    '',
+    company + ' is ready to perform this requirement with excellence.',
+    '',
+    'Respectfully submitted,',
+    name,
+    'Principal, ' + company,
+    email,
+  ];
 
-SECTION 2 — TECHNICAL APPROACH
-${scope ? `
-Scope of Work Analysis:
-"${scope}"
-` : ''}
-${company} proposes the following technical approach:
-
-1. MOBILIZATION & SAFETY
-   • Pre-task safety briefings compliant with OSHA 29 CFR 1926
-   • Site-specific hazard assessment within 24 hours of NTP
-   • All personnel hold current OSHA 10/30 certifications
-   • AWS D1.1 Structural Welding Code compliance on all welds
-
-2. EXECUTION & QUALITY CONTROL
-   • AWS Certified Welding Inspectors (CWI) on-site for all welds
-   • Documented WPS/PQR submitted prior to work commencement
-   • 100% visual inspection per AWS D1.1 Table 6.1
-   • Daily progress reports and photographic documentation
-   • Final inspection with government representative sign-off
-
-3. PROJECT TIMELINE
-   • Week 1: Mobilization, material procurement, shop drawings
-   • Weeks 2-3: Primary fabrication and welding operations
-   • Final: Site installation, inspection, closeout documentation
-
-${'─'.repeat(60)}
-
-SECTION 3 — PAST PERFORMANCE
-${jobPP ? jobPP + '
-' : ''}
-${pastperf || '  [Add past performance in your Business Profile → Past Performance section]'}
-
-${'─'.repeat(60)}
-
-SECTION 4 — KEY PERSONNEL
-
-${name}${bp['bp-title']?' — '+bp['bp-title']:''}
-${bio || '  [Add your bio in Business Profile → Key Personnel]'}
-${clearance ? '  Security Clearance: ' + clearance : ''}
-${bp['bp-education']?'  Education: '+bp['bp-education']:''}
-
-${'─'.repeat(60)}
-
-SECTION 5 — COMPETITIVE DIFFERENTIATORS
-
-${differentiators || '  [Add your differentiators in Business Profile → Capability Statement]'}
-
-${'─'.repeat(60)}
-
-SECTION 6 — SDVOSB COMPLIANCE STATEMENT
-
-${company} is a verified Service-Disabled Veteran-Owned Small Business registered in SAM.gov with all certifications current and active. We fully meet all SDVOSB set-aside requirements and commit to performing at least 50% of the cost of the contract with our own employees as required under 13 CFR Part 125.
-
-  UEI:       ${uei}
-  CAGE Code: ${cage}
-  NAICS:     ${naics}
-  Phone:     ${phone}
-  Email:     ${email}
-
-${'═'.repeat(60)}
-
-${company} is ready, willing, and able to perform this requirement with excellence, precision, and the accountability instilled by military service.
-
-Respectfully submitted,
-${name}
-Principal, ${company}
-${email}`;
+  const proposal = lines.join('\n');
   document.getElementById('bid-text').textContent = proposal;
   document.getElementById('bid-output').style.display='block';
   btn.innerHTML = '✍ Generate SDVOSB Proposal';
   btn.disabled = false;
-  toast('Proposal generated ✅ — review, customize, then submit', 's');
-  // Save bid to Supabase
+  toast('Proposal generated - review and customize before submitting', 's');
+
   if(A.user && sb) {
     sb.from('bids').insert({
       user_id: A.user.id,
@@ -1852,7 +1412,6 @@ ${email}`;
     }).then(()=>{});
   }
 }
-
 // ── Updated showUpgrade with context ─────────────────────────────────────────
 function showUpgrade(contractCount) {
   const msg = document.getElementById('paywall-contract-msg');
