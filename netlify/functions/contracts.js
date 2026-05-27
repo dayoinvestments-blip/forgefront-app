@@ -9,8 +9,8 @@
  *   fetch('/.netlify/functions/contracts?naics=332312&state=LA&setaside=SDVOSBC')
  */
 
-const SUPABASE_URL      = process.env.SUPABASE_URL;
-const SUPABASE_KEY      = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const SUPABASE_URL      = 'https://ycadicxcwcgdiefdqbrn.supabase.co';
+const SUPABASE_KEY      = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InljYWRpY3hjd2NnZGllZmRxYnJuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3OTQ5ODI0NCwiZXhwIjoyMDk1MDc0MjQ0fQ.6M_jrAF9WH-HRbHaxvWgDa-dCiY043VbDI12fCB5OaU';
 const SAM_API_KEY       = process.env.SAM_GOV_API_KEY;
 const SAM_BASE          = 'https://api.sam.gov/opportunities/v2/search';
 const CACHE_TTL_HOURS   = 6;

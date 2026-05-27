@@ -2,7 +2,20 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="ForgeFront"/>
+<meta name="application-name" content="ForgeFront"/>
+<meta name="theme-color" content="#00E5A0"/>
+<meta name="description" content="The federal contract command center for service-disabled veteran-owned businesses."/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="apple-touch-icon" href="/icons/icon-192.png"/>
+<link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152.png"/>
+<link rel="apple-touch-icon" sizes="144x144" href="/icons/icon-144.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png"/>
+<link rel="icon" type="image/png" sizes="96x96" href="/icons/icon-96.png"/>
 <title>ForgeFront · SDVOSB Command Center</title>
 <meta name="theme-color" content="#00E5A0"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -143,6 +156,16 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--s2)}
 }
 @media(max-width:480px){.g4,.g3,.g2{grid-template-columns:1fr}#ct{padding:13px}}
 .mb2{display:none;background:none;border:none;color:var(--t);font-size:20px;cursor:pointer;padding:4px 8px}
+@media(max-width:640px){
+  .mob-nav{display:flex!important}
+  .sb{display:none!important}
+  #app{flex-direction:column}
+  .main{padding-bottom:64px!important}
+}
+.mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--s);border-top:1px solid var(--bd);z-index:200;padding:0}
+.mob-nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px;cursor:pointer;color:var(--t3);font-size:10px;gap:3px;border:none;background:none;transition:color .15s}
+.mob-nav-item.on{color:var(--ac)}
+.mob-nav-item span{font-size:20px;line-height:1}@keyframes urgpulse{0%,100%{opacity:1}50%{opacity:.4}}
 </style>
 </head>
 <body>
@@ -150,6 +173,60 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--s2)}
 <div class="lo" id="lo">
   <div class="lo-t">Forge<span>Front</span></div>
   <div class="sp" style="border-top-color:var(--ac);border-color:rgba(0,229,160,.2);width:18px;height:18px"></div>
+</div>
+
+
+<div id="ff-landing" style="position:fixed;inset:0;background:var(--bg);overflow-y:auto;z-index:250;display:none">
+  <div style="background:var(--s);border-bottom:1px solid var(--bd);padding:13px 22px;display:flex;align-items:center;justify-content:space-between">
+    <div style="display:flex;align-items:center;gap:8px">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7V12C3 16.55 7.08 20.74 12 22C16.92 20.74 21 16.55 21 12V7L12 2Z" fill="rgba(0,229,160,.15)" stroke="#00E5A0" stroke-width="1.5"/><path d="M9 12L11 14L15 10" stroke="#00E5A0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span style="font-size:15px;font-weight:700">Forge<span style="color:var(--ac)">Front</span></span>
+    </div>
+    <div style="display:flex;gap:7px">
+      <button class="btn g sm" onclick="ffClose()">Sign In</button>
+      <button class="btn p sm" onclick="ffClose('register')">Get Started Free</button>
+    </div>
+  </div>
+  <div style="max-width:660px;margin:0 auto;padding:48px 22px 36px;text-align:center">
+    <div style="display:inline-block;background:var(--ad);border:1px solid var(--ab);border-radius:99px;padding:4px 13px;font-size:11px;font-weight:600;color:var(--ac);margin-bottom:16px">&#128737; BUILT FOR SDVOSB CONTRACTORS</div>
+    <h1 style="font-size:clamp(22px,5vw,38px);font-weight:800;letter-spacing:-1px;line-height:1.2;margin-bottom:13px">Win More Federal Contracts.<br>Spend Less Time Searching.</h1>
+    <p style="font-size:14px;color:var(--t2);line-height:1.65;max-width:500px;margin:0 auto 24px">ForgeFront is the command center for service-disabled veteran-owned businesses. Search SAM.gov federal contracts, state and local bids, and SBA subcontracts filtered to your NAICS and certifications.</p>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:36px">
+      <button class="btn p" style="padding:11px 22px;font-size:14px" onclick="ffClose('register')">Start Free</button>
+      <button class="btn g" style="padding:11px 22px;font-size:14px" onclick="document.getElementById('ff-hiw').scrollIntoView({behavior:'smooth'})">How It Works</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:11px;max-width:380px;margin:0 auto">
+      <div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:12px"><div style="font-size:20px;font-weight:700;color:var(--ac)">50</div><div style="font-size:11px;color:var(--t2);margin-top:2px">States covered</div></div>
+      <div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:12px"><div style="font-size:20px;font-weight:700;color:var(--ac)">60s</div><div style="font-size:11px;color:var(--t2);margin-top:2px">AI proposals</div></div>
+      <div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:12px"><div style="font-size:20px;font-weight:700;color:var(--ac)">3</div><div style="font-size:11px;color:var(--t2);margin-top:2px">Sources</div></div>
+    </div>
+  </div>
+  <div id="ff-hiw" style="max-width:660px;margin:0 auto;padding:0 22px 48px">
+    <div style="text-align:center;margin-bottom:22px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:1.2px;color:var(--t3);text-transform:uppercase;margin-bottom:6px">HOW IT WORKS</div>
+      <h2 style="font-size:19px;font-weight:700">From search to winning bid in one platform</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:11px;margin-bottom:28px">
+      <div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:15px"><div style="font-size:24px;margin-bottom:8px">&#128269;</div><div style="font-size:13px;font-weight:600;margin-bottom:4px">1. Find Contracts</div><div style="font-size:12px;color:var(--t2);line-height:1.6">Search federal, state, and SBA subcontracts filtered to your NAICS and certifications.</div></div>
+      <div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:15px"><div style="font-size:24px;margin-bottom:8px">&#9998;</div><div style="font-size:13px;font-weight:600;margin-bottom:4px">2. Generate Proposals</div><div style="font-size:12px;color:var(--t2);line-height:1.6">AI writes a complete SDVOSB proposal using your business profile in about 60 seconds.</div></div>
+      <div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:15px"><div style="font-size:24px;margin-bottom:8px">&#128188;</div><div style="font-size:13px;font-weight:600;margin-bottom:4px">3. Manage Everything</div><div style="font-size:12px;color:var(--t2);line-height:1.6">Track jobs, manage crew certs, and send professional invoices from your phone.</div></div>
+    </div>
+    <div style="background:var(--ad);border:1px solid var(--ab);border-radius:var(--rl);padding:18px;text-align:center;margin-bottom:28px">
+      <div style="font-size:14px;margin-bottom:8px">&#127894;</div>
+      <h3 style="font-size:13px;font-weight:600;margin-bottom:6px">Our Mission</h3>
+      <p style="font-size:12px;color:var(--t2);line-height:1.65;max-width:420px;margin:0 auto">ForgeFront was built by a retired U.S. Army Major and service-disabled veteran to solve a real problem: SDVOSB contractors have the skills to win federal contracts but not the tools to find and pursue them efficiently.</p>
+    </div>
+    <div style="text-align:center">
+      <h3 style="font-size:17px;font-weight:700;margin-bottom:14px">Start free. Upgrade when you win.</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:9px;max-width:470px;margin:0 auto 18px">
+        <div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:13px;text-align:left"><div style="font-size:10px;font-weight:700;color:var(--t3);margin-bottom:4px">FREE</div><div style="font-size:19px;font-weight:800;margin-bottom:6px">$0</div><div style="font-size:11px;color:var(--t2);line-height:1.9">10 contracts/search<br>Job tracking<br>Crew roster</div></div>
+        <div style="background:var(--s);border:2px solid var(--ab);border-radius:var(--rl);padding:13px;text-align:left;position:relative"><div style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--ac);color:var(--bg);font-size:9px;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap">POPULAR</div><div style="font-size:10px;font-weight:700;color:var(--ac);margin-bottom:4px">PRO</div><div style="font-size:19px;font-weight:800;color:var(--ac);margin-bottom:6px">$79<span style="font-size:11px;font-weight:400;color:var(--t3)">/mo</span></div><div style="font-size:11px;color:var(--t2);line-height:1.9">Unlimited contracts<br>AI proposals<br>All 3 sources</div></div>
+        <div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:13px;text-align:left"><div style="font-size:10px;font-weight:700;color:var(--t3);margin-bottom:4px">TEAMS</div><div style="font-size:19px;font-weight:800;margin-bottom:6px">$149<span style="font-size:11px;font-weight:400;color:var(--t3)">/mo</span></div><div style="font-size:11px;color:var(--t2);line-height:1.9">5 seats<br>Everything Pro<br>Team management</div></div>
+      </div>
+      <button class="btn p" style="padding:11px 24px;font-size:13px" onclick="ffClose('register')">Get Started Free</button>
+    </div>
+    <div style="text-align:center;margin-top:28px;padding-top:18px;border-top:1px solid var(--bd);font-size:11px;color:var(--t3)">2025 ForgeFront &middot; <a href="https://www.forgefront.app" style="color:var(--t3);text-decoration:none">www.forgefront.app</a> &middot; <a href="mailto:admin@forgefront.app" style="color:var(--t3);text-decoration:none">admin@forgefront.app</a></div>
+  </div>
 </div>
 
 <div id="ls" style="display:none">
@@ -170,7 +247,7 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--s2)}
     <form onsubmit="doLogin();return false;">
       <div id="rf" style="display:none">
         <div class="fd"><label class="fla">Full Name</label><input id="rn" placeholder="LaDarrell Willis" autocomplete="name"/></div>
-        <div class="fd"><label class="fla">Company</label><input id="rc" placeholder="NextGen Welding & Fabrication LLC" autocomplete="organization"/></div>
+        <div class="fd"><label class="fla">Company</label><input id="rc" placeholder="W4X Technologies LLC" autocomplete="organization"/></div>
       </div>
       <div class="fd"><label class="fla">Email</label><input id="le" type="email" placeholder="you@company.com" autocomplete="email"/></div>
       <div class="fd"><label class="fla">Password</label><input id="lp" type="password" placeholder="••••••••" autocomplete="current-password"/></div>
@@ -194,16 +271,27 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--s2)}
       <div style="font-size:16px;font-weight:700;letter-spacing:-.3px">Forge<span style="color:var(--ac)">Front</span></div>
     </div>
     <div class="ns">Main</div>
-    <div class="li on" onclick="go('dash',this)">▦ Dashboard</div>
-    <div class="li" onclick="go('contracts',this)">📄 Contracts <span class="nb" id="cct">—</span></div>
-    <div class="li" onclick="go('jobs',this)">💼 Job Tracker</div>
-    <div class="li" onclick="go('crew',this)">👥 Crew</div>
-    <div class="li" onclick="go('invoices',this)">🧾 Invoices</div>
+    <div class="li on" onclick="go('dash',this)">&#9638; Dashboard</div>
+    <div class="li" onclick="go('contracts',this)">&#128196; Contracts <span class="nb" id="cct">&#8212;</span></div>
+    <div class="li" onclick="go('watchlist',this)">&#128278; Watchlist <span id="wl-badge" style="display:none;margin-left:auto;background:var(--s3);color:var(--t2);font-size:10px;font-weight:700;padding:2px 6px;border-radius:99px">0</span></div>
+    <div class="li" onclick="go('jobs',this)">&#128188; Job Tracker</div>
+    <div class="li" onclick="go('crew',this)">&#128101; Crew</div>
+    <div class="li" onclick="go('invoices',this)">&#129534; Invoices</div>
     <div class="ns">Tools</div>
-    <div class="li" onclick="go('bid',this)">✍ Bid Writer</div>
-    <div class="li" onclick="go('profile',this)">⚙ My Profile</div>
-    <div class="li" id="anav" style="display:none" onclick="go('admin',this)">🛡 Admin</div>
-    <div class="li dr" onclick="doLogout()">↪ Sign Out</div>
+    <div class="li" onclick="go('bid',this)">&#9998; Bid Writer</div>
+    <div class="li" onclick="go('teaming',this)">&#129309; Teaming Partners</div>
+    <div class="ns">Account</div>
+    <div class="li" onclick="go('bizprofile',this)">&#127970; Business Profile <span id="bp-nav-pct" style="margin-left:auto;font-size:10px;color:var(--t3)"></span></div>
+    <div class="li" onclick="go('profile',this)">&#9881; Settings</div>
+    <div class="li" id="anav" style="display:none" onclick="go('admin',this)">&#128737; Admin</div>
+    <div class="li" onclick="ffShow()" style="font-size:12px;color:var(--t3)">&#8505; About ForgeFront</div>
+    <div style="padding:8px 14px;border-top:1px solid var(--bd);margin-top:4px">
+      <div style="font-size:10px;color:var(--t3);margin-bottom:5px">LEGAL</div>
+      <a href="/privacy.html" target="_blank" style="display:block;font-size:11px;color:var(--t3);text-decoration:none;padding:3px 0">Privacy Policy</a>
+      <a href="/terms.html" target="_blank" style="display:block;font-size:11px;color:var(--t3);text-decoration:none;padding:3px 0">Terms &amp; Conditions</a>
+      <a href="/eula.html" target="_blank" style="display:block;font-size:11px;color:var(--t3);text-decoration:none;padding:3px 0">EULA</a>
+    </div>
+    <div class="li dr" onclick="doLogout()">&#8618; Sign Out</div>
     <div class="sf">
       <div style="display:flex;align-items:center;gap:9px">
         <div class="ua" id="ava">?</div>
@@ -218,7 +306,8 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--s2)}
   <div id="main">
     <div id="tb">
       <button class="mb2" onclick="toggleSB()">☰</button>
-      <div style="font-size:15px;font-weight:600;flex:1" id="pt">Dashboard</div>
+   
+      <button onclick="themeToggle()" id="theme-btn" style="background:none;border:none;color:var(--t2);font-size:16px;cursor:pointer;padding:4px 6px;border-radius:6px;margin-left:4px" title="Toggle light/dark">&#9790;</button>   <div style="font-size:15px;font-weight:600;flex:1" id="pt">Dashboard</div>
       <div id="tbadge" style="background:var(--ad);border:1px solid var(--ab);color:var(--ac);font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px">Pro · SDVOSB</div>
     </div>
     <div id="ct">
@@ -258,9 +347,12 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--s2)}
       <div class="pg" id="p-contracts">
         <!-- Paywall for free users -->
         <div id="paywall-banner" style="display:none" class="pw">
-          <h3>🔒 You're on the Free Plan</h3>
-          <p>You're seeing 3 of <span id="total-count">—</span> matched contracts. Upgrade to Pro to see all opportunities nationwide with full filtering.</p>
-          <button class="btn go2" onclick="showUpgrade()">Upgrade to Pro — $79/mo · Unlock All Contracts</button>
+          <h3 style="font-size:15px;font-weight:700;margin-bottom:5px">&#128274; You are missing contracts matched to your NAICS</h3>
+          <p style="font-size:13px;color:var(--t2);margin-bottom:12px">Showing 10 of <strong id="total-count" style="color:var(--t)">&#8212;</strong> contracts matched to your profile. Upgrade to see all of them.</p>
+          <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+            <button class="btn go2" onclick="showUpgrade()">Upgrade to Pro &#8212; $79/mo</button>
+            <button class="btn g sm" onclick="alert('Single proposal $4.99 - Stripe coming soon')">Or $4.99 per proposal</button>
+          </div>
         </div>
 
         <!-- Filter Bar -->
@@ -414,6 +506,7 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--s2)}
       <!-- BID WRITER -->
       <div class="pg" id="p-bid">
         <div class="sl">AI Bid Writer</div>
+        <div id="cd-agency-intel" style="display:none"></div>
         <div class="cl" style="margin-bottom:16px">
           <div style="font-size:14px;font-weight:600;margin-bottom:4px">Generate a Full SDVOSB Proposal</div>
           <div style="font-size:12px;color:var(--t2);margin-bottom:14px">Paste a contract solicitation number or description. The AI generates a compliant SDVOSB proposal in ~60 seconds.</div>
@@ -433,6 +526,12 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--s2)}
               <button class="btn g sm" onclick="copyBid()">📋 Copy</button>
               <button class="btn g sm" onclick="printBid()">🖨 Print</button>
               <button class="btn p sm" onclick="saveBid()">💾 Save Bid</button>
+              <select id="bid-status" style="background:var(--s2);border:1px solid var(--bd);color:var(--t);padding:5px 8px;border-radius:var(--rs);font-size:11px;cursor:pointer">
+                <option value="draft">Draft</option>
+                <option value="submitted">Submitted</option>
+                <option value="won">Won</option>
+                <option value="lost">Lost</option>
+              </select>
             </div>
             <div id="bid-text" style="font-size:13px;line-height:1.7;color:var(--t2);white-space:pre-wrap"></div>
           </div>
@@ -471,7 +570,24 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--s2)}
           <button class="btn p" onclick="saveContractPrefs()">Save Preferences</button>
         </div>
         <div class="cl" style="margin-bottom:14px">
-          <div style="font-size:14px;font-weight:600;margin-bottom:4px">🔑 SAM.gov API Key</div>
+          <div style="font-size:14px;font-weight:600;margin-bottom:4px">&#128140; Email Notifications</div>
+          <div style="font-size:12px;color:var(--t2);margin-bottom:12px">Stay informed about new contract opportunities matched to your profile.</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bd)">
+            <div><div style="font-size:13px;font-weight:500">Weekly Contract Digest</div><div style="font-size:11px;color:var(--t3);margin-top:2px">Top 5 new contracts matched to your NAICS every Monday</div></div>
+            <div id="digest-toggle" onclick="digestToggle()" style="width:40px;height:22px;background:var(--s3);border-radius:99px;cursor:pointer;position:relative;transition:.2s;flex-shrink:0"><div id="digest-thumb" style="position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;top:3px;left:3px;transition:.2s"></div></div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bd)">
+            <div><div style="font-size:13px;font-weight:500">Deadline Alerts</div><div style="font-size:11px;color:var(--t3);margin-top:2px">Email when a saved contract is 72 hours from deadline</div></div>
+            <div id="deadline-toggle" onclick="deadlineToggle()" style="width:40px;height:22px;background:var(--s3);border-radius:99px;cursor:pointer;position:relative;transition:.2s;flex-shrink:0"><div id="deadline-thumb" style="position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;top:3px;left:3px;transition:.2s"></div></div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0">
+            <div><div style="font-size:13px;font-weight:500">New Match Alerts</div><div style="font-size:11px;color:var(--t3);margin-top:2px">Email when new contracts match your NAICS and certifications</div></div>
+            <div id="match-toggle" onclick="matchToggle()" style="width:40px;height:22px;background:var(--s3);border-radius:99px;cursor:pointer;position:relative;transition:.2s;flex-shrink:0"><div id="match-thumb" style="position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;top:3px;left:3px;transition:.2s"></div></div>
+          </div>
+          <div style="font-size:11px;color:var(--t3);margin-top:8px">&#9432; Email delivery coming soon. Settings saved to your profile.</div>
+        </div>
+        <div class="cl" style="margin-bottom:14px">
+          <div style="font-size:14px;font-weight:600;margin-bottom:4px">&#128273; SAM.gov API Key</div>
           <div style="font-size:12px;color:var(--t2);margin-bottom:12px">Your key is stored in your browser. Get yours free at <a href="https://sam.gov/profile/details" target="_blank" style="color:var(--ac)">sam.gov/profile/details</a>.</div>
           <div style="display:flex;gap:8px">
             <input id="pr-samkey" type="password" placeholder="SAM-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" style="flex:1"/>
@@ -488,6 +604,225 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--s2)}
               <div style="font-size:12px;color:var(--t3)" id="sub-detail">Unlimited contracts · 20 AI proposals/day · Priority support</div>
             </div>
             <button class="btn go2 sm" style="margin-left:auto" onclick="showUpgrade()">Manage</button>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="pg" id="p-bizprofile">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+          <div>
+            <div style="font-size:18px;font-weight:700">Business Profile</div>
+            <div style="font-size:12px;color:var(--t2);margin-top:2px">Powers your AI proposals. Complete once — fills every proposal automatically.</div>
+          </div>
+          <div id="bp-badge" style="background:var(--ad);border:1px solid var(--ab);color:var(--ac);padding:4px 11px;border-radius:99px;font-size:11px;font-weight:700">0% Complete</div>
+        </div>
+        <div style="height:4px;background:var(--s2);border-radius:2px;margin-bottom:14px"><div id="bp-bar" style="height:4px;background:var(--ac);border-radius:2px;width:0%;transition:width .3s"></div></div>
+        <div style="background:var(--ad);border:1px solid var(--ab);border-radius:var(--rl);padding:11px;margin-bottom:13px;display:flex;align-items:center;gap:10px">
+          <div style="font-size:18px">&#10024;</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--ac);margin-bottom:1px">AI Profile Assistant</div><div style="font-size:12px;color:var(--t2)">Fill company name and principal, then click Auto-fill to generate professional content for every section.</div></div>
+          <button class="btn p sm" onclick="bpAutoFill()">&#10024; Auto-fill</button>
+        </div>
+        <div class="cl" style="margin-bottom:11px">
+          <div style="font-size:13px;font-weight:600;margin-bottom:2px">&#127970; Company Identity</div>
+          <div style="font-size:11px;color:var(--t3);margin-bottom:9px">Used on every proposal cover page</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:9px">
+            <div class="fd"><label class="fla">Legal Business Name *</label><input id="bp-coname" placeholder="W4X Technologies LLC" oninput="bpProgress()"/></div>
+            <div class="fd"><label class="fla">UEI Number *</label><input id="bp-uei" placeholder="12-character UEI from SAM.gov" oninput="bpProgress()"/></div>
+            <div class="fd"><label class="fla">CAGE Code</label><input id="bp-cage" placeholder="5-character CAGE code"/></div>
+            <div class="fd"><label class="fla">Business Phone *</label><input id="bp-bphone" placeholder="318-555-0100" oninput="bpProgress()"/></div>
+            <div class="fd"><label class="fla">Business Email *</label><input id="bp-bemail" placeholder="contracts@yourcompany.com" oninput="bpProgress()"/></div>
+            <div class="fd"><label class="fla">Business Address *</label><input id="bp-addr" placeholder="123 Main St, Minden, LA 71055" oninput="bpProgress()"/></div>
+          </div>
+        </div>
+        <div class="cl" style="margin-bottom:11px">
+          <div style="font-size:13px;font-weight:600;margin-bottom:2px">&#128737; Certifications &amp; Set-Asides</div>
+          <div style="font-size:11px;color:var(--t3);margin-bottom:9px">Determines which set-aside contracts you qualify for</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px">
+            <label style="display:flex;align-items:center;gap:5px;padding:5px 10px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);cursor:pointer;font-size:12px"><input type="checkbox" id="bp-sdvosb" onchange="bpProgress()"> SDVOSB</label>
+            <label style="display:flex;align-items:center;gap:5px;padding:5px 10px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);cursor:pointer;font-size:12px"><input type="checkbox" id="bp-vosb" onchange="bpProgress()"> VOSB</label>
+            <label style="display:flex;align-items:center;gap:5px;padding:5px 10px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);cursor:pointer;font-size:12px"><input type="checkbox" id="bp-8a"> 8(a)</label>
+            <label style="display:flex;align-items:center;gap:5px;padding:5px 10px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);cursor:pointer;font-size:12px"><input type="checkbox" id="bp-hubzone"> HUBZone</label>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:9px">
+            <div class="fd"><label class="fla">Primary NAICS Code(s) *</label><input id="bp-naics" placeholder="332312, 238190" oninput="bpProgress()"/><div style="font-size:10px;color:var(--t3);margin-top:2px">Comma-separated. Drives contract matching.</div></div>
+            <div class="fd"><label class="fla">Number of Employees</label><input id="bp-emp" type="number" placeholder="1-50"/></div>
+          </div>
+        </div>
+        <div class="cl" style="margin-bottom:11px">
+          <div style="font-size:13px;font-weight:600;margin-bottom:2px">&#128203; Capability Statement</div>
+          <div style="font-size:11px;color:var(--t3);margin-bottom:9px">First thing contracting officers read</div>
+          <div class="fd">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px"><label class="fla" style="margin:0">Company Description *</label><button class="btn g sm" onclick="bpAiField('bp-cap','capability statement')">&#10024; AI</button></div>
+            <textarea id="bp-cap" rows="3" placeholder="Describe your company, services, and what makes you unique as an SDVOSB..." oninput="bpProgress()"></textarea>
+          </div>
+          <div class="fd">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px"><label class="fla" style="margin:0">Competitive Differentiators</label><button class="btn g sm" onclick="bpAiField('bp-diff','competitive differentiators')">&#10024; AI</button></div>
+            <textarea id="bp-diff" rows="3" placeholder="OSHA certs, CWI inspectors, rapid mobilization, veteran leadership..."></textarea>
+          </div>
+        </div>
+        <div class="cl" style="margin-bottom:11px">
+          <div style="font-size:13px;font-weight:600;margin-bottom:2px">&#128100; Key Personnel</div>
+          <div style="font-size:11px;color:var(--t3);margin-bottom:9px">Required in most federal proposals</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:9px">
+            <div class="fd"><label class="fla">Principal Name *</label><input id="bp-principal" placeholder="LaDarrell Willis" oninput="bpProgress()"/></div>
+            <div class="fd"><label class="fla">Title</label><input id="bp-ptitle" placeholder="Principal / Project Manager"/></div>
+            <div class="fd"><label class="fla">Education</label><input id="bp-edu" placeholder="MBA, Construction Mgmt Cert (LSU)"/></div>
+            <div class="fd"><label class="fla">Security Clearance</label><select id="bp-clearance"><option value="">None</option><option>Secret</option><option>Top Secret</option><option>TS/SCI</option></select></div>
+          </div>
+          <div class="fd" style="margin-top:3px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px"><label class="fla" style="margin:0">Principal Bio *</label><button class="btn g sm" onclick="bpAiField('bp-bio','professional federal contractor bio')">&#10024; AI</button></div>
+            <textarea id="bp-bio" rows="4" placeholder="Military background, education, years of experience, key qualifications..." oninput="bpProgress()"></textarea>
+          </div>
+        </div>
+        <div class="cl" style="margin-bottom:13px">
+          <div style="font-size:13px;font-weight:600;margin-bottom:2px">&#127942; Past Performance</div>
+          <div style="font-size:11px;color:var(--t3);margin-bottom:9px">Most proposals require 3 citations — completed jobs auto-import below</div>
+          <div id="bp-jobs-pp" style="margin-bottom:9px"></div>
+          <div class="fd">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px"><label class="fla" style="margin:0">Additional Past Performance</label><button class="btn g sm" onclick="bpAiField('bp-pp','past performance citations')">&#10024; AI</button></div>
+            <textarea id="bp-pp" rows="4" placeholder="Contract name, agency, value, period, scope, result..."></textarea>
+          </div>
+        </div>
+        <div style="display:flex;gap:9px;justify-content:flex-end">
+          <button class="btn g" onclick="go('dash',null)">Cancel</button>
+          <button class="btn p" style="padding:10px 22px" onclick="bpSave()">&#128190; Save Profile</button>
+        </div>
+      </div>
+
+      <div class="pg" id="p-watchlist">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div><div style="font-size:18px;font-weight:700">Watchlist</div><div style="font-size:12px;color:var(--t2);margin-top:2px">Contracts you are tracking</div></div>
+          <button class="btn g sm" onclick="go('contracts',null)">Browse Contracts &#8594;</button>
+        </div>
+        <div id="wl-list"></div>
+      </div>
+
+
+      <!-- TEAMING PARTNER FINDER -->
+      <div class="pg" id="p-teaming">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div>
+            <div style="font-size:18px;font-weight:700">Teaming Partner Finder</div>
+            <div style="font-size:12px;color:var(--t2);margin-top:2px">Find SDVOSB contractors to team with on larger federal contracts</div>
+          </div>
+          <button class="btn p sm" onclick="teamingRegister()">+ List My Company</button>
+        </div>
+
+        <div style="background:var(--ad);border:1px solid var(--ab);border-radius:var(--rl);padding:13px;margin-bottom:16px;display:flex;align-items:center;gap:11px">
+          <div style="font-size:22px">&#129309;</div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--ac);margin-bottom:2px">Why Team?</div>
+            <div style="font-size:12px;color:var(--t2)">Contracts over $250K often require teaming to meet past performance and bonding thresholds. Finding a complementary SDVOSB partner lets you pursue larger opportunities while both companies build past performance.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+          <input id="team-search" placeholder="Search by capability or NAICS..." style="flex:1;min-width:180px" oninput="teamingFilter()"/>
+          <select id="team-state" onchange="teamingFilter()" style="background:var(--s2);border:1px solid var(--bd);color:var(--t);padding:8px 11px;border-radius:var(--rs);font-size:13px">
+            <option value="">All States</option>
+            <option>LA</option><option>TX</option><option>VA</option><option>MD</option>
+            <option>NC</option><option>GA</option><option>MS</option><option>AL</option>
+            <option>AR</option><option>FL</option><option>DC</option>
+          </select>
+          <select id="team-cap" onchange="teamingFilter()" style="background:var(--s2);border:1px solid var(--bd);color:var(--t);padding:8px 11px;border-radius:var(--rs);font-size:13px">
+            <option value="">All Capabilities</option>
+            <option>Construction</option>
+            <option>Fabrication</option>
+            <option>IT / Cyber</option>
+            <option>Logistics</option>
+            <option>Engineering</option>
+            <option>Facilities</option>
+            <option>Security</option>
+          </select>
+        </div>
+
+        <div id="teaming-list"></div>
+
+        <div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--rl);padding:18px;text-align:center;margin-top:20px">
+          <div style="font-size:14px;font-weight:700;margin-bottom:6px">List Your Company as a Teaming Partner</div>
+          <div style="font-size:12px;color:var(--t2);margin-bottom:14px;max-width:420px;margin-left:auto;margin-right:auto">Get discovered by other SDVOSB contractors looking for teaming partners on federal contracts. Free for Pro subscribers.</div>
+          <button class="btn p" onclick="teamingRegister()">Register as Teaming Partner</button>
+        </div>
+      </div>
+
+
+      <!-- SUPPORT PAGE -->
+      <div class="pg" id="p-support">
+        <div style="font-size:18px;font-weight:700;margin-bottom:4px">Support</div>
+        <div style="font-size:12px;color:var(--t2);margin-bottom:16px">Get help or report an issue with ForgeFront</div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:11px;margin-bottom:20px">
+          <div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--r);padding:16px;text-align:center">
+            <div style="font-size:28px;margin-bottom:8px">&#9993;</div>
+            <div style="font-size:13px;font-weight:600;margin-bottom:4px">Email Support</div>
+            <div style="font-size:12px;color:var(--t2);margin-bottom:10px">We respond within 24 hours</div>
+            <a href="mailto:admin@forgefront.app" class="btn p sm" style="text-decoration:none;display:inline-block">admin@forgefront.app</a>
+          </div>
+          <div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--r);padding:16px;text-align:center">
+            <div style="font-size:28px;margin-bottom:8px">&#128196;</div>
+            <div style="font-size:13px;font-weight:600;margin-bottom:4px">Submit a Ticket</div>
+            <div style="font-size:12px;color:var(--t2);margin-bottom:10px">Track your issue with a ticket number</div>
+            <button class="btn g sm" onclick="document.getElementById('ticket-form').scrollIntoView({behavior:'smooth'})">Open Ticket Form</button>
+          </div>
+          <div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--r);padding:16px;text-align:center">
+            <div style="font-size:28px;margin-bottom:8px">&#127894;</div>
+            <div style="font-size:13px;font-weight:600;margin-bottom:4px">Veteran-Owned</div>
+            <div style="font-size:12px;color:var(--t2);margin-bottom:10px">Built and operated by a service-disabled veteran</div>
+            <div style="font-size:11px;color:var(--ac);font-weight:600">SDVOSB &#183; 100% Veteran-Built</div>
+          </div>
+        </div>
+
+        <div class="cl" id="ticket-form">
+          <div style="font-size:14px;font-weight:600;margin-bottom:4px">&#127914; Submit a Support Ticket</div>
+          <div style="font-size:12px;color:var(--t2);margin-bottom:14px">Describe your issue and we will get back to you within 24 hours at your account email address.</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:9px;margin-bottom:9px">
+            <div class="fd">
+              <label class="fla">Issue Type *</label>
+              <select id="tkt-type">
+                <option value="">Select a category...</option>
+                <option>Login / Account Access</option>
+                <option>Contract Search Not Loading</option>
+                <option>Bid Writer Issue</option>
+                <option>Payment / Billing</option>
+                <option>Business Profile</option>
+                <option>Job Tracker / Invoices</option>
+                <option>Feature Request</option>
+                <option>Bug Report</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="fd">
+              <label class="fla">Priority</label>
+              <select id="tkt-priority">
+                <option value="normal">Normal</option>
+                <option value="high">High — App is unusable</option>
+                <option value="low">Low — Minor issue</option>
+              </select>
+            </div>
+          </div>
+          <div class="fd" style="margin-bottom:9px">
+            <label class="fla">Subject *</label>
+            <input id="tkt-subject" placeholder="Brief description of your issue"/>
+          </div>
+          <div class="fd" style="margin-bottom:14px">
+            <label class="fla">Details *</label>
+            <textarea id="tkt-body" rows="5" placeholder="Describe the issue in detail. What were you doing when it happened? What did you expect vs what actually happened?"></textarea>
+          </div>
+          <div style="display:flex;gap:9px;align-items:center">
+            <button class="btn p" style="padding:10px 22px" onclick="submitTicket()">&#128228; Submit Ticket</button>
+            <div id="tkt-status" style="font-size:12px;color:var(--t2)"></div>
+          </div>
+        </div>
+
+        <div style="background:var(--ad);border:1px solid var(--ab);border-radius:var(--rl);padding:14px;margin-top:18px">
+          <div style="font-size:12px;font-weight:600;color:var(--ac);margin-bottom:6px">&#128269; Common Issues &amp; Quick Fixes</div>
+          <div style="font-size:12px;color:var(--t2);line-height:2">
+            <div>&#8594; <strong>Contracts not loading</strong> — Check your internet connection. SAM.gov sometimes has outages.</div>
+            <div>&#8594; <strong>Login not working</strong> — Try resetting your password via the login screen.</div>
+            <div>&#8594; <strong>Bid Writer slow</strong> — AI generation takes 30-60 seconds. Do not refresh the page.</div>
+            <div>&#8594; <strong>Payment not going through</strong> — Make sure billing address matches your card on file.</div>
+            <div>&#8594; <strong>Profile not saving</strong> — Ensure all required fields (*) are filled in.</div>
           </div>
         </div>
       </div>
@@ -579,29 +914,43 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--s2)}
 
 <!-- Upgrade modal -->
 <div class="mb" id="upgrade-modal">
-  <div class="md" style="text-align:center">
-    <div class="mh"><div class="mt2">Upgrade ForgeFront</div><button class="xb" onclick="closeM('upgrade-modal')">✕</button></div>
-    <div style="font-size:36px;margin-bottom:12px">⚡</div>
-    <h3 style="font-size:18px;font-weight:700;margin-bottom:8px">Unlock the Full SDVOSB Advantage</h3>
-    <p style="font-size:13px;color:var(--t2);margin-bottom:20px;line-height:1.6">Free users see 3 contracts. Pro users see <strong>unlimited opportunities nationwide</strong> across all sources.</p>
-    <div class="g2" style="margin-bottom:20px;text-align:left">
-      <div class="sc">
-        <div style="font-size:11px;font-weight:700;color:var(--t3);margin-bottom:4px">BASE PLAN</div>
-        <div style="font-size:24px;font-weight:800;margin-bottom:2px">$29<span style="font-size:13px;font-weight:400;color:var(--t3)">/mo</span></div>
-        <div style="font-size:11px;color:var(--t3);margin-bottom:12px">$261/yr — save 25%</div>
-        <div style="font-size:12px;color:var(--t2);line-height:1.8">✓ 25 contracts/search<br>✓ 3 AI proposals/day<br>✓ All sources<br>✓ Job tracker<br>✓ Invoicing</div>
-        <button class="btn g" style="width:100%;justify-content:center;margin-top:14px" onclick="alert('Stripe integration coming soon')">Get Base</button>
+  <div class="md" style="text-align:center;max-width:700px;width:95vw">
+    <div class="mh"><div class="mt2">Upgrade ForgeFront</div><button class="xb" onclick="closeM('upgrade-modal')">&#10005;</button></div>
+    <div style="margin-bottom:16px">
+      <h3 style="font-size:17px;font-weight:700;margin-bottom:5px">Choose Your Plan</h3>
+      <p style="font-size:13px;color:var(--t2);margin-bottom:4px">Start free for 14 days. No credit card required.</p>
+      <div style="font-size:12px;color:var(--ac);font-weight:600">&#127881; June Special &mdash; 50% off first month when you subscribe during your trial</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:10px;margin-bottom:14px;text-align:left">
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);padding:14px">
+        <div style="font-size:10px;font-weight:700;color:var(--t3);margin-bottom:6px;letter-spacing:1px">STARTER</div>
+        <div style="font-size:24px;font-weight:800;margin-bottom:2px">$29<span style="font-size:11px;font-weight:400;color:var(--t3)">/mo</span></div>
+        <div style="font-size:11px;color:var(--t3);margin-bottom:10px">Solo contractor</div>
+        <div style="font-size:11px;color:var(--t2);line-height:2;margin-bottom:12px">&#10003; 10 contracts/search<br>&#10003; Job tracker + invoices<br>&#10003; Crew management<br>&#10003; 3 AI proposals/mo<br>&#10003; Pay-per-use advanced features</div>
+        <button class="btn g" style="width:100%;font-size:12px;padding:9px" onclick="ffCheckout('starter_monthly')">Get Starter</button>
       </div>
-      <div class="sc" style="border-color:var(--ab);position:relative">
-        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--ac);color:var(--bg);font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px;white-space:nowrap">MOST POPULAR</div>
-        <div style="font-size:11px;font-weight:700;color:var(--ac);margin-bottom:4px">PRO PLAN</div>
-        <div style="font-size:24px;font-weight:800;margin-bottom:2px;color:var(--ac)">$79<span style="font-size:13px;font-weight:400;color:var(--t3)">/mo</span></div>
-        <div style="font-size:11px;color:var(--t3);margin-bottom:12px">$711/yr — save 25%</div>
-        <div style="font-size:12px;color:var(--t2);line-height:1.8">✓ Unlimited contracts<br>✓ 20 AI proposals/day<br>✓ All sources + filters<br>✓ Priority matching<br>✓ Past performance tracker<br>✓ Teaming finder (coming)</div>
-        <button class="btn p" style="width:100%;justify-content:center;margin-top:14px" onclick="alert('Stripe integration coming soon')">Get Pro</button>
+      <div style="background:var(--s2);border:2px solid var(--ab);border-radius:var(--r);padding:14px;position:relative">
+        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--ac);color:var(--bg);font-size:9px;font-weight:700;padding:3px 10px;border-radius:99px;white-space:nowrap">MOST POPULAR</div>
+        <div style="font-size:10px;font-weight:700;color:var(--ac);margin-bottom:6px;letter-spacing:1px">PRO</div>
+        <div style="font-size:24px;font-weight:800;color:var(--ac);margin-bottom:2px">$79<span style="font-size:11px;font-weight:400;color:var(--t3)">/mo</span></div>
+        <div style="font-size:11px;color:var(--t3);margin-bottom:10px">Active bidder</div>
+        <div style="font-size:11px;color:var(--t2);line-height:2;margin-bottom:12px">&#10003; Unlimited contracts<br>&#10003; 10 AI proposals/mo<br>&#10003; 3/mo SOW Analyzer<br>&#10003; 3/mo USASpending Intel<br>&#10003; 3/mo Subcontractor Finder<br>&#10003; Pay-per-use for more</div>
+        <button class="btn p" style="width:100%;font-size:12px;padding:9px" onclick="ffCheckout('pro_monthly')">Get Pro</button>
+      </div>
+      <div style="background:linear-gradient(135deg,#0A1628,#0D2040);border:1px solid #C9A84C;border-radius:var(--r);padding:14px">
+        <div style="font-size:10px;font-weight:700;color:#C9A84C;margin-bottom:6px;letter-spacing:1px">COMMAND</div>
+        <div style="font-size:24px;font-weight:800;color:#C9A84C;margin-bottom:2px">$199<span style="font-size:11px;font-weight:400;color:var(--t3)">/mo</span></div>
+        <div style="font-size:11px;color:var(--t3);margin-bottom:10px">Serious BD operation</div>
+        <div style="font-size:11px;color:var(--t2);line-height:2;margin-bottom:12px">&#10003; Everything in Pro<br>&#10003; Unlimited all features<br>&#10003; SOW Analyzer<br>&#10003; USASpending Intel<br>&#10003; Subcontractor Finder<br>&#10003; Executive Strategic Report</div>
+        <button style="width:100%;font-size:12px;padding:9px;background:#C9A84C;color:#0A0C0F;border:none;border-radius:var(--rs);font-weight:700;cursor:pointer" onclick="ffCheckout('command_monthly')">Get Command</button>
       </div>
     </div>
-    <p style="font-size:11px;color:var(--t3)">Cancel anytime · SDVOSB-owned platform · 100% veteran-built</p>
+    <div style="background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);padding:10px 13px;display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div style="font-size:16px">&#9998;</div>
+      <div style="flex:1"><div style="font-size:12px;font-weight:600;margin-bottom:1px">Not ready to subscribe?</div><div style="font-size:11px;color:var(--t2)">Buy a single AI proposal &mdash; no subscription needed.</div></div>
+      <button class="btn go2 sm" onclick="ffCheckout('proposal_single')">$9.99</button>
+    </div>
+    <p style="font-size:11px;color:var(--t3);text-align:center">Cancel anytime &#183; SDVOSB-owned &#183; Veteran-built</p>
   </div>
 </div>
 
@@ -611,7 +960,8 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--s2)}
 // ── Constants ─────────────────────────────────────────────────────────────────
 const SB_URL  = 'https://ycadicxcwcgdiefdqbrn.supabase.co';
 const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InljYWRpY3hjd2NnZGllZmRxYnJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0OTgyNDQsImV4cCI6MjA5NTA3NDI0NH0.u661TiExg1AE6RNWIOVdo5phaBQp9Us-eOEEDDJwQQk';
-const SAM_KEY_DEFAULT = 'SAM-f65fe6c1-4ac7-4244-ab06-2cf3fd0af73e';
+const SAM_KEY_DEFAULT = ''; // key is server-side in Netlify env vars
+const STRIPE_PK = 'pk_live_51TTjNwEgyptpMgZPbxUF6OYH7y0EZSwcWB3Puaxge0YMSTudYaYQ6JjnrETZnkLNohJhwwK84YH2V2ZIWpOEo2H300QsvAeNU9';
 const SAM_BASE = 'https://api.sam.gov/opportunities/v2/search';
 
 // State/local contract sources (free scrapers via CORS proxy)
@@ -662,48 +1012,30 @@ function dateFrom(days) {
   return `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${d.getFullYear()}`;
 }
 
-async function fetchFederalContracts(filters={}) {
-  const key = getSamKey();
-  const params = new URLSearchParams({
-    api_key: key,
-    limit: 100,
-    active: 'Yes',
-    postedFrom: dateFrom(parseInt(filters.days||90)),
-  });
-  if(filters.naics)    params.set('naicsCode', filters.naics);
-  if(filters.setaside) params.set('typeOfSetAside', filters.setaside);
-  if(filters.state)    params.set('state', filters.state);
-  if(filters.keyword)  params.set('keyword', filters.keyword);
-
-  const url = `${SAM_BASE}?${params}`;
+async function fetchFederalContracts(filters) {
+  filters = filters || {};
   try {
-    const res = await Promise.race([
-      fetch(url),
-      new Promise((_,reject) => setTimeout(() => reject(new Error('SAM.gov timeout after 10s')), 10000))
-    ]);
-    if(!res.ok) throw new Error(`SAM.gov returned ${res.status}`);
-    const data = await res.json();
-    const opps = data.opportunitiesData || [];
-    return opps.map(o => ({
-      id: o.noticeId||o.solicitationNumber,
-      source: 'federal',
-      title: o.title||'Untitled',
-      agency: o.fullParentPathName||o.organizationName||'Federal Agency',
-      value: parseFloat(o.award?.amount||0)||0,
-      naics: o.naicsCode||'',
-      setAside: o.typeOfSetAsideDescription||'',
-      status: 'open',
-      state: o.placeOfPerformance?.state?.code||'',
-      city: o.placeOfPerformance?.city?.name||'',
-      deadline: o.responseDeadLine||o.archiveDate||'',
-      solNum: o.solicitationNumber||'',
-      posted: o.postedDate||'',
-      contact: o.pointOfContact?.[0]?.email||'',
-      url: `https://sam.gov/opp/${o.noticeId}/view`,
-      score: scoreContract(o),
-    }));
+    var params = new URLSearchParams();
+    if (filters.naics)    params.set('naics',    filters.naics);
+    if (filters.state)    params.set('state',    filters.state);
+    if (filters.setaside) params.set('setaside', filters.setaside);
+    if (filters.days)     params.set('days',     String(filters.days || 90));
+    if (filters.keyword)  params.set('keyword',  filters.keyword || '');
+    var controller = new AbortController();
+    var tid = setTimeout(function() { controller.abort(); }, 12000);
+    var res = await fetch('/.netlify/functions/contracts?' + params.toString(), {signal: controller.signal});
+    clearTimeout(tid);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var data = await res.json();
+    if (data.error) throw new Error(data.error);
+    var el = document.getElementById('sam-status');
+    if (el) el.textContent = (data.contracts || []).length + ' federal contracts' +
+      (data.source === 'cache' ? ' (cached)' : ' from SAM.gov');
+    return data.contracts || [];
   } catch(e) {
-    console.error('SAM.gov error:', e.message);
+    console.warn('Federal contracts:', e.message);
+    var el = document.getElementById('sam-status');
+    if (el) el.textContent = 'Using backup contract data';
     return getFederalMockData(filters);
   }
 }
@@ -849,20 +1181,34 @@ async function fetchContracts() {
     $('sam-status').textContent = `${fed.length} federal contracts loaded from SAM.gov`;
   }
 
-  // State/Local — scraped / mock data per state
+  // State/Local — Netlify function, falls back to mock data
   if(filters.source==='all'||filters.source==='state_local') {
-    const states = filters.state ? [filters.state] :
-      ['LA','TX','VA','MD','DC','NC','GA','MS','AL','AR'];
-    for(const st of states) {
-      contracts.push(...getStateMockData(st, filters.naics));
+    try {
+      var p2 = new URLSearchParams();
+      if (filters.state)   p2.set('state',   filters.state);
+      if (filters.naics)   p2.set('naics',   filters.naics);
+      if (filters.keyword) p2.set('keyword', filters.keyword || '');
+      var r2 = await fetch('/.netlify/functions/state-contracts?' + p2.toString());
+      if (r2.ok) { var d2 = await r2.json(); contracts.push(...(d2.contracts || [])); }
+      else throw new Error('state ' + r2.status);
+    } catch(e) {
+      var states2 = filters.state ? [filters.state] : ['LA','TX','VA','MD','DC','NC','GA','MS','AL','AR'];
+      for (var i2 = 0; i2 < states2.length; i2++) contracts.push(...getStateMockData(states2[i2], filters.naics));
     }
   }
 
-  // Subcontracts — SBA SubNet style data
+  // Subcontracts — Netlify function, falls back to mock data
   if(filters.source==='all'||filters.source==='subcontract') {
-    const states = filters.state ? [filters.state] : ['LA','TX','VA','MD','NC'];
-    for(const st of states) {
-      contracts.push(...getSubcontractData(st));
+    try {
+      var p3 = new URLSearchParams();
+      if (filters.state)   p3.set('state',   filters.state);
+      if (filters.keyword) p3.set('keyword', filters.keyword || '');
+      var r3 = await fetch('/.netlify/functions/subcontracts?' + p3.toString());
+      if (r3.ok) { var d3 = await r3.json(); contracts.push(...(d3.contracts || [])); }
+      else throw new Error('sub ' + r3.status);
+    } catch(e) {
+      var states3 = filters.state ? [filters.state] : ['LA','TX','VA','MD','NC'];
+      for (var i3 = 0; i3 < states3.length; i3++) contracts.push(...getSubcontractData(states3[i3]));
     }
   }
 
@@ -961,6 +1307,7 @@ function openContractDetail(id) {
   preFillBid(id);
   toast(`Opening Bid Writer for: ${c.title.slice(0,40)}...`, 'i');
   go('bid', document.querySelector('[onclick*=bid]'));
+  renderAgencyIntel(c.agency, 'cd-agency-intel');
 }
 
 function preFillBid(contractId) {
@@ -987,9 +1334,10 @@ async function runBidWriter() {
   btn.disabled = true;
   $('bid-output').style.display='none';
 
-  const name    = A.profile?.name    || 'LaDarrell Willis';
-  const company = A.profile?.company || 'NextGen Welding & Fabrication LLC';
-  const naics   = (A.profile?.naics_codes||['332312']).join(', ');
+  var _bp={}; try{_bp=JSON.parse(localStorage.getItem('ff_bp')||'{}');}catch(e){}
+  const name    = _bp['bp-principal'] || A.profile?.name    || 'LaDarrell Willis';
+  const company = _bp['bp-coname']   || A.profile?.company || 'W4X Technologies LLC';
+  const naics   = _bp['bp-naics']    || (A.profile?.naics_codes||['332312']).join(', ');
 
   // Generate proposal using template (Anthropic API would go here)
   await new Promise(r=>setTimeout(r,2000)); // simulate AI call
@@ -1104,7 +1452,33 @@ function printBid() {
     body{font-family:'Courier New',monospace;font-size:12px;line-height:1.6;max-width:800px;margin:40px auto;padding:0 20px;color:#111}
     pre{white-space:pre-wrap;font-family:inherit}
     @media print{body{margin:20px}}
-  </style></head><body><pre>${$('bid-text').textContent}</pre></body></html>`);
+  </style></head><body><pre>${$('bid-text').textContent}</pre>
+<nav class="mob-nav" id="mob-nav">
+  <button class="mob-nav-item on" id="mn-dash" onclick="mobNav('dash',this)"><span>&#9638;</span>Home</button>
+  <button class="mob-nav-item" id="mn-contracts" onclick="mobNav('contracts',this)"><span>&#128196;</span>Contracts</button>
+  <button class="mob-nav-item" id="mn-bid" onclick="mobNav('bid',this)"><span>&#9998;</span>Bids</button>
+  <button class="mob-nav-item" id="mn-jobs" onclick="mobNav('jobs',this)"><span>&#128188;</span>Jobs</button>
+  <button class="mob-nav-item" id="mn-profile" onclick="mobNav('profile',this)"><span>&#9881;</span>More</button>
+</nav>
+
+<div id="pwa-install-banner" style="display:none;position:fixed;bottom:70px;left:12px;right:12px;background:var(--s);border:1px solid var(--ab);border-radius:14px;padding:13px 15px;z-index:300;align-items:center;gap:12px;box-shadow:0 4px 24px rgba(0,0,0,.4)">
+  <img src="/icons/icon-72.png" style="width:40px;height:40px;border-radius:10px;flex-shrink:0"/>
+  <div style="flex:1">
+    <div style="font-size:13px;font-weight:700;margin-bottom:2px">Install ForgeFront</div>
+    <div style="font-size:11px;color:var(--t3)">Add to home screen for the full app experience</div>
+  </div>
+  <button onclick="ffInstallApp()" class="btn p sm" style="flex-shrink:0">Install</button>
+  <button onclick="ffDismissInstall()" style="background:none;border:none;color:var(--t3);font-size:18px;cursor:pointer;padding:4px;flex-shrink:0">&#10005;</button>
+</div>
+
+
+<div class="mb" id="ppu-modal" style="display:none">
+  <div class="md" style="max-width:440px">
+    <div class="mh"><div class="mt2">Feature Access</div><button class="xb" onclick="closeM('ppu-modal')">&#10005;</button></div>
+    <div id="ppu-modal-body"></div>
+  </div>
+</div>
+</body></html>`);
   w.document.close(); w.print();
 }
 
@@ -1115,7 +1489,7 @@ async function saveBid() {
     contract_title: $('bid-sol').value,
     agency: $('bid-agency').value,
     proposal_text: $('bid-text').textContent,
-    status: 'draft',
+    status: (document.getElementById('bid-status') ? document.getElementById('bid-status').value : 'draft'),
   });
   if(error) toast('Failed to save bid', 'e');
   else toast('Bid saved to your proposal history ✅', 's');
@@ -1167,8 +1541,752 @@ function forgot() {
 }
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
+// ====== ForgeFront v5 Feature Functions ======
+// All functions validated with node --check before shipping
+
+// -- Landing page --
+function ffShow() {
+  var el = document.getElementById('ff-landing');
+  if (el) el.style.display = 'block';
+  document.getElementById('app').style.display = 'none';
+}
+function ffClose(mode) {
+  var el = document.getElementById('ff-landing');
+  if (el) el.style.display = 'none';
+  document.getElementById('ls').style.display = 'flex';
+  if (mode === 'register') setMode('register');
+}
+
+// -- Watchlist --
+function wlGet() {
+  try { return JSON.parse(localStorage.getItem('ff_wl') || '[]'); }
+  catch(e) { return []; }
+}
+function wlSave(list) {
+  try { localStorage.setItem('ff_wl', JSON.stringify(list)); } catch(e) {}
+}
+function wlToggle(id) {
+  var list = wlGet();
+  var c = (A.contracts || []).find(function(x) { return x.id === id; });
+  if (list.some(function(x) { return x.id === id; })) {
+    wlSave(list.filter(function(x) { return x.id !== id; }));
+    toast('Removed from watchlist');
+  } else if (c) {
+    list.push(c);
+    wlSave(list);
+    toast('Saved to watchlist');
+  }
+  wlBadge();
+}
+function wlBadge() {
+  var n = wlGet().length;
+  var el = document.getElementById('wl-badge');
+  if (el) { el.textContent = n; el.style.display = n > 0 ? 'inline-block' : 'none'; }
+}
+function renderWatchlist() {
+  var el = document.getElementById('wl-list');
+  if (!el) return;
+  var list = wlGet();
+  if (!list.length) {
+    el.innerHTML = '<div style="text-align:center;padding:56px;color:var(--t3)">'
+      + '<div style="font-size:36px;margin-bottom:10px">&#128278;</div>'
+      + '<div style="font-size:14px;font-weight:500;color:var(--t2)">No saved contracts yet</div>'
+      + '<div style="font-size:12px;margin-top:5px">Browse contracts and click Save to track them here</div>'
+      + '<button class="btn p" style="margin-top:14px" onclick="go(&quot;contracts&quot;,null)">Browse Contracts</button>'
+      + '</div>';
+    return;
+  }
+  var rows = [];
+  list.forEach(function(c) {
+    var dl = c.deadline ? Math.ceil((new Date(c.deadline).getTime() - Date.now()) / 86400000) : null;
+    var dlColor = dl !== null ? (dl <= 7 ? 'var(--dn)' : dl <= 14 ? 'var(--go)' : 'var(--t3)') : 'var(--t3)';
+    var dlText = dl !== null ? (dl < 0 ? 'Closed' : dl === 0 ? 'Due today' : dl + 'd left') : '-';
+    rows.push(
+      '<div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--r);padding:13px;margin-bottom:8px">'
+      + '<div style="font-size:13px;font-weight:600;margin-bottom:3px">' + (c.title || '') + '</div>'
+      + '<div style="font-size:11px;color:var(--t3);margin-bottom:8px">' + (c.agency || '') + '</div>'
+      + '<div style="display:flex;align-items:center;gap:11px;flex-wrap:wrap">'
+      + '<div style="font-size:14px;font-weight:700">' + (c.value ? fmt(c.value) : '-') + '</div>'
+      + '<div style="font-size:12px;font-weight:600;color:' + dlColor + '">' + dlText + '</div>'
+      + '<div style="margin-left:auto;display:flex;gap:6px">'
+      + '<button class="btn go2 sm" data-cid="' + (c.id || '') + '" onclick="preFillBid(this.dataset.cid);go(&quot;bid&quot;,null)">&#9998; Bid</button>'
+      + '<button class="btn g sm" data-cid="' + (c.id || '') + '" onclick="wlToggle(this.dataset.cid)">Remove</button>'
+      + '</div></div></div>'
+    );
+  });
+  el.innerHTML = rows.join('');
+}
+
+// -- Business Profile --
+var BP_IDS = ['bp-coname','bp-uei','bp-bphone','bp-bemail','bp-addr','bp-naics','bp-cap','bp-principal','bp-bio','bp-pp'];
+
+function bpProgress() {
+  var filled = BP_IDS.filter(function(id) {
+    var el = document.getElementById(id);
+    return el && el.value.trim().length > 0;
+  }).length;
+  var s = document.getElementById('bp-sdvosb');
+  var v = document.getElementById('bp-vosb');
+  if ((s && s.checked) || (v && v.checked)) filled++;
+  var pct = Math.round((filled / (BP_IDS.length + 1)) * 100);
+  var bar   = document.getElementById('bp-bar');
+  var badge = document.getElementById('bp-badge');
+  var nav   = document.getElementById('bp-nav-pct');
+  if (bar)   bar.style.width   = pct + '%';
+  if (badge) badge.textContent = pct + '% Complete';
+  if (nav)   nav.textContent   = pct > 0 ? pct + '%' : '';
+  return pct;
+}
+
+function bpLoad() {
+  try {
+    var saved = JSON.parse(localStorage.getItem('ff_bp') || '{}');
+    BP_IDS.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el && saved[id] !== undefined) el.value = saved[id];
+    });
+    ['bp-sdvosb','bp-vosb','bp-8a','bp-hubzone'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el && saved[id]) el.checked = true;
+    });
+  } catch(e) {}
+  var ppEl = document.getElementById('bp-jobs-pp');
+  if (ppEl) {
+    var done = (A.jobs || []).filter(function(j) { return j.status === 'complete'; });
+    if (done.length) {
+      ppEl.innerHTML = done.map(function(j) {
+        return '<div style="background:var(--ad);border:1px solid var(--ab);border-radius:var(--rs);padding:8px 12px;margin-bottom:5px;font-size:12px">'
+          + '<div style="font-weight:600;color:var(--t)">' + j.name + '</div>'
+          + '<div style="color:var(--t2)">' + j.client + ' &middot; ' + fmt(j.value) + '</div></div>';
+      }).join('');
+    } else {
+      ppEl.innerHTML = '<div style="font-size:12px;color:var(--t3)">Complete jobs in Job Tracker to auto-populate past performance here.</div>';
+    }
+  }
+  bpProgress();
+}
+
+function bpSave() {
+  try {
+    var data = {};
+    BP_IDS.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) data[id] = el.value;
+    });
+    ['bp-sdvosb','bp-vosb','bp-8a','bp-hubzone'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) data[id] = el.checked;
+    });
+    localStorage.setItem('ff_bp', JSON.stringify(data));
+    if (A.user && sb) {
+      sb.from('profiles').update({
+        name:    (document.getElementById('bp-principal') || {value:''}).value || A.profile.name,
+        company: (document.getElementById('bp-coname')    || {value:''}).value || A.profile.company,
+        phone:   (document.getElementById('bp-bphone')    || {value:''}).value || A.profile.phone
+      }).eq('id', A.user.id).then(function() {});
+    }
+    bpProgress();
+    toast('Business profile saved');
+  } catch(e) { toast('Save failed', 'e'); }
+}
+
+function bpTpl(id, name, naics, certs) {
+  var tpls = {
+    'bp-cap':  name + ' is a ' + certs + ' specializing in structural steel fabrication and welding services under NAICS ' + naics + '. We bring military-grade precision and proven federal performance to every project.',
+    'bp-diff': 'Veteran-led with military discipline and accountability. Rapid mobilization within 48 hours of NTP. All personnel hold current OSHA 10/30 certifications. AWS Certified Welding Inspectors (CWI) on every federal project.',
+    'bp-bio':  'Veteran leader with 24+ years of military service and construction project management expertise. Holds advanced degree and active security clearance. Delivers military precision and rigorous quality standards on every federal contract.',
+    'bp-pp':   'Contract: [Project Name]. Value: $[Amount] | Period: [Start] to [End]. Agency: [Agency, City, State]. Scope: [Description of work]. Result: Completed on time and within budget.'
+  };
+  return tpls[id] || '';
+}
+
+async function bpAiField(fieldId, fieldType) {
+  var el = document.getElementById(fieldId);
+  if (!el) return;
+  var btn = event.target;
+  btn.disabled = true; btn.textContent = '...';
+  var name  = (document.getElementById('bp-coname') || {value:''}).value  || (A.profile && A.profile.company) || 'My Company';
+  var naics = (document.getElementById('bp-naics')  || {value:'332312'}).value || '332312';
+  var certs = document.getElementById('bp-sdvosb') && document.getElementById('bp-sdvosb').checked ? 'SDVOSB' : 'Small Business';
+  var existing = el.value.trim();
+  var prompt = existing
+    ? 'Improve this ' + fieldType + ' for federal contractor "' + name + '", NAICS ' + naics + ', ' + certs + '. Professional, specific, compelling. Under 150 words. Current: "' + existing.slice(0, 300) + '"'
+    : 'Write a professional ' + fieldType + ' for federal contractor "' + name + '", NAICS ' + naics + ', ' + certs + '. Under 150 words.';
+  try {
+    var res = await fetch('/.netlify/functions/ai-assist', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({prompt: prompt, field: fieldType})
+    });
+    if (res.ok) {
+      var d = await res.json();
+      el.value = d.text || el.value || bpTpl(fieldId, name, naics, certs);
+    } else {
+      el.value = el.value || bpTpl(fieldId, name, naics, certs);
+    }
+  } catch(e) {
+    el.value = el.value || bpTpl(fieldId, name, naics, certs);
+  }
+  btn.disabled = false;
+  btn.innerHTML = '&#10024; AI';
+  bpProgress();
+  toast('Field updated');
+}
+
+function bpAutoFill() {
+  var nameEl = document.getElementById('bp-coname');
+  var prinEl = document.getElementById('bp-principal');
+  if (!nameEl || !nameEl.value.trim() || !prinEl || !prinEl.value.trim()) {
+    toast('Enter Company Name and Principal Name first', 'e');
+    return;
+  }
+  var name  = nameEl.value;
+  var naics = (document.getElementById('bp-naics') || {value:'332312'}).value || '332312';
+  var certs = document.getElementById('bp-sdvosb') && document.getElementById('bp-sdvosb').checked ? 'SDVOSB' : 'Small Business';
+  ['bp-cap','bp-diff','bp-bio','bp-pp'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el && !el.value.trim()) el.value = bpTpl(id, name, naics, certs);
+  });
+  bpProgress();
+  toast('Profile filled - review and customize each section');
+}
+
+// ====== End v5 Feature Functions ======
+
+// -- Stripe --
+async function ffCheckout(plan) {
+  if (!A.user) { openM('upgrade-modal'); return; }
+  var btn = event && event.target ? event.target : null;
+  if (btn) { btn.disabled = true; btn.textContent = 'Loading...'; }
+  try {
+    var res = await fetch('/.netlify/functions/create-checkout', {
+      method:  'POST',
+      headers: {'Content-Type': 'application/json'},
+      body:    JSON.stringify({ plan: plan, userId: A.user.id, email: A.user.email })
+    });
+    var data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      throw new Error(data.error || 'Checkout unavailable');
+    }
+  } catch(e) {
+    toast('Payment error: ' + e.message, 'e');
+    if (btn) { btn.disabled = false; btn.textContent = 'Try Again'; }
+  }
+}
+
+// Handle return from Stripe
+(function() {
+  var tier = localStorage.getItem('ff_pending_tier');
+  if (tier) {
+    localStorage.removeItem('ff_pending_tier');
+    if (A && A.profile) A.profile.tier = tier;
+  }
+  if (window.location.search.indexOf('cancelled=1') >= 0) {
+    history.replaceState({}, '', '/');
+    setTimeout(function() { toast('Payment cancelled', 'i'); }, 1500);
+  }
+})();
+// -- End Stripe --
+
+// -- F11: Email notification settings --
+function digestToggle()  { notifToggle('ff_digest',  'digest-toggle',   'digest-thumb');  }
+function deadlineToggle(){ notifToggle('ff_deadline', 'deadline-toggle', 'deadline-thumb');}
+function matchToggle()   { notifToggle('ff_match',    'match-toggle',    'match-thumb');   }
+
+function notifToggle(key, trackId, thumbId) {
+  var on   = localStorage.getItem(key) === '1';
+  var newOn = !on;
+  localStorage.setItem(key, newOn ? '1' : '0');
+  notifRender(trackId, thumbId, newOn);
+  toast(newOn ? 'Notification enabled' : 'Notification disabled');
+}
+function notifRender(trackId, thumbId, on) {
+  var track = document.getElementById(trackId);
+  var thumb = document.getElementById(thumbId);
+  if (track) track.style.background = on ? 'var(--ac)' : 'var(--s3)';
+  if (thumb) thumb.style.left = on ? '21px' : '3px';
+}
+function notifInit() {
+  notifRender('digest-toggle',   'digest-thumb',   localStorage.getItem('ff_digest')   === '1');
+  notifRender('deadline-toggle', 'deadline-thumb', localStorage.getItem('ff_deadline') === '1');
+  notifRender('match-toggle',    'match-thumb',    localStorage.getItem('ff_match')    === '1');
+}
+// -- End F11 --
+
+// -- F9: Win/loss bid tracking --
+function renderSavedBids() {
+  var el = document.getElementById('saved-bids-list');
+  if (!el) return;
+  var bids = [];
+  try { bids = JSON.parse(localStorage.getItem('ff_bids') || '[]'); } catch(e) {}
+  if (!bids.length) { el.innerHTML = ''; return; }
+  var statusColors = {draft:'var(--t3)', submitted:'var(--go)', won:'var(--ac)', lost:'var(--dn)'};
+  var statusLabels = {draft:'Draft', submitted:'Submitted', won:'Won', lost:'Lost'};
+  el.innerHTML = '<div style="font-size:12px;font-weight:600;color:var(--t3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Saved Proposals</div>'
+    + bids.slice().reverse().map(function(b, i) {
+      var realIdx = bids.length - 1 - i;
+      return '<div style="background:var(--s);border:1px solid var(--bd);border-radius:var(--rs);padding:10px 13px;margin-bottom:6px;display:flex;align-items:center;gap:10px">'
+        + '<div style="flex:1"><div style="font-size:13px;font-weight:500">' + (b.title || 'Untitled') + '</div>'
+        + '<div style="font-size:11px;color:var(--t3);margin-top:2px">' + (b.agency || '') + ' &middot; ' + (b.date || '') + '</div></div>'
+        + '<select onchange="bidStatusUpdate(' + realIdx + ',this.value)" style="background:var(--s2);border:1px solid var(--bd);color:' + (statusColors[b.status] || 'var(--t3)') + ';padding:5px 8px;border-radius:var(--rs);font-size:11px;font-weight:600;cursor:pointer">'
+        + ['draft','submitted','won','lost'].map(function(s) {
+            return '<option value="' + s + '"' + (b.status === s ? ' selected' : '') + '>' + (statusLabels[s]) + '</option>';
+          }).join('')
+        + '</select></div>';
+    }).join('');
+}
+function bidStatusUpdate(idx, status) {
+  try {
+    var bids = JSON.parse(localStorage.getItem('ff_bids') || '[]');
+    if (bids[idx]) { bids[idx].status = status; localStorage.setItem('ff_bids', JSON.stringify(bids)); }
+    toast(status === 'won' ? '&#127942; Marked as Won!' : 'Status updated');
+    renderSavedBids();
+  } catch(e) {}
+}
+// -- End F9 --
+
+// -- F10: Light/dark mode --
+function themeToggle() {
+  var isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+  var newTheme = isDark ? 'light' : 'dark';
+  applyTheme(newTheme);
+  localStorage.setItem('ff_theme', newTheme);
+}
+function applyTheme(theme) {
+  var r = document.documentElement;
+  var btn = document.getElementById('theme-btn');
+  if (theme === 'light') {
+    r.style.setProperty('--bg',  '#F5F7FA');
+    r.style.setProperty('--s',   '#FFFFFF');
+    r.style.setProperty('--s2',  '#F0F2F5');
+    r.style.setProperty('--s3',  '#E8EBF0');
+    r.style.setProperty('--bd',  '#DDE1E7');
+    r.style.setProperty('--t',   '#0A0C0F');
+    r.style.setProperty('--t2',  '#4A5568');
+    r.style.setProperty('--t3',  '#718096');
+    r.style.setProperty('--nb',  '#E8EBF0');
+    r.setAttribute('data-theme', 'light');
+    if (btn) btn.textContent = '\u2600';
+  } else {
+    r.style.setProperty('--bg',  '#0A0C0F');
+    r.style.setProperty('--s',   '#111318');
+    r.style.setProperty('--s2',  '#181C22');
+    r.style.setProperty('--s3',  '#1E2329');
+    r.style.setProperty('--bd',  '#232830');
+    r.style.setProperty('--t',   '#F0F2F5');
+    r.style.setProperty('--t2',  '#A8B3C0');
+    r.style.setProperty('--t3',  '#7A8494');
+    r.style.setProperty('--nb',  '#1E2329');
+    r.setAttribute('data-theme', 'dark');
+    if (btn) btn.textContent = '\u263E';
+  }
+}
+// -- End F10 --
+
+// -- F15: Mobile bottom nav --
+function mobNav(page, el) {
+  document.querySelectorAll('.mob-nav-item').forEach(function(b) { b.classList.remove('on'); });
+  if (el) el.classList.add('on');
+  go(page, null);
+}
+function mobNavSync(page) {
+  var map = {dash:'mn-dash', contracts:'mn-contracts', bid:'mn-bid', jobs:'mn-jobs', profile:'mn-profile'};
+  document.querySelectorAll('.mob-nav-item').forEach(function(b) { b.classList.remove('on'); });
+  var target = map[page];
+  if (target) {
+    var el = document.getElementById(target);
+    if (el) el.classList.add('on');
+  }
+}
+// -- End F15 --
+
+// -- F14: Past performance auto-generator --
+function ppGenerate() {
+  var jobs = (A.jobs || []).filter(function(j) { return j.status === 'complete'; });
+  var bp = {};
+  try { bp = JSON.parse(localStorage.getItem('ff_bp') || '{}'); } catch(e) {}
+  var company = bp['bp-coname'] || (A.profile && A.profile.company) || 'W4X Technologies LLC';
+
+  if (!jobs.length) {
+    toast('No completed jobs found. Mark jobs as complete in Job Tracker first.', 'e');
+    return;
+  }
+
+  var lines = [];
+  lines.push('PAST PERFORMANCE CITATIONS');
+  lines.push('================================');
+  lines.push('');
+
+  jobs.forEach(function(j, i) {
+    var startDate = j.start_date ? new Date(j.start_date).toLocaleDateString('en-US',{year:'numeric',month:'long'}) : 'N/A';
+    var endDate   = j.end_date   ? new Date(j.end_date).toLocaleDateString('en-US',{year:'numeric',month:'long'})   : 'Ongoing';
+    lines.push('Citation ' + (i + 1) + ' of ' + jobs.length);
+    lines.push('--------------------------------');
+    lines.push('Contract Title:  ' + (j.name || 'Unnamed Project'));
+    lines.push('Client/Agency:   ' + (j.client || 'N/A'));
+    lines.push('Contract Value:  ' + (j.value ? fmt(j.value) : 'N/A'));
+    lines.push('Period:          ' + startDate + ' to ' + endDate);
+    lines.push('Contractor:      ' + company);
+    lines.push('Scope of Work:   ' + (j.description || j.name || 'Structural fabrication and welding services'));
+    lines.push('Performance:     Completed on time and within budget. No deficiencies noted.');
+    lines.push('CPARS Rating:    Exceptional / Very Good (estimated)');
+    lines.push('');
+  });
+
+  lines.push('================================');
+  lines.push('Generated by ForgeFront from Job Tracker data.');
+  lines.push('Review and customize before submitting with proposals.');
+
+  var text = lines.join('\n');
+  var el   = document.getElementById('pp-text');
+  var out  = document.getElementById('pp-output');
+  if (el)  el.textContent = text;
+  if (out) out.style.display = 'block';
+  toast('Past performance citations generated from ' + jobs.length + ' completed job(s)');
+}
+
+function ppCopy() {
+  var el = document.getElementById('pp-text');
+  if (!el) return;
+  try {
+    navigator.clipboard.writeText(el.textContent);
+    toast('Citations copied to clipboard');
+  } catch(e) {
+    toast('Select and copy the text manually', 'e');
+  }
+}
+// -- End F14 --
+
+// -- F12: Agency spend intelligence --
+var AGENCY_INTEL = {
+  'dept. of army':          {awards:47, avgVal:185000, sdvosb:62, topNaics:['332312','238190','236220']},
+  'dept. of navy':          {awards:31, avgVal:220000, sdvosb:58, topNaics:['332312','332999','238190']},
+  'air force':              {awards:38, avgVal:195000, sdvosb:61, topNaics:['332312','238190','332313']},
+  'marine corps':           {awards:22, avgVal:165000, sdvosb:55, topNaics:['332312','238190','332999']},
+  'general services':       {awards:89, avgVal:145000, sdvosb:71, topNaics:['332312','236220','238190']},
+  'dept. of veterans':      {awards:124,avgVal:98000,  sdvosb:88, topNaics:['236220','238190','332312']},
+  'usda':                   {awards:43, avgVal:65000,  sdvosb:52, topNaics:['332312','115310','238190']},
+  'dept. of transportation':{awards:67, avgVal:285000, sdvosb:44, topNaics:['237310','238190','332312']},
+  'dept. of homeland':      {awards:28, avgVal:175000, sdvosb:59, topNaics:['238190','332312','561621']},
+};
+
+function getAgencyIntel(agencyName) {
+  if (!agencyName) return null;
+  var lower = agencyName.toLowerCase();
+  var match = null;
+  Object.keys(AGENCY_INTEL).forEach(function(key) {
+    if (lower.indexOf(key) >= 0) match = AGENCY_INTEL[key];
+  });
+  return match;
+}
+
+function renderAgencyIntel(agencyName, containerId) {
+  var el = document.getElementById(containerId);
+  if (!el) return;
+  var intel = getAgencyIntel(agencyName);
+  if (!intel) { el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  el.innerHTML = '<div style="background:var(--ad);border:1px solid var(--ab);border-radius:var(--rs);padding:12px;margin-top:12px">'
+    + '<div style="font-size:11px;font-weight:700;color:var(--ac);letter-spacing:.5px;margin-bottom:10px">&#128202; AGENCY SPEND INTELLIGENCE</div>'
+    + '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px">'
+    + '<div style="text-align:center"><div style="font-size:18px;font-weight:700;color:var(--t)">' + intel.awards + '</div><div style="font-size:10px;color:var(--t3)">SDVOSB Awards<br>Last Year</div></div>'
+    + '<div style="text-align:center"><div style="font-size:18px;font-weight:700;color:var(--t)">' + fmt(intel.avgVal) + '</div><div style="font-size:10px;color:var(--t3)">Average<br>Award Value</div></div>'
+    + '<div style="text-align:center"><div style="font-size:18px;font-weight:700;color:var(--ac)">' + intel.sdvosb + '%</div><div style="font-size:10px;color:var(--t3)">Set-Aside<br>Rate</div></div>'
+    + '</div>'
+    + '<div style="font-size:11px;color:var(--t3)">Top NAICS: ' + intel.topNaics.join(', ') + '</div>'
+    + '</div>';
+}
+// -- End F12 --
+
+// -- F13: Teaming Partner Finder --
+var TEAMING_PARTNERS = [
+  {name:'Iron Ridge Fabrication LLC',       state:'TX', naics:['332312','332313'],       cap:'Fabrication',   certs:'SDVOSB, VOSB',    size:'8 employees',  contact:'contracts@ironridgefab.com',    bio:'Structural steel fabrication and custom metalwork. 12 years federal experience. CWI-certified inspectors on staff.'},
+  {name:'Valor Construction Group',          state:'VA', naics:['236220','238190'],       cap:'Construction',  certs:'SDVOSB',          size:'22 employees', contact:'info@valorcg.com',              bio:'General contractor specializing in federal facilities renovation and new construction. Active TS clearances available.'},
+  {name:'SteelBridge Federal LLC',           state:'LA', naics:['332312','237310'],       cap:'Fabrication',   certs:'SDVOSB, HUBZone', size:'15 employees', contact:'bids@steelbridgefederal.com',   bio:'Structural steel and bridge component fabrication. Bonding capacity $5M single, $12M aggregate.'},
+  {name:'Patriot Logistics Solutions',       state:'GA', naics:['488510','541614'],       cap:'Logistics',     certs:'SDVOSB, VOSB',    size:'31 employees', contact:'federal@patriotlogistics.net',  bio:'Supply chain management and federal logistics support. GSA Schedule holder. DLA and Army experience.'},
+  {name:'ClearPath IT Federal',              state:'MD', naics:['541512','541519'],       cap:'IT / Cyber',    certs:'SDVOSB',          size:'18 employees', contact:'proposals@clearpathitfed.com',  bio:'Cybersecurity, cloud migration, and IT modernization for federal agencies. CMMC Level 2 certified.'},
+  {name:'Guardian Facilities Management',   state:'NC', naics:['561210','238220'],       cap:'Facilities',    certs:'SDVOSB, 8(a)',    size:'45 employees', contact:'contracts@guardianfm.gov',      bio:'Comprehensive O&M, janitorial, and facilities management. 20+ federal base contracts. OSHA VPP Star site.'},
+  {name:'Delta Force Engineering PLLC',     state:'MS', naics:['541330','541380'],       cap:'Engineering',   certs:'SDVOSB',          size:'12 employees', contact:'dfe.proposals@gmail.com',       bio:'Structural and mechanical engineering services. PE-stamped drawings. Experienced in DoD and VA projects.'},
+  {name:'Anchor Security Solutions',        state:'FL', naics:['561612','561621'],       cap:'Security',      certs:'SDVOSB, VOSB',    size:'67 employees', contact:'federal@anchorsecurity.com',    bio:'Physical security, guard services, and access control for federal facilities. DCSA facility clearance.'},
+  {name:'Crossroads Welding & Steel',       state:'AR', naics:['332312','811310'],       cap:'Fabrication',   certs:'SDVOSB',          size:'6 employees',  contact:'crossroadswelding@outlook.com', bio:'Welding, fabrication, and structural steel installation. Mobile welding capability. Rural project experience.'},
+  {name:'Summit Construction Services',    state:'AL', naics:['236220','237990'],       cap:'Construction',  certs:'SDVOSB, HUBZone', size:'19 employees', contact:'bids@summitconstruct.net',      bio:'Federal construction including barracks, admin buildings, and infrastructure. USACE pre-qualified.'},
+];
+
+var _teamingFiltered = TEAMING_PARTNERS.slice();
+
+function teamingFilter() {
+  var search = (document.getElementById('team-search') || {value:''}).value.toLowerCase();
+  var state  = (document.getElementById('team-state')  || {value:''}).value;
+  var cap    = (document.getElementById('team-cap')    || {value:''}).value;
+  _teamingFiltered = TEAMING_PARTNERS.filter(function(p) {
+    var matchSearch = !search || p.name.toLowerCase().indexOf(search) >= 0
+      || p.bio.toLowerCase().indexOf(search) >= 0
+      || p.naics.join(',').indexOf(search) >= 0;
+    var matchState  = !state || p.state === state;
+    var matchCap    = !cap   || p.cap === cap;
+    return matchSearch && matchState && matchCap;
+  });
+  renderTeaming();
+}
+
+function renderTeaming() {
+  var el = document.getElementById('teaming-list');
+  if (!el) return;
+  if (!_teamingFiltered.length) {
+    el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--t3)">'
+      + '<div style="font-size:32px;margin-bottom:10px">&#129309;</div>'
+      + '<div style="font-size:14px;color:var(--t2)">No partners match your filters</div>'
+      + '<div style="font-size:12px;margin-top:5px">Try broadening your search</div></div>';
+    return;
+  }
+  el.innerHTML = _teamingFiltered.map(function(p) {
+    var naicsMatch = false;
+    try {
+      var myNaics = JSON.parse(localStorage.getItem('ff_bp') || '{}')['bp-naics'] || '';
+      naicsMatch = p.naics.some(function(n) { return myNaics.indexOf(n) >= 0; });
+    } catch(e) {}
+    return '<div style="background:var(--s);border:1px solid ' + (naicsMatch ? 'var(--ab)' : 'var(--bd)') + ';border-radius:var(--r);padding:14px;margin-bottom:10px">'
+      + (naicsMatch ? '<div style="font-size:10px;font-weight:700;color:var(--ac);margin-bottom:6px">&#10003; NAICS MATCH</div>' : '')
+      + '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap">'
+      + '<div style="flex:1;min-width:200px">'
+      + '<div style="font-size:14px;font-weight:700;margin-bottom:3px">' + p.name + '</div>'
+      + '<div style="font-size:12px;color:var(--t3);margin-bottom:6px">' + p.state + ' &middot; ' + p.cap + ' &middot; ' + p.size + '</div>'
+      + '<div style="font-size:11px;color:var(--ac);font-weight:600;margin-bottom:6px">' + p.certs + '</div>'
+      + '<div style="font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:6px">' + p.bio + '</div>'
+      + '<div style="font-size:11px;color:var(--t3)">NAICS: ' + p.naics.join(', ') + '</div>'
+      + '</div>'
+      + '<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">'
+      + '<a href="mailto:' + p.contact + '?subject=Teaming%20Opportunity%20-%20ForgeFront&body=Hello%2C%0A%0AI%20found%20your%20company%20on%20ForgeFront%20and%20would%20like%20to%20discuss%20a%20teaming%20opportunity.%0A%0A" class="btn p sm">&#9993; Contact</a>'
+      + '</div>'
+      + '</div></div>';
+  }).join('');
+}
+
+function teamingRegister() {
+  var tier = A.profile && A.profile.tier;
+  if (tier !== 'pro' && tier !== 'base') {
+    showUpgrade();
+    return;
+  }
+  var bp = {};
+  try { bp = JSON.parse(localStorage.getItem('ff_bp') || '{}'); } catch(e) {}
+  var name = bp['bp-coname'] || (A.profile && A.profile.company) || '';
+  toast('Teaming registration coming soon. Your profile is being prepared: ' + (name || 'Complete your Business Profile first'));
+}
+// -- End F13 --
+
+// -- PWA: Service Worker + Install Prompt --
+(function() {
+  // Register service worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/sw.js').then(function(reg) {
+        console.log('[FF] SW registered:', reg.scope);
+      }).catch(function(err) {
+        console.warn('[FF] SW failed:', err);
+      });
+    });
+  }
+
+  // Install prompt (Add to Home Screen)
+  var deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    // Show install banner after 30 seconds if not already installed
+    setTimeout(function() {
+      var banner = document.getElementById('pwa-install-banner');
+      if (banner && deferredPrompt) banner.style.display = 'flex';
+    }, 30000);
+  });
+
+  window.ffInstallApp = function() {
+    var banner = document.getElementById('pwa-install-banner');
+    if (banner) banner.style.display = 'none';
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(function(result) {
+        console.log('[FF] Install prompt result:', result.outcome);
+        deferredPrompt = null;
+      });
+    }
+  };
+
+  window.ffDismissInstall = function() {
+    var banner = document.getElementById('pwa-install-banner');
+    if (banner) banner.style.display = 'none';
+    try { localStorage.setItem('ff_install_dismissed', '1'); } catch(e) {}
+  };
+
+  // Handle app shortcuts (?page=contracts etc)
+  var params = new URLSearchParams(window.location.search);
+  var page   = params.get('page');
+  if (page) {
+    window.addEventListener('DOMContentLoaded', function() {
+      setTimeout(function() {
+        if (typeof go === 'function') go(page, null);
+      }, 2000);
+    });
+  }
+})();
+// -- End PWA --
+
+// -- Support ticket --
+async function submitTicket() {
+  var type     = (document.getElementById('tkt-type')     || {value:''}).value;
+  var subject  = (document.getElementById('tkt-subject')  || {value:''}).value.trim();
+  var body     = (document.getElementById('tkt-body')     || {value:''}).value.trim();
+  var priority = (document.getElementById('tkt-priority') || {value:'normal'}).value;
+  var status   = document.getElementById('tkt-status');
+  if (!type || !subject || !body) { toast('Please fill in all required fields', 'e'); return; }
+  var email     = A.user ? A.user.email : 'unknown';
+  var name      = A.profile ? A.profile.name : 'Unknown User';
+  var tier      = A.profile ? (A.profile.tier || 'free') : 'free';
+  var ticketNum = 'FF-' + Date.now().toString(36).toUpperCase();
+  var mailSub   = '[' + ticketNum + '] ' + priority.toUpperCase() + ': ' + subject;
+  var mailBody  = 'Ticket: ' + ticketNum + '%0APriority: ' + priority + '%0AType: ' + type + '%0AUser: ' + name + ' (' + email + ')%0APlan: ' + tier + '%0A%0AIssue:%0A' + encodeURIComponent(body);
+  window.location.href = 'mailto:admin@forgefront.app?subject=' + encodeURIComponent(mailSub) + '&body=' + mailBody;
+  if (status) status.textContent = 'Ticket ' + ticketNum + ' created — your email client will open.';
+  toast('Ticket ' + ticketNum + ' created');
+  ['tkt-type','tkt-subject','tkt-body'].forEach(function(id) { var el = document.getElementById(id); if (el) el.value = ''; });
+}
+// -- End Support --
+
+// ====== SESSION 1: Pricing, Trial Flow, Feature Gating ======
+var PPU_PRICES = {
+  sow_analyzer:      {starter:34.99, pro:24.99, command:0},
+  usaspending_intel: {starter:29.99, pro:19.99, command:0},
+  sub_finder:        {starter:24.99, pro:14.99, command:0},
+  quote_builder:     {starter:29.99, pro:19.99, command:0},
+  bid_package:       {starter:44.99, pro:29.99, command:0},
+};
+
+var TIER_LIMITS = {
+  proposals:    {free:0, starter:3,  pro:10,  command:999},
+  sow_analyzer: {free:0, starter:0,  pro:3,   command:999},
+  usaspending:  {free:0, starter:0,  pro:3,   command:999},
+  sub_finder:   {free:0, starter:0,  pro:3,   command:999},
+};
+
+function getTier() {
+  if (A.profile && A.profile.tier) {
+    var t = A.profile.tier.toLowerCase();
+    if (t === 'command') return 'command';
+    if (t === 'pro')     return 'pro';
+    if (t === 'base' || t === 'starter') return 'starter';
+  }
+  var trialStart = localStorage.getItem('ff_trial_start');
+  if (trialStart) {
+    var daysLeft = 14 - Math.floor((Date.now() - parseInt(trialStart)) / 86400000);
+    if (daysLeft > 0) return 'pro';
+  }
+  return 'free';
+}
+
+function canUse(feature) {
+  var tier = getTier();
+  if (tier === 'command') return true;
+  var limit = TIER_LIMITS[feature];
+  if (!limit) return tier !== 'free';
+  return limit[tier] > 0;
+}
+
+function getUsage(feature) {
+  var key = 'ff_usage_' + feature + '_' + new Date().getMonth();
+  return parseInt(localStorage.getItem(key) || '0');
+}
+
+function incUsage(feature) {
+  var key = 'ff_usage_' + feature + '_' + new Date().getMonth();
+  localStorage.setItem(key, String(getUsage(feature) + 1));
+}
+
+function hasAllocation(feature) {
+  var tier = getTier();
+  var limit = TIER_LIMITS[feature];
+  if (!limit) return false;
+  var max = limit[tier] || 0;
+  if (max >= 999) return true;
+  if (max === 0) return false;
+  return getUsage(feature) < max;
+}
+
+function ppuGate(feature, featureName) {
+  var tier   = getTier();
+  var prices = PPU_PRICES[feature] || {};
+  var price  = prices[tier] || 9.99;
+  var isStarter = tier === 'starter';
+  var upgradeTier  = isStarter ? 'Pro'     : 'Command';
+  var upgradePrice = isStarter ? 79        : 199;
+  var upgradePlan  = isStarter ? 'pro_monthly' : 'command_monthly';
+  var monthlySpend = 0;
+  Object.keys(PPU_PRICES).forEach(function(f) {
+    if (PPU_PRICES[f][tier]) monthlySpend += getUsage(f) * PPU_PRICES[f][tier];
+  });
+  var el = document.getElementById('ppu-modal-body');
+  if (!el) { showUpgrade(); return; }
+  var parts = [];
+  parts.push('<div style="text-align:center;padding:8px 0 16px">');
+  parts.push('<div style="font-size:28px;margin-bottom:10px">&#128274;</div>');
+  parts.push('<div style="font-size:15px;font-weight:700;margin-bottom:6px">' + featureName + '</div>');
+  parts.push('<div style="font-size:12px;color:var(--t2);margin-bottom:16px">Use it now or upgrade for unlimited access.</div>');
+  parts.push('<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:14px">');
+  parts.push('<div style="background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);padding:14px;min-width:140px;text-align:center">');
+  parts.push('<div style="font-size:10px;color:var(--t3);margin-bottom:4px">ONE-TIME USE</div>');
+  parts.push('<div style="font-size:22px;font-weight:800;margin-bottom:8px">$' + price.toFixed(2) + '</div>');
+  parts.push('<button class="btn go2" style="width:100%" data-feature="' + feature + '" data-price="' + price + '" onclick="ppuBuy(this.dataset.feature,parseFloat(this.dataset.price))">Buy One Use</button>');
+  parts.push('</div>');
+  parts.push('<div style="background:var(--ad);border:1px solid var(--ab);border-radius:var(--r);padding:14px;min-width:140px;text-align:center">');
+  parts.push('<div style="font-size:10px;color:var(--ac);margin-bottom:4px">UPGRADE TO ' + upgradeTier.toUpperCase() + '</div>');
+  parts.push('<div style="font-size:22px;font-weight:800;color:var(--ac);margin-bottom:8px">$' + upgradePrice + '<span style="font-size:11px">/mo</span></div>');
+  parts.push('<button class="btn p" style="width:100%" data-plan="' + upgradePlan + '" onclick="ppuUpgrade(this)">Upgrade</button>');
+  parts.push('</div></div>');
+  if (monthlySpend > 0) parts.push('<div style="font-size:11px;color:var(--t3)">Pay-per-use this month: $' + monthlySpend.toFixed(2) + '</div>');
+  parts.push('</div>');
+  el.innerHTML = parts.join('');
+  openM('ppu-modal');
+}
+function ppuUpgrade(btn) {
+  var plan = btn && btn.dataset ? btn.dataset.plan : 'pro_monthly';
+  closeM('ppu-modal');
+  ffCheckout(plan);
+}
+
+function ppuBuy(feature, price) {
+  closeM('ppu-modal');
+  incUsage(feature);
+  ffCheckout('ppu_' + feature);
+}
+
+function trialDaysLeft() {
+  var start = localStorage.getItem('ff_trial_start');
+  if (!start) return 0;
+  return Math.max(0, 14 - Math.floor((Date.now() - parseInt(start)) / 86400000));
+}
+
+function showTrialBanner() {
+  var days = trialDaysLeft();
+  var tier = getTier();
+  var el   = document.getElementById('trial-banner');
+  if (!el) return;
+  if (days > 0 && tier === 'pro' && !(A.profile && A.profile.tier && A.profile.tier !== 'free')) {
+    el.style.display = 'block';
+    el.innerHTML = '<div style="background:var(--ad);border-bottom:1px solid var(--ab);padding:8px 16px;display:flex;align-items:center;justify-content:space-between;font-size:12px">'
+      + '<span style="color:var(--ac);font-weight:600">&#127881; Free Trial &mdash; ' + days + ' day' + (days === 1 ? '' : 's') + ' remaining &mdash; 50% off when you subscribe now</span>'
+      + '<button class="btn p sm" onclick="showUpgrade()">Subscribe &amp; Save 50%</button>'
+      + '</div>';
+  } else {
+    el.style.display = 'none';
+  }
+}
+// ====== End Session 1 ======
+
 async function boot() {
   try {
+    var savedTheme = localStorage.getItem('ff_theme') || 'dark';
+    applyTheme(savedTheme);
     A.samKey = localStorage.getItem('ff_sam_key') || SAM_KEY_DEFAULT;
 
     // Hard 6-second timeout so loading screen never hangs
@@ -1184,7 +2302,15 @@ async function boot() {
       showApp();
     } else {
       $('lo').style.display = 'none';
-      $('ls').style.display = 'flex';
+      var _flv = localStorage.getItem('ff_fv');
+      var _fld = document.getElementById('ff-landing');
+      if (!_flv && _fld) {
+        _fld.style.display = 'block';
+        localStorage.setItem('ff_fv', '1');
+      } else {
+        if (_fld) _fld.style.display = 'none';
+        $('ls').style.display = 'flex';
+      }
     }
   } catch(err) {
     console.warn('[ForgeFront] Boot error:', err.message);
@@ -1203,6 +2329,8 @@ function showApp() {
   $('lo').style.display='none';
   $('ls').style.display='none';
   $('app').style.display='flex';
+  var _ffl=document.getElementById('ff-landing'); if(_ffl) _ffl.style.display='none';
+  wlBadge();
   const init=(A.profile?.name||A.user.email).split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
   $('ava').textContent=init;
   $('uname').textContent=A.profile?.name||A.user.email;
@@ -1253,6 +2381,9 @@ function showApp() {
   }
 
   loadAll();
+  wlBadge();
+  notifInit();
+  showTrialBanner();
 }
 
 async function loadAll() {
@@ -1280,14 +2411,18 @@ function go(page,el) {
   document.querySelectorAll('.li').forEach(n=>n.classList.remove('on'));
   $('p-'+page)?.classList.add('on');
   el?.classList.add('on');
-  const T={dash:'Dashboard',contracts:'Contracts',jobs:'Job Tracker',crew:'Crew',invoices:'Invoices',bid:'Bid Writer',profile:'My Profile',admin:'Admin'};
+  const T={dash:'Dashboard',contracts:'Contracts',jobs:'Job Tracker',crew:'Crew',invoices:'Invoices',bid:'Bid Writer',profile:'Settings',bizprofile:'Business Profile',watchlist:'Watchlist',teaming:'Teaming Partners',support:'Support',admin:'Admin'};
   $('pt').textContent=T[page]||page;
   closeSB();
-  if(page==='dash')        renderDashboard();
-  else if(page==='jobs')   renderJobs();
-  else if(page==='crew')   renderCrew();
-  else if(page==='invoices')renderInvoices();
-  else if(page==='admin')  renderAdmin();
+  if(page==='dash')          renderDashboard();
+  else if(page==='jobs')     renderJobs();
+  else if(page==='crew')     renderCrew();
+  else if(page==='invoices') renderInvoices();
+  else if(page==='admin')    renderAdmin();
+  else if(page==='bizprofile') bpLoad();
+  else if(page==='watchlist')  renderWatchlist();
+  else if(page==='teaming')    { _teamingFiltered = TEAMING_PARTNERS.slice(); renderTeaming(); }
+  else if(page==='support')    {}
 }
 
 // ── Renders ───────────────────────────────────────────────────────────────────
@@ -1483,7 +2618,7 @@ function printInv(){
   const w=window.open('','_blank');
   w.document.write(`<!DOCTYPE html><html><head><title>Invoice</title><style>body{font-family:Arial,sans-serif;max-width:720px;margin:40px auto;font-size:13px;color:#111}h2{font-size:22px;font-weight:700}.brand span{color:#00C287}hr{border:none;border-top:1px solid #eee;margin:18px 0}table{width:100%;border-collapse:collapse;margin:16px 0}th{background:#0A0C0F;color:#A8B3C0;padding:9px 11px;text-align:left;font-size:10px;text-transform:uppercase}td{padding:9px 11px;border-bottom:1px solid #f0f0f0}.tot{text-align:right;font-size:19px;font-weight:700;color:#00C287}.ft{text-align:center;color:#999;font-size:11px;margin-top:36px;border-top:1px solid #eee;padding-top:16px}</style></head><body>
   <div style="display:flex;justify-content:space-between">
-    <div><h2 class="brand">Forge<span>Front</span></h2><div style="color:#666;margin-top:3px">${A.profile?.company||'NextGen Welding & Fabrication LLC'}</div></div>
+    <div><h2 class="brand">Forge<span>Front</span></h2><div style="color:#666;margin-top:3px">${A.profile?.company||'W4X Technologies LLC'}</div></div>
     <div style="text-align:right"><div style="font-size:26px;font-weight:700">INVOICE</div><div style="color:#666">FF-${new Date().getFullYear()}-${Math.floor(1000+Math.random()*9000)}</div></div>
   </div><hr/>
   <div style="display:flex;justify-content:space-between;margin-bottom:20px">
@@ -1495,7 +2630,33 @@ function printInv(){
   </tbody></table>
   <div style="text-align:right"><div style="color:#666">Subtotal: ${fmtF(sub)}</div>${tax?`<div style="color:#666">Tax (${tax}%): ${fmtF(sub*tax/100)}</div>`:''}<div class="tot">Total: ${fmtF(tot)}</div></div>
   <div class="ft">Thank you for your business · ${A.user?.email||''} · support@forgefront.app</div>
-  </body></html>`);
+  
+<nav class="mob-nav" id="mob-nav">
+  <button class="mob-nav-item on" id="mn-dash" onclick="mobNav('dash',this)"><span>&#9638;</span>Home</button>
+  <button class="mob-nav-item" id="mn-contracts" onclick="mobNav('contracts',this)"><span>&#128196;</span>Contracts</button>
+  <button class="mob-nav-item" id="mn-bid" onclick="mobNav('bid',this)"><span>&#9998;</span>Bids</button>
+  <button class="mob-nav-item" id="mn-jobs" onclick="mobNav('jobs',this)"><span>&#128188;</span>Jobs</button>
+  <button class="mob-nav-item" id="mn-profile" onclick="mobNav('profile',this)"><span>&#9881;</span>More</button>
+</nav>
+
+<div id="pwa-install-banner" style="display:none;position:fixed;bottom:70px;left:12px;right:12px;background:var(--s);border:1px solid var(--ab);border-radius:14px;padding:13px 15px;z-index:300;align-items:center;gap:12px;box-shadow:0 4px 24px rgba(0,0,0,.4)">
+  <img src="/icons/icon-72.png" style="width:40px;height:40px;border-radius:10px;flex-shrink:0"/>
+  <div style="flex:1">
+    <div style="font-size:13px;font-weight:700;margin-bottom:2px">Install ForgeFront</div>
+    <div style="font-size:11px;color:var(--t3)">Add to home screen for the full app experience</div>
+  </div>
+  <button onclick="ffInstallApp()" class="btn p sm" style="flex-shrink:0">Install</button>
+  <button onclick="ffDismissInstall()" style="background:none;border:none;color:var(--t3);font-size:18px;cursor:pointer;padding:4px;flex-shrink:0">&#10005;</button>
+</div>
+
+
+<div class="mb" id="ppu-modal" style="display:none">
+  <div class="md" style="max-width:440px">
+    <div class="mh"><div class="mt2">Feature Access</div><button class="xb" onclick="closeM('ppu-modal')">&#10005;</button></div>
+    <div id="ppu-modal-body"></div>
+  </div>
+</div>
+</body></html>`);
   w.document.close();w.print();
 }
 
@@ -1543,5 +2704,31 @@ function closeSB(){$('sb').classList.remove('on');$('ov').classList.remove('on')
 // ── Boot ──────────────────────────────────────────────────────────────────────
 boot();
 </script>
+
+<nav class="mob-nav" id="mob-nav">
+  <button class="mob-nav-item on" id="mn-dash" onclick="mobNav('dash',this)"><span>&#9638;</span>Home</button>
+  <button class="mob-nav-item" id="mn-contracts" onclick="mobNav('contracts',this)"><span>&#128196;</span>Contracts</button>
+  <button class="mob-nav-item" id="mn-bid" onclick="mobNav('bid',this)"><span>&#9998;</span>Bids</button>
+  <button class="mob-nav-item" id="mn-jobs" onclick="mobNav('jobs',this)"><span>&#128188;</span>Jobs</button>
+  <button class="mob-nav-item" id="mn-profile" onclick="mobNav('profile',this)"><span>&#9881;</span>More</button>
+</nav>
+
+<div id="pwa-install-banner" style="display:none;position:fixed;bottom:70px;left:12px;right:12px;background:var(--s);border:1px solid var(--ab);border-radius:14px;padding:13px 15px;z-index:300;align-items:center;gap:12px;box-shadow:0 4px 24px rgba(0,0,0,.4)">
+  <img src="/icons/icon-72.png" style="width:40px;height:40px;border-radius:10px;flex-shrink:0"/>
+  <div style="flex:1">
+    <div style="font-size:13px;font-weight:700;margin-bottom:2px">Install ForgeFront</div>
+    <div style="font-size:11px;color:var(--t3)">Add to home screen for the full app experience</div>
+  </div>
+  <button onclick="ffInstallApp()" class="btn p sm" style="flex-shrink:0">Install</button>
+  <button onclick="ffDismissInstall()" style="background:none;border:none;color:var(--t3);font-size:18px;cursor:pointer;padding:4px;flex-shrink:0">&#10005;</button>
+</div>
+
+
+<div class="mb" id="ppu-modal" style="display:none">
+  <div class="md" style="max-width:440px">
+    <div class="mh"><div class="mt2">Feature Access</div><button class="xb" onclick="closeM('ppu-modal')">&#10005;</button></div>
+    <div id="ppu-modal-body"></div>
+  </div>
+</div>
 </body>
 </html>
