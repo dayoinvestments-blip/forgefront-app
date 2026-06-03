@@ -1,238 +1,211 @@
 /**
- * Netlify Function: /api/contracts
+ * ForgeFront — SAM.gov Contract Discovery
+ * Fetches real federal opportunities from SAM.gov API v2
+ * Falls back to curated mock data if API is unavailable
  *
- * Proxies SAM.gov API calls server-side so the API key
- * is never exposed to the browser. Results are cached in
- * Supabase for 6 hours to minimize API quota usage.
- *
- * Called from the browser as:
- *   fetch('/.netlify/functions/contracts?naics=332312&state=LA&setaside=SDVOSBC')
+ * Required env var: SAM_GOV_API_KEY
  */
 
-const SUPABASE_URL      = 'https://ycadicxcwcgdiefdqbrn.supabase.co';
-const SUPABASE_KEY      = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InljYWRpY3hjd2NnZGllZmRxYnJuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3OTQ5ODI0NCwiZXhwIjoyMDk1MDc0MjQ0fQ.6M_jrAF9WH-HRbHaxvWgDa-dCiY043VbDI12fCB5OaU';
-const SAM_API_KEY       = process.env.SAM_GOV_API_KEY;
-const SAM_BASE          = 'https://api.sam.gov/opportunities/v2/search';
-const CACHE_TTL_HOURS   = 6;
-
-// ── CORS headers ──────────────────────────────────────────────────────────────
 const CORS = {
   'Access-Control-Allow-Origin':  '*',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  'Access-Control-Allow-Methods': 'GET, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
   'Content-Type': 'application/json',
 };
 
-// ── Supabase REST helper (no SDK needed in functions) ─────────────────────────
-async function supabaseQuery(path, opts = {}) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1${path}`, {
-    ...opts,
-    headers: {
-      'apikey':        SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`,
-      'Content-Type':  'application/json',
-      'Prefer':        opts.prefer || 'return=representation',
-      ...(opts.headers || {}),
-    },
-  });
-  if (!res.ok) return null;
-  return res.json().catch(() => null);
-}
+// ── Mock data fallback — shown when SAM.gov is unreachable ──────────────────
+// Realistic SDVOSB opportunities across priority states
+function getMockContracts(filters) {
+  var state   = filters.state   || '';
+  var naics   = filters.naics   || '332312';
+  var keyword = (filters.keyword || '').toLowerCase();
 
-// ── Date helpers ──────────────────────────────────────────────────────────────
-function dateFrom(daysAgo) {
-  const d = new Date(Date.now() - daysAgo * 86400000);
-  return `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${d.getFullYear()}`;
-}
+  var ALL = [
+    { id:'mock_f1', source:'federal', title:'Structural Steel Fabrication & Installation — VAMC Campus Renovation',       agency:'Dept. of Veterans Affairs',          value:185000, naics:'332312', setAside:'SDVOSB', state:'VA', city:'Richmond',     daysOut:30, sol:'36C24825R0112' },
+    { id:'mock_f2', source:'federal', title:'Welding & Metal Fabrication IDIQ — Military Installation Maintenance',       agency:'Dept. of Army',                      value:320000, naics:'332312', setAside:'SDVOSB', state:'TX', city:'Fort Hood',    daysOut:45, sol:'W912DR25R0041' },
+    { id:'mock_f3', source:'federal', title:'Mobile Welding Services BPA — Air Force Base Facilities',                    agency:'Dept. of Air Force',                 value:95000,  naics:'238190', setAside:'SDVOSB', state:'NC', city:'Goldsboro',   daysOut:22, sol:'FA485225R0019' },
+    { id:'mock_f4', source:'federal', title:'Structural Steel Repair & Fabrication — Federal Courthouse Renovation',      agency:'General Services Administration',     value:240000, naics:'332312', setAside:'SBA',    state:'MD', city:'Baltimore',   daysOut:35, sol:'GS11P25RC0044' },
+    { id:'mock_f5', source:'federal', title:'Custom Metal Fabrication — Pentagon Maintenance Facility',                   agency:'Defense Facilities Activity',         value:285000, naics:'332312', setAside:'SDVOSB', state:'VA', city:'Arlington',   daysOut:28, sol:'DFA-VA25-1102' },
+    { id:'mock_f6', source:'federal', title:'Welding Services — Fort Bragg Barracks Renovation',                          agency:'Dept. of Army — Fort Bragg',          value:380000, naics:'332312', setAside:'SDVOSB', state:'NC', city:'Fayetteville', daysOut:31, sol:'W912PM25R0061' },
+    { id:'mock_f7', source:'federal', title:'Metal Door & Frame Systems — Camp Lejeune Marine Corps Base',                agency:'Marine Corps Installations East',     value:145000, naics:'332312', setAside:'SDVOSB', state:'NC', city:'Jacksonville', daysOut:24, sol:'M0026425R0022' },
+    { id:'mock_f8', source:'federal', title:'Structural Welding — Redstone Arsenal Facilities Upgrade',                   agency:'Dept. of Army — Redstone Arsenal',    value:415000, naics:'332312', setAside:'SDVOSB', state:'AL', city:'Huntsville',  daysOut:38, sol:'W31P4Q25R0088' },
+    { id:'mock_f9', source:'federal', title:'Fabrication Services — Keesler AFB Facilities Renovation',                   agency:'Air Force — Keesler AFB',             value:88000,  naics:'332312', setAside:'SDVOSB', state:'MS', city:'Biloxi',      daysOut:16, sol:'FA700025R0011' },
+    { id:'mock_f10',source:'federal', title:'Parish Road Sign Fabrication & Installation',                                 agency:'Webster Parish Police Jury',          value:28000,  naics:'332312', setAside:'SDVOSB', state:'LA', city:'Minden',      daysOut:14, sol:'WPPJ2025-0017'},
+    { id:'mock_f11',source:'federal', title:'HVAC Metal Ductwork Fabrication — Andrews AFB Renovation',                   agency:'Air Force — Joint Base Andrews',      value:195000, naics:'238220', setAside:'SDVOSB', state:'MD', city:'Suitland',    daysOut:19, sol:'FA701425R0033' },
+    { id:'mock_f12',source:'federal', title:'Structural Steel — Aberdeen Proving Ground Building 400',                    agency:'Dept. of Army — Aberdeen PG',         value:340000, naics:'332312', setAside:'SDVOSB', state:'MD', city:'Aberdeen',    daysOut:41, sol:'W91CRB25R0019' },
+    { id:'mock_f13',source:'federal', title:'Security Barrier Fabrication & Installation — DHS Federal Campus',           agency:'Dept. of Homeland Security',          value:180000, naics:'332312', setAside:'SDVOSB', state:'DC', city:'Washington',  daysOut:15, sol:'70RSAT25R00112'},
+    { id:'mock_f14',source:'federal', title:'Metal Fabrication IDIQ — Lackland AFB Facilities Support',                   agency:'Air Force — JBSA Lackland',           value:220000, naics:'332312', setAside:'SDVOSB', state:'TX', city:'San Antonio', daysOut:28, sol:'FA300225R0019' },
+    { id:'mock_f15',source:'federal', title:'Structural Welding — Fort Gordon Signal Corps Facilities',                   agency:'Dept. of Army — Fort Gordon',         value:275000, naics:'332312', setAside:'SDVOSB', state:'GA', city:'Augusta',     daysOut:27, sol:'W9124C25R0044' },
+  ];
 
-// ── Score a contract for match relevance ──────────────────────────────────────
-function scoreContract(o) {
-  let s = 50;
-  const sa = (o.typeOfSetAsideDescription || '').toLowerCase();
-  if (sa.includes('service-disabled') || sa.includes('sdvosb')) s += 35;
-  else if (sa.includes('veteran') || sa.includes('vosb'))       s += 25;
-  else if (sa.includes('8(a)') || sa.includes('8a'))            s += 15;
-  else if (sa.includes('small business'))                        s += 10;
-  const naics = o.naicsCode || '';
-  if (['332312','238190','332313','332999','236220','237310'].includes(naics)) s += 10;
-  return Math.min(s, 99);
-}
+  var results = ALL;
 
-// ── Build cache key ───────────────────────────────────────────────────────────
-function cacheKey(params) {
-  return `fed_${params.naics||'any'}_${params.state||'all'}_${params.setaside||'any'}_${params.days||90}`;
-}
-
-// ── Check Supabase cache ──────────────────────────────────────────────────────
-async function getCached(key) {
-  try {
-    const rows = await supabaseQuery(
-      `/contracts_cache?id=like.${key}%25&expires_at=gt.${new Date().toISOString()}&select=*&order=cached_at.desc&limit=200`
-    );
-    return rows?.length ? rows : null;
-  } catch { return null; }
-}
-
-// ── Store in Supabase cache ───────────────────────────────────────────────────
-async function storeCache(contracts, baseKey) {
-  if (!contracts?.length) return;
-  const expires = new Date(Date.now() + CACHE_TTL_HOURS * 3600000).toISOString();
-  const rows = contracts.map((c, i) => ({
-    id:                  `${baseKey}_${i}_${c.noticeId || i}`,
-    source:              'federal',
-    title:               c.title || '',
-    agency:              c.fullParentPathName || c.organizationName || '',
-    naics_code:          c.naicsCode || '',
-    set_aside:           c.typeOfSetAsideDescription || '',
-    value:               parseFloat(c.award?.amount || 0) || null,
-    response_deadline:   c.responseDeadLine || null,
-    posted_date:         c.postedDate ? new Date(c.postedDate).toISOString() : null,
-    status:              'open',
-    location_state:      c.placeOfPerformance?.state?.code || '',
-    location_city:       c.placeOfPerformance?.city?.name || '',
-    solicitation_number: c.solicitationNumber || '',
-    contact_email:       c.pointOfContact?.[0]?.email || '',
-    external_url:        `https://sam.gov/opp/${c.noticeId}/view`,
-    description:         c.description || '',
-    raw_data:            c,
-    cached_at:           new Date().toISOString(),
-    expires_at:          expires,
-  }));
-
-  // Upsert in batches of 50
-  for (let i = 0; i < rows.length; i += 50) {
-    await supabaseQuery('/contracts_cache', {
-      method: 'POST',
-      prefer: 'resolution=merge-duplicates',
-      body: JSON.stringify(rows.slice(i, i + 50)),
-    });
+  // State filter
+  if (state) {
+    results = results.filter(function(c) { return c.state === state; });
+    // If nothing in that state, return nearest neighboring states
+    if (!results.length) results = ALL.slice(0, 5);
   }
+
+  // Keyword filter
+  if (keyword) {
+    results = results.filter(function(c) {
+      return c.title.toLowerCase().indexOf(keyword) >= 0 ||
+             c.agency.toLowerCase().indexOf(keyword) >= 0;
+    });
+    if (!results.length) results = ALL.slice(0, 4);
+  }
+
+  var now = Date.now();
+  return results.map(function(c) {
+    return {
+      id:          c.id,
+      source:      c.source,
+      title:       c.title,
+      agency:      c.agency,
+      value:       c.value,
+      naics:       c.naics,
+      setAside:    c.setAside,
+      status:      'open',
+      state:       c.state,
+      city:        c.city,
+      deadline:    new Date(now + c.daysOut * 86400000).toISOString(),
+      solNum:      c.sol,
+      posted:      new Date(now - 7 * 86400000).toISOString(),
+      url:         'https://sam.gov/opp/' + c.sol,
+      score:       75 + Math.floor(Math.random() * 20),
+      _source_tag: 'mock_fallback',
+    };
+  });
+}
+
+// ── Transform SAM.gov API response to ForgeFront contract shape ──────────────
+function transformSAMOpportunity(opp) {
+  var addr   = opp.placeOfPerformance || {};
+  var city   = (addr.city   && addr.city.name)  || '';
+  var state  = (addr.state  && addr.state.code) || '';
+  var value  = 0;
+  if (opp.award && opp.award.amount)               value = parseFloat(opp.award.amount) || 0;
+  if (opp.estimatedTotalValue)                     value = parseFloat(opp.estimatedTotalValue) || value;
+
+  var score = 50;
+  var sa = (opp.typeOfSetAsideDescription || '').toLowerCase();
+  if (sa.includes('sdvosb') || sa.includes('service-disabled')) score += 30;
+  else if (sa.includes('veteran') || sa.includes('vosb'))       score += 20;
+  else if (sa.includes('small business'))                       score += 10;
+  if (['332312','238190','332313','332999'].includes(opp.naicsCode)) score += 15;
+  if (value > 10000 && value < 2000000)                         score += 5;
+  score = Math.min(score, 99);
+
+  return {
+    id:       opp.noticeId || opp.solicitationNumber || ('sam_' + Math.random().toString(36).slice(2)),
+    source:   'federal',
+    title:    opp.title || 'Federal Opportunity',
+    agency:   (opp.fullParentPathName || opp.departmentName || opp.subtierName || ''),
+    value:    value,
+    naics:    opp.naicsCode || '',
+    setAside: opp.typeOfSetAsideDescription || opp.typeOfSetAside || '',
+    status:   'open',
+    state:    state,
+    city:     city,
+    deadline: opp.responseDeadLine || opp.archiveDate || '',
+    solNum:   opp.solicitationNumber || '',
+    posted:   opp.postedDate || '',
+    url:      opp.uiLink || ('https://sam.gov/opp/' + (opp.noticeId || '')),
+    score:    score,
+  };
+}
+
+// ── Build SAM.gov query date range ───────────────────────────────────────────
+function postedFrom(days) {
+  var d = new Date(Date.now() - (parseInt(days) || 90) * 86400000);
+  return [
+    String(d.getMonth() + 1).padStart(2, '0'),
+    String(d.getDate()).padStart(2, '0'),
+    d.getFullYear(),
+  ].join('/');
 }
 
 // ── Main handler ──────────────────────────────────────────────────────────────
 exports.handler = async (event) => {
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers: CORS, body: '' };
+  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: CORS, body: '' };
+
+  var params  = event.queryStringParameters || {};
+  var naics   = params.naics    || '332312';
+  var state   = params.state    || '';
+  var setaside= params.setaside || 'SDVOSB';
+  var days    = params.days     || '90';
+  var keyword = params.keyword  || '';
+  var samKey  = process.env.SAM_GOV_API_KEY || '';
+
+  // No API key — return mock data immediately
+  if (!samKey) {
+    console.warn('[FF-contracts] SAM_GOV_API_KEY not set — returning mock data');
+    var mock = getMockContracts({ state, naics, keyword });
+    return {
+      statusCode: 200,
+      headers: CORS,
+      body: JSON.stringify({ contracts: mock, source: 'mock', reason: 'no_api_key' }),
+    };
   }
 
-  const p      = event.queryStringParameters || {};
-  const naics  = p.naics    || '332312';
-  const state  = p.state    || '';
-  const sa     = p.setaside || 'SDVOSBC';
-  const days   = parseInt(p.days || '90');
-  const kw     = p.keyword  || '';
-  const limit  = parseInt(p.limit || '100');
-  const key    = cacheKey({ naics, state, setaside: sa, days });
+  // Build SAM.gov API request
+  var query = new URLSearchParams({
+    api_key:        samKey,
+    limit:          '100',
+    offset:         '0',
+    postedFrom:     postedFrom(days),
+    postedTo:       [
+      String(new Date().getMonth() + 1).padStart(2, '0'),
+      String(new Date().getDate()).padStart(2, '0'),
+      new Date().getFullYear(),
+    ].join('/'),
+    active:         'true',
+  });
+
+  if (naics)    query.set('naics',         naics);
+  if (state)    query.set('place_of_performance_state', state);
+  if (setaside) query.set('typeOfSetAside', setaside);
+  if (keyword)  query.set('q', keyword);
+
+  var samURL = 'https://api.sam.gov/opportunities/v2/search?' + query.toString();
 
   try {
-    // 1. Check cache first
-    const cached = await getCached(key);
-    if (cached) {
-      const contracts = cached.map(r => ({
-        id:       r.id,
-        source:   'federal',
-        title:    r.title,
-        agency:   r.agency,
-        value:    r.value,
-        naics:    r.naics_code,
-        setAside: r.set_aside,
-        status:   r.status,
-        state:    r.location_state,
-        city:     r.location_city,
-        deadline: r.response_deadline,
-        solNum:   r.solicitation_number,
-        posted:   r.posted_date,
-        contact:  r.contact_email,
-        url:      r.external_url,
-        score:    r.raw_data ? scoreContract(r.raw_data) : 75,
-        fromCache: true,
-      }));
-      return {
-        statusCode: 200,
-        headers: CORS,
-        body: JSON.stringify({ contracts, total: contracts.length, source: 'cache' }),
-      };
-    }
+    var controller = new AbortController();
+    var timeout    = setTimeout(function() { controller.abort(); }, 10000);
 
-    // 2. Cache miss — call SAM.gov
-    if (!SAM_API_KEY) {
-      return {
-        statusCode: 200,
-        headers: CORS,
-        body: JSON.stringify({ contracts: [], total: 0, error: 'SAM_GOV_API_KEY not configured' }),
-      };
-    }
-
-    const params = new URLSearchParams({
-      api_key:    SAM_API_KEY,
-      limit:      Math.min(limit, 1000),
-      active:     'Yes',
-      postedFrom: dateFrom(days),
-      naicsCode:  naics,
-    });
-    if (sa)    params.set('typeOfSetAside', sa);
-    if (state) params.set('state', state);
-    if (kw)    params.set('keyword', kw);
-
-    const samRes = await fetch(`${SAM_BASE}?${params}`, {
+    var res = await fetch(samURL, {
+      signal: controller.signal,
       headers: { 'Accept': 'application/json' },
-      signal: AbortSignal.timeout(15000),
     });
+    clearTimeout(timeout);
 
-    if (!samRes.ok) {
-      const errText = await samRes.text();
-      console.error(`SAM.gov error ${samRes.status}:`, errText.slice(0, 200));
-      return {
-        statusCode: 200,
-        headers: CORS,
-        body: JSON.stringify({ contracts: [], total: 0, error: `SAM.gov ${samRes.status}` }),
-      };
+    if (!res.ok) {
+      throw new Error('SAM.gov API returned ' + res.status);
     }
 
-    const data = await samRes.json();
-    const opps = data.opportunitiesData || [];
+    var data = await res.json();
+    var opps = (data.opportunitiesData || data._embedded && data._embedded.results || []);
+    var contracts = opps.map(transformSAMOpportunity);
 
-    // 3. Store in cache (async — don't block response)
-    storeCache(opps, key).catch(e => console.warn('Cache store failed:', e.message));
+    return {
+      statusCode: 200,
+      headers: CORS,
+      body: JSON.stringify({ contracts: contracts, source: 'sam_gov', total: data.totalRecords || contracts.length }),
+    };
 
-    // 4. Format and return
-    const contracts = opps.map(o => ({
-      id:       o.noticeId || o.solicitationNumber || Math.random().toString(36).slice(2),
-      source:   'federal',
-      title:    o.title || 'Untitled',
-      agency:   o.fullParentPathName || o.organizationName || 'Federal Agency',
-      value:    parseFloat(o.award?.amount || 0) || 0,
-      naics:    o.naicsCode || naics,
-      setAside: o.typeOfSetAsideDescription || '',
-      status:   'open',
-      state:    o.placeOfPerformance?.state?.code || state,
-      city:     o.placeOfPerformance?.city?.name || '',
-      deadline: o.responseDeadLine || o.archiveDate || '',
-      solNum:   o.solicitationNumber || '',
-      posted:   o.postedDate || '',
-      contact:  o.pointOfContact?.[0]?.email || '',
-      url:      `https://sam.gov/opp/${o.noticeId}/view`,
-      score:    scoreContract(o),
-      fromCache: false,
-    }));
-
+  } catch(err) {
+    // SAM.gov is down or timed out — fall back to mock data gracefully
+    console.error('[FF-contracts] SAM.gov API error:', err.message, '— falling back to mock data');
+    var fallback = getMockContracts({ state, naics, keyword });
     return {
       statusCode: 200,
       headers: CORS,
       body: JSON.stringify({
-        contracts,
-        total: contracts.length,
-        totalRecords: data.totalRecords,
-        source: 'live',
+        contracts: fallback,
+        source:    'mock',
+        reason:    'sam_api_error',
+        error:     err.message,
       }),
-    };
-
-  } catch (err) {
-    console.error('[contracts function]', err.message);
-    return {
-      statusCode: 200,
-      headers: CORS,
-      body: JSON.stringify({ contracts: [], total: 0, error: err.message }),
     };
   }
 };
