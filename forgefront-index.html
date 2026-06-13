@@ -1624,7 +1624,7 @@ document.getElementById('cta-signin-btn').onclick  = ffSignIn;
             </div>
             <div class="fg">
               <div class="fl">Keyword</div>
-              <input id="f-keyword" placeholder="Keywords (optional)" onkeydown="if(event.key==='Enter')fetchContracts()"/>
+              <input id="f-keyword" placeholder="welding, fabrication, steel..." onkeydown="if(event.key==='Enter')fetchContracts()"/>
             </div>
             <div class="fg" style="max-width:110px">
               <div class="fl">Days Posted</div>
@@ -2947,6 +2947,8 @@ function scoreContract(o) {
   if(sa.includes('sdvosb')||sa.includes('service-disabled')) s+=30;
   else if(sa.includes('veteran')||sa.includes('vosb')) s+=20;
   else if(sa.includes('small business')) s+=10;
+  const naics = o.naicsCode||'';
+  if(['332312','238190','332313','332999'].includes(naics)) s+=15;
   const val = parseFloat(o.award?.amount||0)||0;
   if(val>10000&&val<2000000) s+=5;
   return Math.min(s,99);
@@ -2954,68 +2956,6 @@ function scoreContract(o) {
 
 // State/Local Mock Data — realistic opportunities for top states
 function getStateMockData(state, naics) {
-  const TECH_NAICS = ['511210','541511','541512','541513','541519','541715','518210','519130'];
-  const isTech = TECH_NAICS.indexOf(naics) >= 0;
-
-  if (isTech) {
-    const techData = {
-      VA: [
-        {title:'Software Development IDIQ — DoD Agency Modernization',agency:'Dept. of Defense — DISA',value:425000,city:'Arlington',deadline:30,sol:'HC1028-25-R-0041'},
-        {title:'IT Project Management Support — Army PEO EIS',agency:'Dept. of Army — PEO EIS',value:195000,city:'Fort Belvoir',deadline:22,sol:'W91WAW-25-R-0077'},
-        {title:'Cybersecurity Operations — Pentagon IT Support',agency:'Defense Information Systems Agency',value:310000,city:'Arlington',deadline:28,sol:'HC1028-25-R-0099'},
-      ],
-      MD: [
-        {title:'Cloud Migration Services — NSA IT Modernization',agency:'National Security Agency',value:540000,city:'Fort Meade',deadline:35,sol:'H98230-25-R-0019'},
-        {title:'Data Analytics Platform — CMS Enterprise Systems',agency:'Centers for Medicare & Medicaid Services',value:285000,city:'Woodlawn',deadline:19,sol:'75FCMC-25-R-0044'},
-      ],
-      DC: [
-        {title:'Web Application Development — Federal Citizen Services',agency:'General Services Administration — 18F',value:360000,city:'Washington',deadline:33,sol:'GS35F-25-RC-0077'},
-        {title:'SaaS Platform Implementation — Federal HR Systems',agency:'Office of Personnel Management',value:175000,city:'Washington',deadline:15,sol:'OPM-ITS-2025-0044'},
-      ],
-      TX: [
-        {title:'Software Maintenance IDIQ — Army FORSCOM Systems',agency:'Dept. of Army — FORSCOM',value:490000,city:'Fort Sam Houston',deadline:45,sol:'W9124J-25-R-0088'},
-        {title:'Cybersecurity Assessment — Air Force AETC Networks',agency:'Air Force — AETC',value:195000,city:'San Antonio',deadline:28,sol:'FA3002-25-R-0055'},
-        {title:'Business Intelligence Dashboard — Texas Military Dept.',agency:'Texas Military Department',value:88000,city:'Austin',deadline:20,sol:'TX-MILCOM-IT-2025-044'},
-      ],
-      NC: [
-        {title:'IT Modernization Support — Ft. Liberty Installation',agency:'Dept. of Army — Ft. Liberty',value:320000,city:'Fayetteville',deadline:31,sol:'W912PM-25-R-0089'},
-        {title:'Network Infrastructure Services — USMC Camp Lejeune',agency:'Marine Corps — Camp Lejeune',value:145000,city:'Jacksonville',deadline:24,sol:'M00264-25-R-0055'},
-      ],
-      GA: [
-        {title:'Program Management Information System — Army Cyber',agency:'Dept. of Army — Army Cyber Command',value:275000,city:'Augusta',deadline:27,sol:'W9124C-25-R-0088'},
-      ],
-      MS: [
-        {title:'Software Development — Air Force Logistics Systems',agency:'Air Force — Keesler AFB',value:195000,city:'Biloxi',deadline:16,sol:'FA7000-25-R-0044'},
-      ],
-      AL: [
-        {title:'IT Support Services — Redstone Arsenal Systems',agency:'Dept. of Army — Redstone Arsenal',value:415000,city:'Huntsville',deadline:38,sol:'W31P4Q-25-R-0099'},
-      ],
-      LA: [
-        {title:'Software Development — Louisiana State IT Modernization',agency:'Louisiana Division of Administration',value:145000,city:'Baton Rouge',deadline:21,sol:'LA-OTS-2025-0041'},
-        {title:'Data Analytics Dashboard — Louisiana National Guard',agency:'Louisiana Military Department',value:88000,city:'Hammond',deadline:14,sol:'LA-MILCOM-IT-2025-017'},
-      ],
-    };
-    const base = techData[state] || techData.VA;
-    return base.map(o => ({
-      id: `sl_${o.sol}`,
-      source: 'state_local',
-      title: o.title,
-      agency: o.agency,
-      value: o.value,
-      naics: naics || '541511',
-      setAside: 'SDVOSB',
-      status: 'open',
-      state: state,
-      city: o.city,
-      deadline: new Date(Date.now()+o.deadline*86400000).toISOString(),
-      solNum: o.sol,
-      posted: new Date(Date.now()-7*86400000).toISOString(),
-      contact: '',
-      url: STATE_SOURCES[state]||'https://sam.gov',
-      score: 78 + Math.floor(Math.random()*15),
-    }));
-  }
-
   const stateData = {
     LA: [
       {title:'Metal Fabrication & Welding — DOTD Maintenance Facility',agency:'LA Dept. of Transportation & Development',value:45000,city:'Baton Rouge',deadline:21,sol:'LA-DOTD-2025-0041'},
@@ -3078,34 +3018,7 @@ function getStateMockData(state, naics) {
   }));
 }
 
-function getSubcontractData(state, naics) {
-  const TECH_NAICS = ['511210','541511','541512','541513','541519','541715','518210','519130'];
-  const isTech = TECH_NAICS.indexOf(naics||'') >= 0;
-  if (isTech) {
-    const subs = [
-      {title:`IT Subcontract — Federal Agency Web Portal (${state})`, prime:'Booz Allen Hamilton Federal', value:125000, days:14, sol:`BAH-IT-SUB-2025-${state}-019`},
-      {title:`Software Development Sub — DoD Systems Integration`, prime:'Leidos Federal Solutions', value:285000, days:21, sol:`LFS-2025-IT-044`},
-      {title:`Cybersecurity Support Sub — FISMA Compliance`, prime:'SAIC Government Services', value:195000, days:28, sol:`SAIC-CYBER-${state}-2025-033`},
-    ];
-    return subs.map(s => ({
-      id: `sub_${s.sol}`,
-      source: 'subcontract',
-      title: s.title,
-      agency: `Prime: ${s.prime}`,
-      value: s.value,
-      naics: naics || '541511',
-      setAside: 'SDVOSB',
-      status: 'open',
-      state: state,
-      city: '',
-      deadline: new Date(Date.now()+s.days*86400000).toISOString(),
-      solNum: s.sol,
-      posted: new Date(Date.now()-3*86400000).toISOString(),
-      contact: '',
-      url: 'https://web.sba.gov/subnet',
-      score: 82 + Math.floor(Math.random()*12),
-    }));
-  }
+function getSubcontractData(state) {
   const subs = [
     {title:`Structural Welding Sub — Military Installation (${state})`,prime:'Cajun Defense Construction LLC',value:35000,days:10,sol:`CDC-SUB-2025-${state}-019`},
     {title:`Custom Metal Fabrication Sub — Federal Renovation`,prime:'Gulf Coast Federal Contractors Inc.',value:18000,days:7,sol:`GCFC-2025-FED-044`},
@@ -3117,7 +3030,7 @@ function getSubcontractData(state, naics) {
     title: s.title,
     agency: `Prime: ${s.prime}`,
     value: s.value,
-    naics: naics || '332312',
+    naics: '332312',
     setAside: 'SDVOSB',
     status: 'open',
     state: state,
@@ -3132,23 +3045,12 @@ function getSubcontractData(state, naics) {
 }
 
 function getFederalMockData(filters) {
-  const state = filters.state || 'VA';
-  const naics = filters.naics || '';
-  const TECH_NAICS = ['511210','541511','541512','541513','541519','541715','518210','519130'];
-  const isTech = TECH_NAICS.indexOf(naics) >= 0;
-  if (isTech) {
-    return [
-      {id:'f1',source:'federal',title:'Custom Software Development — DoD Agency Portal Modernization',agency:'Dept. of Defense — DISA',value:385000,naics:naics,setAside:'SDVOSB',status:'open',state:state,city:'Arlington',deadline:new Date(Date.now()+30*86400000).toISOString(),solNum:'HC102825R0041',posted:new Date().toISOString(),url:'https://sam.gov',score:95},
-      {id:'f2',source:'federal',title:'Cloud Migration & IT Modernization — Federal ERP Systems',agency:'General Services Administration',value:520000,naics:naics,setAside:'SDVOSB',status:'open',state:state,city:'',deadline:new Date(Date.now()+45*86400000).toISOString(),solNum:'GS35F25RC0081',posted:new Date().toISOString(),url:'https://sam.gov',score:88},
-      {id:'f3',source:'federal',title:'Cybersecurity Assessment & FISMA Compliance Services',agency:'Dept. of Veterans Affairs — OIT',value:195000,naics:naics,setAside:'SDVOSB',status:'open',state:state,city:'',deadline:new Date(Date.now()+25*86400000).toISOString(),solNum:'36C10B25R0047',posted:new Date().toISOString(),url:'https://sam.gov',score:86},
-      {id:'f4',source:'federal',title:'AI/ML Data Analytics Platform — Program Management Support',agency:'Dept. of Army — PEO EIS',value:460000,naics:naics,setAside:'Small Business',status:'open',state:state,city:'',deadline:new Date(Date.now()+35*86400000).toISOString(),solNum:'W91WAW25R0033',posted:new Date().toISOString(),url:'https://sam.gov',score:76},
-    ];
-  }
+  const state = filters.state||'LA';
   return [
-    {id:'f1',source:'federal',title:'Structural Steel Fabrication — VAMC Campus Renovation',agency:'Dept. of Veterans Affairs',value:185000,naics:'332312',setAside:'SDVOSB',status:'open',state:state,city:'',deadline:new Date(Date.now()+30*86400000).toISOString(),solNum:'36C24825R0112',posted:new Date().toISOString(),url:'https://sam.gov',score:95},
-    {id:'f2',source:'federal',title:'Welding & Metal Fabrication BPA — Military Installation',agency:'Dept. of Army',value:320000,naics:'332312',setAside:'SDVOSB',status:'open',state:state,city:'',deadline:new Date(Date.now()+45*86400000).toISOString(),solNum:'W912DR25R0041',posted:new Date().toISOString(),url:'https://sam.gov',score:88},
-    {id:'f3',source:'federal',title:'Mobile Welding Services — Air Force Base',agency:'Dept. of Air Force',value:95000,naics:'238190',setAside:'SDVOSB',status:'open',state:state,city:'',deadline:new Date(Date.now()+25*86400000).toISOString(),solNum:'FA485225R0019',posted:new Date().toISOString(),url:'https://sam.gov',score:86},
-    {id:'f4',source:'federal',title:'Structural Steel Repair — Federal Facilities',agency:'General Services Administration',value:240000,naics:'332312',setAside:'Small Business',status:'open',state:state,city:'',deadline:new Date(Date.now()+35*86400000).toISOString(),solNum:'GS11P25RC0044',posted:new Date().toISOString(),url:'https://sam.gov',score:76},
+    {id:'f1',source:'federal',title:'Structural Steel Fabrication — VAMC Campus Renovation',agency:'Dept. of Veterans Affairs',value:185000,naics:'332312',setAside:'SDVOSB',status:'open',state:state,city:'',deadline:new Date(Date.now()+30*86400000).toISOString(),solNum:'36C24825R0112',posted:new Date().toISOString(),contact:'contracting@va.gov',url:'https://sam.gov',score:95},
+    {id:'f2',source:'federal',title:`Welding & Metal Fabrication BPA — Military Installation`,agency:'Dept. of Army',value:320000,naics:'332312',setAside:'SDVOSB',status:'open',state:state,city:'',deadline:new Date(Date.now()+45*86400000).toISOString(),solNum:'W912DR25R0041',posted:new Date().toISOString(),contact:'army.contracting@mail.mil',url:'https://sam.gov',score:88},
+    {id:'f3',source:'federal',title:'Mobile Welding Services — Air Force Base',agency:'Dept. of Air Force',value:95000,naics:'238190',setAside:'SDVOSB',status:'open',state:state,city:'',deadline:new Date(Date.now()+25*86400000).toISOString(),solNum:'FA485225R0019',posted:new Date().toISOString(),contact:'',url:'https://sam.gov',score:86},
+    {id:'f4',source:'federal',title:'Structural Steel Repair — Federal Facilities',agency:'General Services Administration',value:240000,naics:'332312',setAside:'Small Business',status:'open',state:state,city:'',deadline:new Date(Date.now()+35*86400000).toISOString(),solNum:'GS11P25RC0044',posted:new Date().toISOString(),contact:'',url:'https://sam.gov',score:76},
   ];
 }
 
@@ -3207,7 +3109,7 @@ async function fetchContracts() {
       else throw new Error('sub ' + r3.status);
     } catch(e) {
       var states3 = filters.state ? [filters.state] : ['LA','TX','VA','MD','NC'];
-      for (var i3 = 0; i3 < states3.length; i3++) contracts.push(...getSubcontractData(states3[i3], filters.naics));
+      for (var i3 = 0; i3 < states3.length; i3++) contracts.push(...getSubcontractData(states3[i3]));
     }
   }
 

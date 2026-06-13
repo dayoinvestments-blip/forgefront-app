@@ -18,13 +18,36 @@ var _samCache = {};
 var _SAM_TTL = 30 * 60 * 1000;
 
 // ── Mock data fallback — shown when SAM.gov is unreachable ──────────────────
-// Realistic SDVOSB opportunities across priority states
+// Realistic SDVOSB opportunities — NAICS-aware: tech pool vs fabrication pool
+var TECH_NAICS = ['511210','541511','541512','541513','541519','541715','518210','519130'];
+var FAB_NAICS  = ['332312','238190','332313','332999','236220','238220','238110'];
+
 function getMockContracts(filters) {
   var state   = filters.state   || '';
-  var naics   = filters.naics   || '332312';
+  var naics   = filters.naics   || '';
   var keyword = (filters.keyword || '').toLowerCase();
+  var isTech  = TECH_NAICS.indexOf(naics) >= 0;
+  var isFab   = FAB_NAICS.indexOf(naics) >= 0 || (!isTech && naics !== '');
 
-  var ALL = [
+  var TECH_ALL = [
+    { id:'mock_t1',  source:'federal', title:'Custom Software Development — DoD Agency Portal Modernization',            agency:'Dept. of Defense — DISA',            value:385000, naics:'541511', setAside:'SDVOSB', state:'VA', city:'Arlington',    daysOut:30, sol:'HC102825R0041' },
+    { id:'mock_t2',  source:'federal', title:'Cloud Migration & IT Modernization — Federal ERP Systems',                  agency:'General Services Administration',     value:520000, naics:'541512', setAside:'SDVOSB', state:'MD', city:'Rockville',    daysOut:45, sol:'GS35F25RC0081' },
+    { id:'mock_t3',  source:'federal', title:'Cybersecurity Assessment & FISMA Compliance Services',                      agency:'Dept. of Veterans Affairs — OIT',     value:195000, naics:'541519', setAside:'SDVOSB', state:'DC', city:'Washington',   daysOut:22, sol:'36C10B25R0047' },
+    { id:'mock_t4',  source:'federal', title:'AI/ML Data Analytics Platform — Program Management Support',                agency:'Dept. of Army — PEO EIS',            value:460000, naics:'541511', setAside:'SDVOSB', state:'VA', city:'Fort Belvoir',  daysOut:35, sol:'W91WAW25R0033' },
+    { id:'mock_t5',  source:'federal', title:'Software Maintenance & Help Desk Support — Legacy Systems IDIQ',            agency:'Dept. of Air Force — AFLCMC',        value:290000, naics:'541511', setAside:'SDVOSB', state:'OH', city:'Dayton',       daysOut:28, sol:'FA8750-25-R-0044'},
+    { id:'mock_t6',  source:'federal', title:'Web Application Development — Veteran Services Portal',                     agency:'Dept. of Veterans Affairs',          value:340000, naics:'541511', setAside:'SDVOSB', state:'TX', city:'Houston',      daysOut:31, sol:'36C10B25R0088' },
+    { id:'mock_t7',  source:'federal', title:'SaaS Platform Implementation — Federal HR Modernization',                   agency:'Office of Personnel Management',      value:175000, naics:'541512', setAside:'SDVOSB', state:'DC', city:'Washington',   daysOut:24, sol:'OPM-ITS-2025-0044'},
+    { id:'mock_t8',  source:'federal', title:'Mobile Application Development — DoD Logistics Platform',                   agency:'Defense Logistics Agency',           value:285000, naics:'511210', setAside:'SDVOSB', state:'PA', city:'Philadelphia',  daysOut:38, sol:'SPRMM225R0019' },
+    { id:'mock_t9',  source:'federal', title:'Network Security Operations — SOC-as-a-Service',                            agency:'Dept. of Homeland Security',         value:620000, naics:'541519', setAside:'SDVOSB', state:'MD', city:'Suitland',     daysOut:16, sol:'70RSAT25R00044'},
+    { id:'mock_t10', source:'federal', title:'Business Intelligence & Reporting — Federal Financial Systems',              agency:'Dept. of Treasury',                  value:245000, naics:'541511', setAside:'SDVOSB', state:'DC', city:'Washington',   daysOut:14, sol:'TREAS-ITS-2025-0017'},
+    { id:'mock_t11', source:'federal', title:'IT Project Management Support — PMSS Task Order',                           agency:'Dept. of Army — FORSCOM',            value:195000, naics:'541611', setAside:'SDVOSB', state:'GA', city:'Fort Gillem',  daysOut:19, sol:'W9124C25R0077' },
+    { id:'mock_t12', source:'federal', title:'Enterprise Software Licensing & Deployment — DoD Enterprise',               agency:'Dept. of Defense — DISA',            value:480000, naics:'511210', setAside:'SDVOSB', state:'VA', city:'Fort Meade',   daysOut:41, sol:'HC102825R0088' },
+    { id:'mock_t13', source:'federal', title:'DevSecOps Pipeline Implementation — Federal CI/CD Environment',             agency:'Dept. of Air Force',                 value:310000, naics:'541512', setAside:'SDVOSB', state:'VA', city:'Pentagon',     daysOut:15, sol:'FA8750-25-R-0099'},
+    { id:'mock_t14', source:'federal', title:'Data Center Optimization & Cloud Services — FedRAMP Authorized',            agency:'Dept. of Veterans Affairs',          value:390000, naics:'518210', setAside:'SDVOSB', state:'TX', city:'Austin',       daysOut:28, sol:'36C10B25R0123' },
+    { id:'mock_t15', source:'federal', title:'Program Management Information System — Army G4 Logistics',                 agency:'Dept. of Army — G4',                 value:225000, naics:'541511', setAside:'SDVOSB', state:'VA', city:'Pentagon',     daysOut:27, sol:'W91WAW25R0061' },
+  ];
+
+  var FAB_ALL = [
     { id:'mock_f1', source:'federal', title:'Structural Steel Fabrication & Installation — VAMC Campus Renovation',       agency:'Dept. of Veterans Affairs',          value:185000, naics:'332312', setAside:'SDVOSB', state:'VA', city:'Richmond',     daysOut:30, sol:'36C24825R0112' },
     { id:'mock_f2', source:'federal', title:'Welding & Metal Fabrication IDIQ — Military Installation Maintenance',       agency:'Dept. of Army',                      value:320000, naics:'332312', setAside:'SDVOSB', state:'TX', city:'Fort Hood',    daysOut:45, sol:'W912DR25R0041' },
     { id:'mock_f3', source:'federal', title:'Mobile Welding Services BPA — Air Force Base Facilities',                    agency:'Dept. of Air Force',                 value:95000,  naics:'238190', setAside:'SDVOSB', state:'NC', city:'Goldsboro',   daysOut:22, sol:'FA485225R0019' },
@@ -41,6 +64,8 @@ function getMockContracts(filters) {
     { id:'mock_f14',source:'federal', title:'Metal Fabrication IDIQ — Lackland AFB Facilities Support',                   agency:'Air Force — JBSA Lackland',           value:220000, naics:'332312', setAside:'SDVOSB', state:'TX', city:'San Antonio', daysOut:28, sol:'FA300225R0019' },
     { id:'mock_f15',source:'federal', title:'Structural Welding — Fort Gordon Signal Corps Facilities',                   agency:'Dept. of Army — Fort Gordon',         value:275000, naics:'332312', setAside:'SDVOSB', state:'GA', city:'Augusta',     daysOut:27, sol:'W9124C25R0044' },
   ];
+
+  var ALL = isTech ? TECH_ALL : FAB_ALL;
 
   var results = ALL;
 
@@ -97,7 +122,6 @@ function transformSAMOpportunity(opp) {
   if (sa.includes('sdvosb') || sa.includes('service-disabled')) score += 30;
   else if (sa.includes('veteran') || sa.includes('vosb'))       score += 20;
   else if (sa.includes('small business'))                       score += 10;
-  if (['332312','238190','332313','332999'].includes(opp.naicsCode)) score += 15;
   if (value > 10000 && value < 2000000)                         score += 5;
   score = Math.min(score, 99);
 
@@ -135,7 +159,7 @@ exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: CORS, body: '' };
 
   var params  = event.queryStringParameters || {};
-  var naics   = params.naics    || '332312';
+  var naics   = params.naics    || '';
   var state   = params.state    || '';
   var setaside= params.setaside || 'SDVOSB';
   var days    = params.days     || '90';
