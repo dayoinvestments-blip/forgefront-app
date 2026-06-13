@@ -12,6 +12,11 @@ const CORS = {
   'Content-Type': 'application/json',
 };
 
+// ── In-memory cache (persists across warm Lambda invocations) ────────────────
+// Keyed by query params; TTL 30 min. Cuts repeat SAM.gov calls and survives 429s.
+var _samCache = {};
+var _SAM_TTL = 30 * 60 * 1000;
+
 // ── Mock data fallback — shown when SAM.gov is unreachable ──────────────────
 // Realistic SDVOSB opportunities across priority states
 function getMockContracts(filters) {
@@ -169,6 +174,17 @@ exports.handler = async (event) => {
 
   var samURL = 'https://api.sam.gov/opportunities/v2/search?' + query.toString();
 
+  // Serve fresh server-side cache without hitting SAM.gov
+  var ckey = naics + '|' + state + '|' + setaside + '|' + days + '|' + keyword;
+  var hit  = _samCache[ckey];
+  if (hit && (Date.now() - hit.ts) < _SAM_TTL) {
+    return {
+      statusCode: 200,
+      headers: CORS,
+      body: JSON.stringify({ contracts: hit.data, source: 'cache', total: hit.data.length }),
+    };
+  }
+
   try {
     var controller = new AbortController();
     var timeout    = setTimeout(function() { controller.abort(); }, 10000);
@@ -179,6 +195,15 @@ exports.handler = async (event) => {
     });
     clearTimeout(timeout);
 
+    if (res.status === 429) {
+      // Rate limited — serve cached real data if we have it, else mock with a clear flag
+      if (hit && hit.data && hit.data.length) {
+        return { statusCode: 200, headers: CORS, body: JSON.stringify({ contracts: hit.data, source: 'cache', reason: 'rate_limited', total: hit.data.length }) };
+      }
+      var mock429 = getMockContracts({ state, naics, keyword });
+      return { statusCode: 200, headers: CORS, body: JSON.stringify({ contracts: mock429, source: 'mock', reason: 'rate_limited' }) };
+    }
+
     if (!res.ok) {
       throw new Error('SAM.gov API returned ' + res.status);
     }
@@ -186,6 +211,9 @@ exports.handler = async (event) => {
     var data = await res.json();
     var opps = (data.opportunitiesData || data._embedded && data._embedded.results || []);
     var contracts = opps.map(transformSAMOpportunity);
+
+    // Cache successful real results
+    _samCache[ckey] = { ts: Date.now(), data: contracts };
 
     return {
       statusCode: 200,

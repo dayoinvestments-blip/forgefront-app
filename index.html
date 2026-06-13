@@ -73,6 +73,16 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 .fr{display:flex;flex-wrap:wrap;gap:9px;align-items:flex-end}
 .fg{display:flex;flex-direction:column;gap:4px;flex:1;min-width:110px}
 .fl{font-size:9px;font-weight:700;letter-spacing:.8px;color:var(--t3);text-transform:uppercase}
+.naics-combo{position:relative}
+.naics-input{width:100%}
+.naics-panel{display:none;position:absolute;top:100%;left:0;right:0;z-index:50;margin-top:4px;max-height:320px;overflow-y:auto;background:var(--sf,#0C1828);border:1px solid var(--bd);border-radius:var(--rs,8px);box-shadow:0 12px 32px rgba(0,0,0,.55)}
+.naics-panel.open{display:block}
+.naics-sector{position:sticky;top:0;background:var(--bg,#08101E);color:var(--go,#E8B030);font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:7px 12px;border-bottom:1px solid var(--bd);z-index:2}
+.naics-opt{padding:8px 12px;font-size:12px;color:var(--t,#E6EDF5);cursor:pointer;display:flex;gap:8px;align-items:baseline}
+.naics-opt:hover,.naics-opt.active{background:rgba(232,176,48,.14)}
+.naics-opt .code{font-weight:700;color:var(--go,#E8B030);min-width:54px}
+.naics-opt .desc{color:var(--t2,#A8B8C8)}
+.naics-empty{padding:14px 12px;font-size:12px;color:var(--t3)}
 select,input,textarea{background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);padding:8px 11px;font-size:13px;color:var(--t);outline:none;font-family:inherit;transition:border-color .13s;width:100%}
 select:focus,input:focus,textarea:focus{border-color:var(--ab)}
 textarea{resize:vertical;min-height:72px}
@@ -1606,16 +1616,11 @@ document.getElementById('cta-signin-btn').onclick  = ffSignIn;
             </div>
             <div class="fg">
               <div class="fl">NAICS Code</div>
-              <select id="f-naics">
-                <option value="332312">332312 — Structural Steel Fab</option>
-                <option value="238190">238190 — Welding &amp; Metal Work</option>
-                <option value="332313">332313 — Plate Work Fabrication</option>
-                <option value="332999">332999 — Other Fabricated Metal</option>
-                <option value="236220">236220 — Commercial Construction</option>
-                <option value="237310">237310 — Highway &amp; Bridge</option>
-                <option value="561210">561210 — Facilities Support</option>
-                <option value="">All NAICS</option>
-              </select>
+              <div class="naics-combo" id="naics-combo">
+                <input type="hidden" id="f-naics" value="">
+                <input type="text" id="naics-search" class="naics-input" placeholder="All NAICS — type to search" autocomplete="off" oninput="naicsFilter(this.value)" onfocus="naicsOpen()" onclick="naicsOpen()">
+                <div class="naics-panel" id="naics-panel"></div>
+              </div>
             </div>
             <div class="fg">
               <div class="fl">Keyword</div>
@@ -1755,7 +1760,7 @@ document.getElementById('cta-signin-btn').onclick  = ffSignIn;
           </div>
           <div class="g2">
             <div class="fd"><label class="fla">Phone</label><input id="pr-phone" placeholder="318-555-0100"/></div>
-            <div class="fd"><label class="fla">Email</label><input id="pr-email" disabled style="opacity:.6"/></div>
+            <div class="fd"><label class="fla">Email</label><input id="pr-email"/></div>
           </div>
           <button class="btn p" onclick="saveProfile()">Save Changes</button>
         </div>
@@ -2683,6 +2688,154 @@ const STATE_SOURCES = {
 
 const sb = supabase.createClient(SB_URL, SB_ANON);
 
+// ── NAICS dataset (federal-contracting focused, grouped by sector) ─────────────
+const NAICS_DATA = [
+  ['11 — Agriculture, Forestry, Fishing & Hunting', [
+    ['113310','Logging'],['115112','Soil Preparation / Planting'],['115310','Forestry Support Services'],
+  ]],
+  ['21 — Mining, Quarrying, Oil & Gas', [
+    ['212311','Dimension Stone Mining'],['213112','Oil & Gas Field Support'],['237120','Oil & Gas Pipeline Construction'],
+  ]],
+  ['22 — Utilities', [
+    ['221310','Water Supply & Irrigation'],['221320','Sewage Treatment'],['237110','Water & Sewer Line Construction'],['237130','Power & Communication Line Construction'],
+  ]],
+  ['23 — Construction', [
+    ['236210','Industrial Building Construction'],['236220','Commercial & Institutional Building Construction'],
+    ['237310','Highway, Street & Bridge Construction'],['237990','Other Heavy & Civil Engineering'],
+    ['238110','Concrete Foundation & Structure'],['238120','Structural Steel & Precast Concrete'],
+    ['238130','Framing Contractors'],['238140','Masonry Contractors'],['238160','Roofing Contractors'],
+    ['238190','Other Foundation/Structure/Building Exterior (Welding & Metal Work)'],
+    ['238210','Electrical Contractors'],['238220','Plumbing, Heating & Air-Conditioning (HVAC)'],
+    ['238290','Other Building Equipment Contractors'],['238310','Drywall & Insulation'],
+    ['238320','Painting & Wall Covering'],['238910','Site Preparation Contractors'],
+    ['238990','All Other Specialty Trade Contractors'],
+  ]],
+  ['31-33 — Manufacturing', [
+    ['332312','Fabricated Structural Metal (Structural Steel Fab)'],['332313','Plate Work Manufacturing'],
+    ['332311','Prefabricated Metal Buildings'],['332321','Metal Windows & Doors'],['332322','Sheet Metal Work'],
+    ['332323','Ornamental & Architectural Metal Work'],['332999','All Other Misc. Fabricated Metal'],
+    ['332710','Machine Shops'],['332996','Fabricated Pipe & Pipe Fitting'],['333120','Construction Machinery Mfg'],
+    ['334111','Electronic Computer Mfg'],['334290','Other Communications Equipment Mfg'],
+    ['334511','Search, Detection & Navigation Instruments'],['336411','Aircraft Mfg'],['336992','Military Armored Vehicle Mfg'],
+    ['339112','Surgical & Medical Instrument Mfg'],
+  ]],
+  ['42 — Wholesale Trade', [
+    ['423510','Metal Service Centers'],['423610','Electrical Equipment Wholesale'],['423830','Industrial Machinery Wholesale'],['424210','Drugs & Druggists Sundries Wholesale'],
+  ]],
+  ['44-45 — Retail Trade', [
+    ['441110','New Car Dealers'],['444110','Home Centers'],['453210','Office Supplies & Stationery Stores'],
+  ]],
+  ['48-49 — Transportation & Warehousing', [
+    ['481211','Nonscheduled Chartered Passenger Air'],['484110','General Freight Trucking, Local'],
+    ['484121','General Freight Trucking, Long-Distance'],['488510','Freight Transportation Arrangement'],
+    ['493110','General Warehousing & Storage'],
+  ]],
+  ['51 — Information', [
+    ['511210','Software Publishers'],['517311','Wired Telecommunications Carriers'],
+    ['518210','Data Processing, Hosting & Related'],['519130','Internet Publishing & Web Search'],
+  ]],
+  ['52 — Finance & Insurance', [
+    ['522110','Commercial Banking'],['524210','Insurance Agencies & Brokerages'],['523930','Investment Advice'],
+  ]],
+  ['53 — Real Estate & Rental/Leasing', [
+    ['531120','Lessors of Nonresidential Buildings'],['531210','Real Estate Agents & Brokers'],['532412','Construction Equipment Rental & Leasing'],
+  ]],
+  ['54 — Professional, Scientific & Technical Services', [
+    ['541110','Offices of Lawyers'],['541211','Offices of CPAs'],['541330','Engineering Services'],
+    ['541310','Architectural Services'],['541350','Building Inspection Services'],['541370','Surveying & Mapping'],
+    ['541380','Testing Laboratories'],['541511','Custom Computer Programming Services'],
+    ['541512','Computer Systems Design Services'],['541513','Computer Facilities Management'],
+    ['541519','Other Computer Related Services'],['541611','Admin & General Management Consulting'],
+    ['541612','HR Consulting Services'],['541614','Process, Physical Distribution & Logistics Consulting'],
+    ['541618','Other Management Consulting'],['541620','Environmental Consulting'],
+    ['541690','Other Scientific & Technical Consulting'],['541711','R&D in Biotechnology'],
+    ['541715','R&D in Physical, Engineering & Life Sciences'],['541330','Engineering Services'],
+    ['541990','All Other Professional/Scientific/Technical Services'],
+  ]],
+  ['55 — Management of Companies', [
+    ['551112','Offices of Other Holding Companies'],
+  ]],
+  ['56 — Administrative, Support & Waste Management', [
+    ['561210','Facilities Support Services'],['561320','Temporary Help Services'],
+    ['561612','Security Guards & Patrol Services'],['561621','Security Systems Services'],
+    ['561710','Exterminating & Pest Control'],['561720','Janitorial Services'],
+    ['561730','Landscaping Services'],['561740','Carpet & Upholstery Cleaning'],
+    ['561790','Other Services to Buildings & Dwellings'],['562910','Remediation Services'],
+  ]],
+  ['61 — Educational Services', [
+    ['611310','Colleges & Universities'],['611430','Professional & Management Development Training'],['611699','All Other Misc. Schools & Instruction'],
+  ]],
+  ['62 — Health Care & Social Assistance', [
+    ['621111','Offices of Physicians'],['621511','Medical Laboratories'],['622110','General Medical & Surgical Hospitals'],['623110','Nursing Care Facilities'],
+  ]],
+  ['71 — Arts, Entertainment & Recreation', [
+    ['711310','Promoters of Events w/ Facilities'],['712110','Museums'],
+  ]],
+  ['72 — Accommodation & Food Services', [
+    ['721110','Hotels & Motels'],['722310','Food Service Contractors'],['722320','Caterers'],
+  ]],
+  ['81 — Other Services', [
+    ['811111','General Automotive Repair'],['811310','Commercial Machinery Repair & Maintenance'],
+    ['811210','Electronic & Precision Equipment Repair'],['561621','Security Systems Services'],
+  ]],
+  ['92 — Public Administration', [
+    ['928110','National Security'],
+  ]],
+];
+
+let _naicsActiveIdx = -1;
+function naicsRender(filter){
+  filter = (filter||'').trim().toLowerCase();
+  const panel = document.getElementById('naics-panel');
+  if(!panel) return;
+  let html = '';
+  html += '<div class="naics-opt" data-code="" data-label="All NAICS"><span class="code">ALL</span><span class="desc">All NAICS codes</span></div>';
+  let matches = 0;
+  for(const [sector, codes] of NAICS_DATA){
+    const filtered = filter
+      ? codes.filter(c => c[0].includes(filter) || c[1].toLowerCase().includes(filter) || sector.toLowerCase().includes(filter))
+      : codes;
+    if(!filtered.length) continue;
+    html += '<div class="naics-sector">'+sector+'</div>';
+    for(const [code, desc] of filtered){
+      matches++;
+      html += '<div class="naics-opt" data-code="'+code+'" data-label="'+code+' — '+desc.replace(/"/g,'&quot;')+'"><span class="code">'+code+'</span><span class="desc">'+desc+'</span></div>';
+    }
+  }
+  if(filter && !matches) html = '<div class="naics-empty">No NAICS codes match "'+filter+'". Press the code you want or pick All NAICS.</div>' ;
+  panel.innerHTML = html;
+  panel.querySelectorAll('.naics-opt').forEach(el=>{
+    el.onclick = ()=> naicsPick(el.getAttribute('data-code'), el.getAttribute('data-label'));
+  });
+  _naicsActiveIdx = -1;
+}
+function naicsPick(code, label){
+  document.getElementById('f-naics').value = code || '';
+  const inp = document.getElementById('naics-search');
+  inp.value = code ? label : '';
+  naicsClose();
+}
+function naicsFilter(v){ naicsOpen(); naicsRender(v); }
+function naicsOpen(){ const p=document.getElementById('naics-panel'); if(p && !p.classList.contains('open')){ p.classList.add('open'); if(!p.innerHTML) naicsRender(''); } }
+function naicsClose(){ const p=document.getElementById('naics-panel'); if(p) p.classList.remove('open'); }
+document.addEventListener('click', function(e){
+  const combo = document.getElementById('naics-combo');
+  if(combo && !combo.contains(e.target)) naicsClose();
+});
+document.addEventListener('keydown', function(e){
+  const p=document.getElementById('naics-panel');
+  if(!p || !p.classList.contains('open')) return;
+  const opts = [...p.querySelectorAll('.naics-opt')];
+  if(!opts.length) return;
+  if(e.key==='ArrowDown'){ e.preventDefault(); _naicsActiveIdx=Math.min(_naicsActiveIdx+1,opts.length-1); }
+  else if(e.key==='ArrowUp'){ e.preventDefault(); _naicsActiveIdx=Math.max(_naicsActiveIdx-1,0); }
+  else if(e.key==='Enter'){ if(_naicsActiveIdx>=0){ e.preventDefault(); opts[_naicsActiveIdx].click(); return; } }
+  else if(e.key==='Escape'){ naicsClose(); return; }
+  else return;
+  opts.forEach(o=>o.classList.remove('active'));
+  if(opts[_naicsActiveIdx]){ opts[_naicsActiveIdx].classList.add('active'); opts[_naicsActiveIdx].scrollIntoView({block:'nearest'}); }
+});
+
 // ── App State ─────────────────────────────────────────────────────────────────
 const A = {
   user: null, profile: null,
@@ -2721,6 +2874,24 @@ function dateFrom(days) {
 
 async function fetchFederalContracts(filters) {
   filters = filters || {};
+  // Cache key from the filters that affect SAM.gov results
+  var cacheKey = 'ff_fed_cache_' + JSON.stringify({
+    n: filters.naics || '', s: filters.state || '', sa: filters.setaside || '',
+    d: filters.days || '90', k: filters.keyword || ''
+  });
+  var TTL = 30 * 60 * 1000; // 30 minutes
+  var setStatus = function(txt){ var el=document.getElementById('sam-status'); if(el) el.textContent=txt; };
+
+  // 1. Serve fresh cache without touching the network
+  try {
+    var cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+    if (cached && cached.ts && (Date.now() - cached.ts) < TTL && Array.isArray(cached.data)) {
+      setStatus(cached.data.length + ' federal contracts (cached · saves API calls)');
+      return cached.data;
+    }
+  } catch(e) {}
+
+  // 2. Fetch from SAM.gov via Netlify function
   try {
     var params = new URLSearchParams();
     if (filters.naics)    params.set('naics',    filters.naics);
@@ -2732,17 +2903,40 @@ async function fetchFederalContracts(filters) {
     var tid = setTimeout(function() { controller.abort(); }, 12000);
     var res = await fetch('/.netlify/functions/contracts?' + params.toString(), {signal: controller.signal});
     clearTimeout(tid);
+
+    // Rate limited — use stale cache if we have any, else mock
+    if (res.status === 429) {
+      var stale = null;
+      try { stale = JSON.parse(localStorage.getItem(cacheKey) || 'null'); } catch(e) {}
+      if (stale && Array.isArray(stale.data) && stale.data.length) {
+        setStatus(stale.data.length + ' contracts (SAM.gov rate limit — showing recent cached results)');
+        return stale.data;
+      }
+      setStatus('SAM.gov rate limit reached — showing backup data. Try again in a few minutes.');
+      return getFederalMockData(filters);
+    }
+
     if (!res.ok) throw new Error('HTTP ' + res.status);
     var data = await res.json();
-    if (data.error) throw new Error(data.error);
-    var el = document.getElementById('sam-status');
-    if (el) el.textContent = (data.contracts || []).length + ' federal contracts' +
-      (data.source === 'cache' ? ' (cached)' : ' from SAM.gov');
-    return data.contracts || [];
+    if (data.error && !(data.contracts || []).length) throw new Error(data.error);
+
+    var contracts = data.contracts || [];
+    // 3. Store fresh cache
+    try { localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data: contracts })); } catch(e) {}
+
+    setStatus(contracts.length + ' federal contracts' + (data.source === 'mock' ? ' (backup data)' : data.source === 'cache' ? ' (cached)' : ' from SAM.gov'));
+    return contracts;
   } catch(e) {
     console.warn('Federal contracts:', e.message);
-    var el = document.getElementById('sam-status');
-    if (el) el.textContent = 'Using backup contract data';
+    // Last resort: any stale cache, then mock
+    try {
+      var last = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+      if (last && Array.isArray(last.data) && last.data.length) {
+        setStatus(last.data.length + ' contracts (offline cache)');
+        return last.data;
+      }
+    } catch(_) {}
+    setStatus('Using backup contract data');
     return getFederalMockData(filters);
   }
 }
@@ -2932,10 +3126,11 @@ async function fetchContracts() {
   contracts.sort((a,b)=>b.score-a.score);
   A.contracts = contracts;
 
-  // Tier-based limits
-  const tier = A.profile?.tier||'free';
-  const limit = tier==='pro'?contracts.length:tier==='base'?25:3;
-  const showPaywall = contracts.length>limit && tier!=='pro';
+  // Tier-based limits — use getTier() so superuser/admin/command get full access
+  const tier = getTier();
+  const unlimited = (tier === 'pro' || tier === 'command');
+  const limit = unlimited ? contracts.length : (tier === 'starter' || tier === 'base') ? 25 : 3;
+  const showPaywall = contracts.length > limit && !unlimited;
 
   // Update badge
   $('cct').textContent = contracts.length;
@@ -3028,7 +3223,7 @@ function preFillBid(contractId) {
 
 // ── Bid Writer ────────────────────────────────────────────────────────────────
 async function runBidWriter() {
-  const tier = A.profile?.tier||'free';
+  const tier = getTier();
   if(tier==='free') { showUpgrade(); return; }
 
   const sol    = $('bid-sol').value.trim();
@@ -3270,7 +3465,7 @@ function forgot() {
     '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" style="margin:0 auto 16px;display:block"><path d="M12 2L3 7V12C3 16.55 7.08 20.74 12 22C16.92 20.74 21 16.55 21 12V7L12 2Z" fill="rgba(0,229,160,.15)" stroke="#00E5A0" stroke-width="1.5"/><path d="M9 12L11 14L15 10" stroke="#00E5A0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
     '<h2 style="font-size:20px;font-weight:700;margin-bottom:12px">Check your email</h2>' +
     '<p style="font-size:14px;color:var(--t2);line-height:1.6;margin-bottom:24px">We sent a reset link to <strong style="color:var(--t)">' + e + '</strong>.<br>Click it to set a new password.</p>' +
-    '<p style="font-size:12px;color:var(--t3)">Didn't get it? Check spam, or <span style="color:var(--ac);cursor:pointer" onclick="location.reload()">try again</span>.</p>' +
+    '<p style="font-size:12px;color:var(--t3)">Didn\'t get it? Check spam, or <span style="color:var(--ac);cursor:pointer" onclick="location.reload()">try again</span>.</p>' +
     '</div>';
 }
 
@@ -3490,6 +3685,11 @@ function bpAutoFill() {
 // -- Stripe --
 async function ffCheckout(plan) {
   if (!A.user) { openM('upgrade-modal'); return; }
+  // Superusers and admins already have full access — no checkout needed
+  if (A.profile && ['superuser','admin'].includes(A.profile.role)) {
+    toast('You have full Command access as a superuser.', 's');
+    return;
+  }
   var btn = event && event.target ? event.target : null;
   if (btn) { btn.disabled = true; btn.textContent = 'Loading...'; }
   try {
@@ -3819,8 +4019,8 @@ function renderTeaming() {
 }
 
 function teamingRegister() {
-  var tier = A.profile && A.profile.tier;
-  if (tier !== 'pro' && tier !== 'base') {
+  var tier = getTier();
+  if (tier !== 'pro' && tier !== 'command' && tier !== 'starter' && tier !== 'base') {
     showUpgrade();
     return;
   }
@@ -4007,6 +4207,8 @@ var TIER_LIMITS = {
 };
 
 function getTier() {
+  // Superuser and admin always get full command access — no paywall
+  if (A.profile && ['superuser','admin'].includes(A.profile.role)) return 'command';
   if (A.profile && A.profile.tier) {
     var t = A.profile.tier.toLowerCase();
     if (t === 'command') return 'command';
@@ -4133,7 +4335,7 @@ function ppuGate(feature, featureName) {
         '<div style="font-size:28px;font-weight:800;color:var(--ac);letter-spacing:-1px;margin-bottom:4px">$' + upgradePrice + '<span style="font-size:12px;font-weight:400;color:var(--t3)">/mo</span></div>' +
         '<div style="font-size:11px;color:var(--t2);line-height:1.5;margin-bottom:14px">' + upgradeDesc + '</div>' +
         '<button class="btn p" style="width:100%;font-size:12px;padding:10px" ' +
-          'data-plan="' + upgradePlan + '" onclick="closeM('ppu-modal');ffCheckout(this.dataset.plan)">' +
+          'data-plan="' + upgradePlan + '" onclick="closeM(\'ppu-modal\');ffCheckout(this.dataset.plan)">' +
           'Upgrade to ' + upgradeTier + ' →' +
         '</button>' +
       '</div>' +
@@ -5728,29 +5930,29 @@ function openUserActions(btn) {
     // Comp
     '<div style="font-size:9px;font-weight:700;letter-spacing:.8px;color:var(--t3);text-transform:uppercase;margin-top:8px">Comp Access</div>' +
     '<div style="display:flex;gap:7px;flex-wrap:wrap">' +
-      '<button class="btn go2 sm" onclick='openGrantCompModal(' + JSON.stringify(u) + ')'>Grant Comp</button>' +
-      (isComp ? '<button class="btn g sm" onclick="admAction('revoke_comp','' + u.id + '',null,'Revoke comp access?')">Revoke Comp</button>' : '') +
+      '<button class="btn go2 sm" onclick="openGrantCompModal(' + JSON.stringify(u).replace(/"/g,'&quot;') + ')">Grant Comp</button>' +
+      (isComp ? '<button class="btn g sm" onclick="admAction(\'revoke_comp\',\'' + u.id + '\',null,\'Revoke comp access?\')">Revoke Comp</button>' : '') +
     '</div>' +
 
     // Subscription
     '<div style="font-size:9px;font-weight:700;letter-spacing:.8px;color:var(--t3);text-transform:uppercase;margin-top:8px">Subscription</div>' +
     '<div style="display:flex;gap:7px;flex-wrap:wrap">' +
-      '<button class="btn g sm" onclick="admAction('cancel_subscription','' + u.id + '',null,'Cancel at period end?')" ' + (!u.stripe_subscription_id ? 'disabled' : '') + '>Cancel at Period End</button>' +
-      '<button class="btn dr sm" onclick="admAction('cancel_immediately','' + u.id + '',null,'Cancel immediately? User loses access now.')" ' + (!u.stripe_subscription_id ? 'disabled' : '') + '>Cancel Immediately</button>' +
+      '<button class="btn g sm" onclick="admAction(\'cancel_subscription\',\'' + u.id + '\',null,\'Cancel at period end?\')" ' + (!u.stripe_subscription_id ? 'disabled' : '') + '>Cancel at Period End</button>' +
+      '<button class="btn dr sm" onclick="admAction(\'cancel_immediately\',\'' + u.id + '\',null,\'Cancel immediately? User loses access now.\')" ' + (!u.stripe_subscription_id ? 'disabled' : '') + '>Cancel Immediately</button>' +
     '</div>' +
 
     // Refund
     '<div style="font-size:9px;font-weight:700;letter-spacing:.8px;color:var(--t3);text-transform:uppercase;margin-top:8px">Refunds</div>' +
     '<div style="display:flex;gap:7px">' +
-      '<button class="btn g sm" onclick="openRefundModal('' + u.id + '','' + (u.email||'') + '')" ' + (!u.stripe_customer_id ? 'disabled title="No Stripe customer"' : '') + '>Issue Refund</button>' +
+      '<button class="btn g sm" onclick="openRefundModal(\'' + u.id + '\',\'' + (u.email||'') + '\')" ' + (!u.stripe_customer_id ? 'disabled title="No Stripe customer"' : '') + '>Issue Refund</button>' +
     '</div>' +
 
     // Account status
     '<div style="font-size:9px;font-weight:700;letter-spacing:.8px;color:var(--t3);text-transform:uppercase;margin-top:8px">Account Status</div>' +
     '<div style="display:flex;gap:7px;flex-wrap:wrap">' +
-      (!isSuspended && !isArchived ? '<button class="btn dr sm" onclick="admAction('suspend','' + u.id + '',null,'Suspend this account? User will lose access.')">Suspend</button>' : '') +
-      (isSuspended ? '<button class="btn p sm" onclick="admAction('reactivate','' + u.id + '',null,'Reactivate this account?')">Reactivate</button>' : '') +
-      (!isArchived ? '<button class="btn dr sm" onclick="admAction('archive','' + u.id + '',null,'Archive this account? This is permanent.')">Archive</button>' : '') +
+      (!isSuspended && !isArchived ? '<button class="btn dr sm" onclick="admAction(\'suspend\',\'' + u.id + '\',null,\'Suspend this account? User will lose access.\')">Suspend</button>' : '') +
+      (isSuspended ? '<button class="btn p sm" onclick="admAction(\'reactivate\',\'' + u.id + '\',null,\'Reactivate this account?\')">Reactivate</button>' : '') +
+      (!isArchived ? '<button class="btn dr sm" onclick="admAction(\'archive\',\'' + u.id + '\',null,\'Archive this account? This is permanent.\')">Archive</button>' : '') +
     '</div>' +
 
     '</div>';
@@ -5760,7 +5962,7 @@ function openUserActions(btn) {
 }
 
 function admActionBtn(label, action, userId, value, cls) {
-  return '<button class="btn ' + cls + ' sm" onclick="admAction('' + action + '','' + userId + '','' + value + '')">' + label + '</button>';
+  return '<button class="btn ' + cls + ' sm" onclick="admAction(\'' + action + '\',\'' + userId + '\',\'' + value + '\')">' + label + '</button>';
 }
 
 async function admAction(action, userId, value, confirmMsg) {
@@ -5817,8 +6019,8 @@ async function admLoadComps() {
             '</div>' +
           '</div>' +
           '<div style="display:flex;gap:7px;flex-shrink:0">' +
-            '<button class="btn g sm" onclick="openExtendComp('' + c.id + '')">Extend</button>' +
-            '<button class="btn dr sm" onclick="admAction('revoke_comp','' + c.id + '',null,'Revoke comp access for ' + (c.email||'this user') + '?')">Revoke</button>' +
+            '<button class="btn g sm" onclick="openExtendComp(\'' + c.id + '\')">Extend</button>' +
+            '<button class="btn dr sm" onclick="admAction(\'revoke_comp\',\'' + c.id + '\',null,\'Revoke comp access for ' + (c.email||'this user') + '?\')">Revoke</button>' +
           '</div>' +
         '</div>' +
       '</div>';
@@ -6175,7 +6377,7 @@ function renderDashboard() {
         <div style="font-size:12px;font-weight:600">${c.value?fmt(c.value):'—'}</div>
         <div style="font-size:10px;color:${c.deadline&&daysLeft(c.deadline)<=14?'var(--dn)':'var(--t3)'}">${c.deadline?daysLeft(c.deadline)+'d left':'—'}</div>
       </div>
-    </div>`).join('')||'<div style="color:var(--t3);font-size:13px;padding:20px 0;text-align:center">Loading contracts...</div>';
+    </div>`).join('')||'<div style="color:var(--t3);font-size:13px;padding:20px 0;text-align:center">No contracts yet — run a search in Contracts to load matches.</div>';
 
   $('d-jobs').innerHTML=A.jobs.filter(j=>j.status!=='complete').slice(0,4).map(j=>{
     const pct=Number(j.value)>0?Math.min(Number(j.invoiced)/Number(j.value)*100,100):0;
@@ -6409,9 +6611,10 @@ function printInv(){
 
 // ── Profile ───────────────────────────────────────────────────────────────────
 async function saveProfile() {
-  const {error}=await sb.from('profiles').update({name:$('pr-name').value.trim(),company:$('pr-company').value.trim(),phone:$('pr-phone').value.trim()}).eq('id',A.user.id);
+  const newEmail=$('pr-email').value.trim();
+  const {error}=await sb.from('profiles').update({name:$('pr-name').value.trim(),company:$('pr-company').value.trim(),phone:$('pr-phone').value.trim(),email:newEmail}).eq('id',A.user.id);
   if(error) toast('Failed to save profile','e');
-  else{toast('Profile saved ✅');A.profile.name=$('pr-name').value.trim();$('uname').textContent=A.profile.name;}
+  else{toast('Profile saved ✅');A.profile.name=$('pr-name').value.trim();if(A.profile)A.profile.email=newEmail;$('uname').textContent=A.profile.name;}
 }
 async function saveContractPrefs() {
   const naics=$('pr-naics').value.split(',').map(s=>s.trim()).filter(Boolean);
@@ -6430,7 +6633,11 @@ function saveSamKey() {
 }
 
 // ── Upgrade ───────────────────────────────────────────────────────────────────
-function showUpgrade(){openM('upgrade-modal');}
+function showUpgrade(){
+  // Superusers and admins never see the paywall
+  if (A.profile && ['superuser','admin'].includes(A.profile.role)) return;
+  openM('upgrade-modal');
+}
 
 // ── Modal helpers ─────────────────────────────────────────────────────────────
 function openM(id){
