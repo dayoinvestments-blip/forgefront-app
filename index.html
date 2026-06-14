@@ -2954,128 +2954,48 @@ function scoreContract(o) {
 
 // State/Local Mock Data — realistic opportunities for top states
 function getStateMockData(state, naics) {
-  const TECH_NAICS = ['511210','541511','541512','541513','541519','541715','518210','519130'];
-  const isTech = TECH_NAICS.indexOf(naics) >= 0;
-
+  var TECH_NAICS = ['511210','541511','541512','541513','541519','541715','518210','519130'];
+  var isTech = TECH_NAICS.indexOf(naics) >= 0;
   if (isTech) {
-    const techData = {
-      VA: [
-        {title:'Software Development IDIQ — DoD Agency Modernization',agency:'Dept. of Defense — DISA',value:425000,city:'Arlington',deadline:30,sol:'HC1028-25-R-0041'},
-        {title:'IT Project Management Support — Army PEO EIS',agency:'Dept. of Army — PEO EIS',value:195000,city:'Fort Belvoir',deadline:22,sol:'W91WAW-25-R-0077'},
-        {title:'Cybersecurity Operations — Pentagon IT Support',agency:'Defense Information Systems Agency',value:310000,city:'Arlington',deadline:28,sol:'HC1028-25-R-0099'},
-      ],
-      MD: [
-        {title:'Cloud Migration Services — NSA IT Modernization',agency:'National Security Agency',value:540000,city:'Fort Meade',deadline:35,sol:'H98230-25-R-0019'},
-        {title:'Data Analytics Platform — CMS Enterprise Systems',agency:'Centers for Medicare & Medicaid Services',value:285000,city:'Woodlawn',deadline:19,sol:'75FCMC-25-R-0044'},
-      ],
-      DC: [
-        {title:'Web Application Development — Federal Citizen Services',agency:'General Services Administration — 18F',value:360000,city:'Washington',deadline:33,sol:'GS35F-25-RC-0077'},
-        {title:'SaaS Platform Implementation — Federal HR Systems',agency:'Office of Personnel Management',value:175000,city:'Washington',deadline:15,sol:'OPM-ITS-2025-0044'},
-      ],
-      TX: [
-        {title:'Software Maintenance IDIQ — Army FORSCOM Systems',agency:'Dept. of Army — FORSCOM',value:490000,city:'Fort Sam Houston',deadline:45,sol:'W9124J-25-R-0088'},
-        {title:'Cybersecurity Assessment — Air Force AETC Networks',agency:'Air Force — AETC',value:195000,city:'San Antonio',deadline:28,sol:'FA3002-25-R-0055'},
-        {title:'Business Intelligence Dashboard — Texas Military Dept.',agency:'Texas Military Department',value:88000,city:'Austin',deadline:20,sol:'TX-MILCOM-IT-2025-044'},
-      ],
-      NC: [
-        {title:'IT Modernization Support — Ft. Liberty Installation',agency:'Dept. of Army — Ft. Liberty',value:320000,city:'Fayetteville',deadline:31,sol:'W912PM-25-R-0089'},
-        {title:'Network Infrastructure Services — USMC Camp Lejeune',agency:'Marine Corps — Camp Lejeune',value:145000,city:'Jacksonville',deadline:24,sol:'M00264-25-R-0055'},
-      ],
-      GA: [
-        {title:'Program Management Information System — Army Cyber',agency:'Dept. of Army — Army Cyber Command',value:275000,city:'Augusta',deadline:27,sol:'W9124C-25-R-0088'},
-      ],
-      MS: [
-        {title:'Software Development — Air Force Logistics Systems',agency:'Air Force — Keesler AFB',value:195000,city:'Biloxi',deadline:16,sol:'FA7000-25-R-0044'},
-      ],
-      AL: [
-        {title:'IT Support Services — Redstone Arsenal Systems',agency:'Dept. of Army — Redstone Arsenal',value:415000,city:'Huntsville',deadline:38,sol:'W31P4Q-25-R-0099'},
-      ],
-      LA: [
-        {title:'Software Development — Louisiana State IT Modernization',agency:'Louisiana Division of Administration',value:145000,city:'Baton Rouge',deadline:21,sol:'LA-OTS-2025-0041'},
-        {title:'Data Analytics Dashboard — Louisiana National Guard',agency:'Louisiana Military Department',value:88000,city:'Hammond',deadline:14,sol:'LA-MILCOM-IT-2025-017'},
-      ],
+    var techData = {
+      VA:[{title:'Software Development IDIQ — DoD Agency Modernization',agency:'Dept. of Defense — DISA',value:425000,city:'Arlington',deadline:30,sol:'HC1028-25-R-0041'},{title:'IT Project Management Support — Army PEO EIS',agency:'Dept. of Army — PEO EIS',value:195000,city:'Fort Belvoir',deadline:22,sol:'W91WAW-25-R-0077'},{title:'Cybersecurity Operations — Pentagon IT Support',agency:'Defense Information Systems Agency',value:310000,city:'Arlington',deadline:28,sol:'HC1028-25-R-0099'}],
+      MD:[{title:'Cloud Migration Services — Federal IT Modernization',agency:'Dept. of Health & Human Services',value:540000,city:'Rockville',deadline:35,sol:'HHS-ITS-25-R-0019'},{title:'Data Analytics Platform — CMS Enterprise Systems',agency:'Centers for Medicare & Medicaid Services',value:285000,city:'Woodlawn',deadline:19,sol:'75FCMC-25-R-0044'}],
+      DC:[{title:'Web Application Development — Federal Citizen Services',agency:'General Services Administration',value:360000,city:'Washington',deadline:33,sol:'GS35F-25-RC-0077'},{title:'SaaS Platform Implementation — Federal HR Systems',agency:'Office of Personnel Management',value:175000,city:'Washington',deadline:15,sol:'OPM-ITS-2025-0044'}],
+      TX:[{title:'Software Maintenance IDIQ — Army FORSCOM Systems',agency:'Dept. of Army — FORSCOM',value:490000,city:'Fort Sam Houston',deadline:45,sol:'W9124J-25-R-0088'},{title:'Cybersecurity Assessment — Air Force AETC Networks',agency:'Air Force — AETC',value:195000,city:'San Antonio',deadline:28,sol:'FA3002-25-R-0055'},{title:'Business Intelligence Dashboard — Texas Military Dept.',agency:'Texas Military Department',value:88000,city:'Austin',deadline:20,sol:'TX-MILCOM-IT-2025-044'}],
+      NC:[{title:'IT Modernization Support — Ft. Liberty Installation',agency:'Dept. of Army — Ft. Liberty',value:320000,city:'Fayetteville',deadline:31,sol:'W912PM-25-R-0089'},{title:'Network Infrastructure Services — USMC Camp Lejeune',agency:'Marine Corps — Camp Lejeune',value:145000,city:'Jacksonville',deadline:24,sol:'M00264-25-R-0055'}],
+      GA:[{title:'Program Management Information System — Army Cyber',agency:'Dept. of Army — Army Cyber Command',value:275000,city:'Augusta',deadline:27,sol:'W9124C-25-R-0088'}],
+      MS:[{title:'Software Development — Air Force Logistics Systems',agency:'Air Force — Keesler AFB',value:195000,city:'Biloxi',deadline:16,sol:'FA7000-25-R-0044'}],
+      AL:[{title:'IT Support Services — Redstone Arsenal Systems',agency:'Dept. of Army — Redstone Arsenal',value:415000,city:'Huntsville',deadline:38,sol:'W31P4Q-25-R-0099'}],
+      LA:[{title:'Software Development — Louisiana State IT Modernization',agency:'Louisiana Division of Administration',value:145000,city:'Baton Rouge',deadline:21,sol:'LA-OTS-2025-0041'},{title:'Data Analytics Dashboard — Louisiana National Guard',agency:'Louisiana Military Department',value:88000,city:'Hammond',deadline:14,sol:'LA-MILCOM-IT-2025-017'}],
     };
-    const base = techData[state] || techData.VA;
-    return base.map(o => ({
-      id: `sl_${o.sol}`,
-      source: 'state_local',
-      title: o.title,
-      agency: o.agency,
-      value: o.value,
-      naics: naics || '541511',
-      setAside: 'SDVOSB',
-      status: 'open',
-      state: state,
-      city: o.city,
-      deadline: new Date(Date.now()+o.deadline*86400000).toISOString(),
-      solNum: o.sol,
-      posted: new Date(Date.now()-7*86400000).toISOString(),
-      contact: '',
-      url: STATE_SOURCES[state]||'https://sam.gov',
-      score: 78 + Math.floor(Math.random()*15),
-    }));
+    var base = techData[state] || techData['VA'];
+    return base.map(function(o) {
+      return { id:'sl_'+o.sol, source:'state_local', title:o.title, agency:o.agency, value:o.value,
+               naics:naics||'541511', setAside:'SDVOSB', status:'open', state:state, city:o.city,
+               deadline:new Date(Date.now()+o.deadline*86400000).toISOString(), solNum:o.sol,
+               posted:new Date(Date.now()-7*86400000).toISOString(), contact:'',
+               url:STATE_SOURCES[state]||'https://sam.gov', score:78+Math.floor(Math.random()*15) };
+    });
   }
-
-  const stateData = {
-    LA: [
-      {title:'Metal Fabrication & Welding — DOTD Maintenance Facility',agency:'LA Dept. of Transportation & Development',value:45000,city:'Baton Rouge',deadline:21,sol:'LA-DOTD-2025-0041'},
-      {title:'Parish Road Sign Fabrication & Installation',agency:'Webster Parish Police Jury',value:28000,city:'Minden',deadline:14,sol:'WPPJ-2025-0017'},
-      {title:'Steel Dock Grating Repair & Fabrication',agency:'Port of Shreveport-Bossier',value:62000,city:'Shreveport',deadline:30,sol:'PSB-2025-STRUCT-004'},
-      {title:'Correctional Facility Metal Door Frames',agency:'Louisiana Dept. of Public Safety',value:38000,city:'Angola',deadline:18,sol:'LDPS-2025-0093'},
-    ],
-    VA: [
-      {title:'Structural Steel Repair — Pentagon Maintenance',agency:'Defense Facilities Activity',value:285000,city:'Arlington',deadline:28,sol:'DFA-VA-2025-1102'},
-      {title:'Welding Services BPA — Ft Belvoir Installation',agency:'Dept. of Army — Ft Belvoir',value:450000,city:'Alexandria',deadline:35,sol:'W91QVN-25-R-0044'},
-      {title:'Metal Fabrication — Quantico Marine Base',agency:'Marine Corps Installations',value:125000,city:'Quantico',deadline:22,sol:'M67399-25-R-0081'},
-    ],
-    MD: [
-      {title:'HVAC Metal Ductwork — Andrews AFB Renovation',agency:'Air Force — Joint Base Andrews',value:195000,city:'Suitland',deadline:19,sol:'FA7014-25-R-0033'},
-      {title:'Structural Steel — Aberdeen Proving Ground',agency:'Dept. of Army — Aberdeen PG',value:340000,city:'Aberdeen',deadline:41,sol:'W91CRB-25-R-0019'},
-    ],
-    DC: [
-      {title:'Custom Metal Fabrication — Federal Building Renovation',agency:'General Services Administration',value:520000,city:'Washington',deadline:33,sol:'GS-11P-25-RC-0077'},
-      {title:'Security Barrier Installation — Federal Grounds',agency:'Dept. of Homeland Security',value:180000,city:'Washington',deadline:15,sol:'70RSAT25R00000112'},
-    ],
-    TX: [
-      {title:'Welding Services IDIQ — Ft Hood Installation',agency:'Dept. of Army — Ft Hood',value:850000,city:'Killeen',deadline:45,sol:'W9124J-25-R-0088'},
-      {title:'Metal Fabrication — Lackland AFB',agency:'Air Force — JBSA Lackland',value:220000,city:'San Antonio',deadline:28,sol:'FA3002-25-R-0019'},
-      {title:'Structural Steel — Camp Mabry Renovation',agency:'Texas Military Dept.',value:95000,city:'Austin',deadline:20,sol:'TX-MILCOM-2025-0044'},
-    ],
-    NC: [
-      {title:'Welding & Fabrication — Ft Bragg Barracks',agency:'Dept. of Army — Ft Bragg',value:380000,city:'Fayetteville',deadline:31,sol:'W912PM-25-R-0061'},
-      {title:'Metal Door Systems — Camp Lejeune',agency:'Marine Corps — Camp Lejeune',value:145000,city:'Jacksonville',deadline:24,sol:'M00264-25-R-0022'},
-    ],
-    GA: [
-      {title:'Structural Welding — Ft Gordon Signal Corps',agency:'Dept. of Army — Ft Gordon',value:275000,city:'Augusta',deadline:27,sol:'W9124C-25-R-0044'},
-    ],
-    MS: [
-      {title:'Metal Fabrication — Keesler AFB Facilities',agency:'Air Force — Keesler AFB',value:88000,city:'Biloxi',deadline:16,sol:'FA7000-25-R-0011'},
-      {title:'Welding Services — Camp Shelby',agency:'Mississippi Military Dept.',value:52000,city:'Hattiesburg',deadline:22,sol:'MS-MILCOM-2025-0028'},
-    ],
-    AL: [
-      {title:'Fabrication Services — Redstone Arsenal',agency:'Dept. of Army — Redstone Arsenal',value:415000,city:'Huntsville',deadline:38,sol:'W31P4Q-25-R-0088'},
-      {title:'Metal Structures — Maxwell AFB',agency:'Air Force — Maxwell AFB',value:165000,city:'Montgomery',deadline:21,sol:'FA3002-25-R-0033'},
-    ],
+  var stateData = {
+    LA:[{title:'Metal Fabrication & Welding — DOTD Maintenance Facility',agency:'LA Dept. of Transportation & Development',value:45000,city:'Baton Rouge',deadline:21,sol:'LA-DOTD-2025-0041'},{title:'Parish Road Sign Fabrication & Installation',agency:'Webster Parish Police Jury',value:28000,city:'Minden',deadline:14,sol:'WPPJ-2025-0017'},{title:'Steel Dock Grating Repair & Fabrication',agency:'Port of Shreveport-Bossier',value:62000,city:'Shreveport',deadline:30,sol:'PSB-2025-STRUCT-004'},{title:'Correctional Facility Metal Door Frames',agency:'Louisiana Dept. of Public Safety',value:38000,city:'Angola',deadline:18,sol:'LDPS-2025-0093'}],
+    VA:[{title:'Structural Steel Repair — Pentagon Maintenance',agency:'Defense Facilities Activity',value:285000,city:'Arlington',deadline:28,sol:'DFA-VA-2025-1102'},{title:'Welding Services BPA — Ft Belvoir Installation',agency:'Dept. of Army — Ft Belvoir',value:450000,city:'Alexandria',deadline:35,sol:'W91QVN-25-R-0044'},{title:'Metal Fabrication — Quantico Marine Base',agency:'Marine Corps Installations',value:125000,city:'Quantico',deadline:22,sol:'M67399-25-R-0081'}],
+    MD:[{title:'HVAC Metal Ductwork — Andrews AFB Renovation',agency:'Air Force — Joint Base Andrews',value:195000,city:'Suitland',deadline:19,sol:'FA7014-25-R-0033'},{title:'Structural Steel — Aberdeen Proving Ground',agency:'Dept. of Army — Aberdeen PG',value:340000,city:'Aberdeen',deadline:41,sol:'W91CRB-25-R-0019'}],
+    DC:[{title:'Custom Metal Fabrication — Federal Building Renovation',agency:'General Services Administration',value:520000,city:'Washington',deadline:33,sol:'GS-11P-25-RC-0077'},{title:'Security Barrier Installation — Federal Grounds',agency:'Dept. of Homeland Security',value:180000,city:'Washington',deadline:15,sol:'70RSAT25R00000112'}],
+    TX:[{title:'Welding Services IDIQ — Ft Hood Installation',agency:'Dept. of Army — Ft Hood',value:850000,city:'Killeen',deadline:45,sol:'W9124J-25-R-0088'},{title:'Metal Fabrication — Lackland AFB',agency:'Air Force — JBSA Lackland',value:220000,city:'San Antonio',deadline:28,sol:'FA3002-25-R-0019'},{title:'Structural Steel — Camp Mabry Renovation',agency:'Texas Military Dept.',value:95000,city:'Austin',deadline:20,sol:'TX-MILCOM-2025-0044'}],
+    NC:[{title:'Welding & Fabrication — Ft Bragg Barracks',agency:'Dept. of Army — Ft Bragg',value:380000,city:'Fayetteville',deadline:31,sol:'W912PM-25-R-0061'},{title:'Metal Door Systems — Camp Lejeune',agency:'Marine Corps — Camp Lejeune',value:145000,city:'Jacksonville',deadline:24,sol:'M00264-25-R-0022'}],
+    GA:[{title:'Structural Welding — Ft Gordon Signal Corps',agency:'Dept. of Army — Ft Gordon',value:275000,city:'Augusta',deadline:27,sol:'W9124C-25-R-0044'}],
+    MS:[{title:'Metal Fabrication — Keesler AFB Facilities',agency:'Air Force — Keesler AFB',value:88000,city:'Biloxi',deadline:16,sol:'FA7000-25-R-0011'},{title:'Welding Services — Camp Shelby',agency:'Mississippi Military Dept.',value:52000,city:'Hattiesburg',deadline:22,sol:'MS-MILCOM-2025-0028'}],
+    AL:[{title:'Fabrication Services — Redstone Arsenal',agency:'Dept. of Army — Redstone Arsenal',value:415000,city:'Huntsville',deadline:38,sol:'W31P4Q-25-R-0088'},{title:'Metal Structures — Maxwell AFB',agency:'Air Force — Maxwell AFB',value:165000,city:'Montgomery',deadline:21,sol:'FA3002-25-R-0033'}],
   };
-  const base = stateData[state] || stateData.LA;
-  return base.map(o => ({
-    id: `sl_${o.sol}`,
-    source: 'state_local',
-    title: o.title,
-    agency: o.agency,
-    value: o.value,
-    naics: naics||'332312',
-    setAside: 'SDVOSB',
-    status: 'open',
-    state: state,
-    city: o.city,
-    deadline: new Date(Date.now()+o.deadline*86400000).toISOString(),
-    solNum: o.sol,
-    posted: new Date(Date.now()-7*86400000).toISOString(),
-    contact: '',
-    url: STATE_SOURCES[state]||'https://sam.gov',
-    score: 78 + Math.floor(Math.random()*15),
-  }));
+  var base = stateData[state] || stateData['LA'];
+  return base.map(function(o) {
+    return { id:'sl_'+o.sol, source:'state_local', title:o.title, agency:o.agency, value:o.value,
+             naics:naics||'332312', setAside:'SDVOSB', status:'open', state:state, city:o.city,
+             deadline:new Date(Date.now()+o.deadline*86400000).toISOString(), solNum:o.sol,
+             posted:new Date(Date.now()-7*86400000).toISOString(), contact:'',
+             url:STATE_SOURCES[state]||'https://sam.gov', score:78+Math.floor(Math.random()*15) };
+  });
 }
 
 function getSubcontractData(state, naics) {
@@ -3132,10 +3052,10 @@ function getSubcontractData(state, naics) {
 }
 
 function getFederalMockData(filters) {
-  const state = filters.state || 'VA';
-  const naics = filters.naics || '';
-  const TECH_NAICS = ['511210','541511','541512','541513','541519','541715','518210','519130'];
-  const isTech = TECH_NAICS.indexOf(naics) >= 0;
+  var state = filters.state || 'VA';
+  var naics = filters.naics || '';
+  var TECH_NAICS = ['511210','541511','541512','541513','541519','541715','518210','519130'];
+  var isTech = TECH_NAICS.indexOf(naics) >= 0;
   if (isTech) {
     return [
       {id:'f1',source:'federal',title:'Custom Software Development — DoD Agency Portal Modernization',agency:'Dept. of Defense — DISA',value:385000,naics:naics,setAside:'SDVOSB',status:'open',state:state,city:'Arlington',deadline:new Date(Date.now()+30*86400000).toISOString(),solNum:'HC102825R0041',posted:new Date().toISOString(),url:'https://sam.gov',score:95},
@@ -3152,7 +3072,6 @@ function getFederalMockData(filters) {
   ];
 }
 
-// ── Main contract fetch orchestrator ──────────────────────────────────────────
 async function fetchContracts() {
   if(A.contractsLoading) return;
   A.contractsLoading = true;
