@@ -6543,6 +6543,9 @@ function adminTab(tab, btn) {
     var el = document.getElementById('adm-' + t);
     if (el) el.style.display = t === tab ? '' : 'none';
   });
+  // Data Import panel (id="admin-data") — show only when its tab is active
+  var dataPanel = document.getElementById('admin-data');
+  if (dataPanel) dataPanel.style.display = (tab === 'data') ? 'block' : 'none';
   document.querySelectorAll('.admin-tab').forEach(function(b) {
     b.style.borderBottomColor = 'transparent';
     b.style.color = 'var(--t3)';
@@ -7216,19 +7219,22 @@ function renderInvoices() {
 }
 
 async function renderAdmin() {
-  const {data:p}=await sb.from('profiles').select('*').order('created_at',{ascending:false});
-  const pr=p||[];
-  $('a-users').textContent=pr.length;
-  $('a-pro').textContent=pr.filter(u=>u.tier==='pro').length;
-  $('a-mrr').textContent=`$${pr.filter(u=>u.tier==='pro').length*79+pr.filter(u=>u.tier==='base').length*29}`;
-  $('admin-users').innerHTML=pr.map(u=>`
-    <tr>
-      <td><strong>${u.name||'—'}</strong><br><span style="font-size:11px;color:var(--t3)">${u.email}</span></td>
-      <td>${u.company||'—'}</td>
-      <td><span style="font-size:11px;font-weight:600;color:var(--ac)">${(u.tier||'free').toUpperCase()}</span></td>
-      <td><span class="rb ${rc(u.role)}">${(u.role||'user').toUpperCase()}</span></td>
-      <td><button class="btn g sm" onclick="editRole('${u.id}','${u.role}')">Edit</button></td>
-    </tr>`).join('')||'<tr><td colspan="5" style="color:var(--t3)">No users</td></tr>';
+  try {
+    const {data:p}=await sb.from('profiles').select('*').order('created_at',{ascending:false});
+    const pr=p||[];
+    var elU=$('a-users'); if(elU) elU.textContent=pr.length;
+    var elP=$('a-pro'); if(elP) elP.textContent=pr.filter(u=>u.tier==='pro').length;
+    var elM=$('a-mrr'); if(elM) elM.textContent=`$${pr.filter(u=>u.tier==='pro').length*79+pr.filter(u=>u.tier==='base').length*29}`;
+    var elList=$('admin-users');
+    if(elList) elList.innerHTML=pr.map(u=>`
+      <tr>
+        <td><strong>${u.name||'—'}</strong><br><span style="font-size:11px;color:var(--t3)">${u.email}</span></td>
+        <td>${u.company||'—'}</td>
+        <td><span style="font-size:11px;font-weight:600;color:var(--ac)">${(u.tier||'free').toUpperCase()}</span></td>
+        <td><span class="rb ${rc(u.role)}">${(u.role||'user').toUpperCase()}</span></td>
+        <td><button class="btn g sm" onclick="editRole('${u.id}','${u.role}')">Edit</button></td>
+      </tr>`).join('')||'<tr><td colspan="5" style="color:var(--t3)">No users</td></tr>';
+  } catch(e) { console.warn('renderAdmin (legacy) skipped:', e.message); }
 }
 
 async function editRole(id, cur) {
