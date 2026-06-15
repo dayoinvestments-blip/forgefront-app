@@ -1571,6 +1571,7 @@ document.getElementById('cta-signin-btn').onclick  = ffSignIn;
                 <option value="all">All Live Sources</option>
                 <option value="federal">🏛 Federal (SAM.gov) — live</option>
                 <option value="subcontract">🤝 SBA SubNet (Subcontracts) — live</option>
+                <option value="federal_live">⚡ Federal (live SAM.gov refresh — uses your API key)</option>
               </select>
             </div>
             <div class="fg">
@@ -3173,6 +3174,79 @@ function dateFrom(days) {
   return `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${d.getFullYear()}`;
 }
 
+async function fetchCachedContracts(filters) {
+  // Reads opportunities from the Supabase cache (synced from SAM.gov bulk CSV).
+  // No API key, no rate limit. Returns [] on any error.
+  try {
+    var q = sb.from('opportunities_cache').select('*').eq('active', true);
+
+    if (filters.naics)    q = q.like('naics_code', filters.naics + '%');
+    if (filters.state)    q = q.eq('state', filters.state);
+    if (filters.setaside) {
+      // map our dropdown values to SAM set-aside codes
+      var saMap = { 'SDVOSBC':'SDVOSBC','SDVOSB':'SDVOSBC','SBA':'SBA','8A':'8A','HZC':'HZC','WOSB':'WOSB','VSA':'VSA' };
+      var code = saMap[filters.setaside] || filters.setaside;
+      q = q.eq('set_aside_code', code);
+    }
+    if (filters.keyword)  q = q.ilike('title', '%' + filters.keyword + '%');
+
+    // date window
+    if (filters.days) {
+      var since = new Date(Date.now() - (parseInt(filters.days)||90)*86400000);
+      q = q.gte('posted_date', since.toISOString().slice(0,10));
+    }
+
+    q = q.order('posted_date', { ascending: false }).limit(500);
+
+    var res = await q;
+    if (res.error) { console.error('cache query error', res.error); return []; }
+    var rows = res.data || [];
+
+    return rows.map(function(r) {
+      // compute a simple match score
+      var score = 60;
+      if (r.set_aside_code && /SDVOSB|VSA|VSS/.test(r.set_aside_code)) score += 25;
+      else if (r.set_aside_code && r.set_aside_code !== 'NONE') score += 12;
+      if (filters.naics && r.naics_code === filters.naics) score += 10;
+
+      // days until deadline
+      var days = null;
+      if (r.response_deadline) {
+        var dl = new Date(r.response_deadline);
+        if (!isNaN(dl)) days = Math.ceil((dl - Date.now())/86400000);
+      }
+
+      return {
+        id:              'cache_' + r.notice_id,
+        noticeId:        r.notice_id,
+        source:          'federal',
+        title:           r.title || 'Untitled',
+        agency:          r.agency || '',
+        naics:           r.naics_code || '',
+        setAside:        r.set_aside_desc || r.set_aside_code || '',
+        state:           r.state || '',
+        city:            r.city || '',
+        deadline:        r.response_deadline || '',
+        days:            days,
+        solNum:          r.solicitation_number || '',
+        value:           null,
+        description:     (r.raw && r.raw.description_text) ? r.raw.description_text : (r.inline_description || ''),
+        descriptionLink: r.description_url || '',
+        url:             r.ui_link || ('https://sam.gov/opp/' + r.notice_id + '/view'),
+        pocName:         r.poc_name || '',
+        pocEmail:        r.poc_email || '',
+        pocPhone:        r.poc_phone || '',
+        score:           Math.min(score, 99),
+        _cached:         true,
+        _live:           true,
+      };
+    });
+  } catch (e) {
+    console.error('fetchCachedContracts failed', e);
+    return [];
+  }
+}
+
 async function fetchFederalContracts(filters) {
   filters = filters || {};
   // Cache key from the filters that affect SAM.gov results
@@ -3266,8 +3340,9 @@ function scoreContract(o) {
 
 async function fetchContracts() {
   if(A.contractsLoading) return;
-  if(!getSamKey()) { showNoKeyPrompt(); return; }
-  if(!samPreflightOK()) { return; }
+  // No key required — search reads the cached database. Key only needed for live refresh.
+  var _src = $('f-source') ? $('f-source').value : 'all';
+  if(_src==='federal_live' && !getSamKey()) { showNoKeyPrompt(); return; }
   A.contractsLoading = true;
   const btn = $('search-btn');
   btn.innerHTML = '<span class="sp"></span> Searching...';
@@ -3286,11 +3361,27 @@ async function fetchContracts() {
 
   let contracts = [];
 
-  // Federal — real SAM.gov API
+  // Federal — cache-first (instant, no API key), live API as fallback/refresh
   if(filters.source==='all'||filters.source==='federal') {
+    const cached = await fetchCachedContracts(filters);
+    if(cached.length){
+      contracts.push(...cached);
+      $('sam-status').textContent = `${cached.length} contracts from database (updated daily · no API used)`;
+    } else if(getSamKey()) {
+      // cache empty — fall back to live API if the user has a key
+      const fed = await fetchFederalContracts(filters);
+      contracts.push(...fed);
+      $('sam-status').textContent = `${fed.length} federal contracts (live SAM.gov)`;
+    } else {
+      $('sam-status').textContent = 'No contracts in database yet. Admin: import the SAM.gov CSV in the Data Import tab.';
+    }
+  }
+
+  // Federal LIVE — explicit live API refresh (power users who want freshest data)
+  if(filters.source==='federal_live' && getSamKey()) {
     const fed = await fetchFederalContracts(filters);
     contracts.push(...fed);
-    $('sam-status').textContent = `${fed.length} federal contracts loaded from SAM.gov`;
+    $('sam-status').textContent = `${fed.length} federal contracts (live SAM.gov)`;
   }
 
   // SBA SubNet — live subcontracting opportunities (real data, parsed from sba.gov)
