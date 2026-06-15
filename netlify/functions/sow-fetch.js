@@ -36,7 +36,7 @@ exports.handler = async (event) => {
   var p        = event.queryStringParameters || {};
   var link     = p.link || '';
   var noticeId = p.noticeId || '';
-  var samKey   = process.env.SAM_GOV_API_KEY || '';
+  var samKey   = (p.userkey && p.userkey.trim()) || process.env.SAM_GOV_API_KEY || '';
 
   if (!samKey) {
     return { statusCode: 200, headers: CORS, body: JSON.stringify({ sow: '', reason: 'no_api_key' }) };

@@ -82,7 +82,8 @@ exports.handler = async (event) => {
   var setaside= params.setaside || 'SDVOSB';
   var days    = params.days     || '90';
   var keyword = params.keyword  || '';
-  var samKey  = process.env.SAM_GOV_API_KEY || '';
+  // Prefer the user's own SAM.gov key (passed per-request); fall back to env var
+  var samKey  = (params.userkey && params.userkey.trim()) || process.env.SAM_GOV_API_KEY || '';
 
   // No API key — honest empty response, never fabricated data
   if (!samKey) {

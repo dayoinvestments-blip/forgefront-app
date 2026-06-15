@@ -1561,6 +1561,7 @@ document.getElementById('cta-signin-btn').onclick  = ffSignIn;
             🔍 Find Contracts Nationwide
             <span id="results-count" style="font-size:11px;color:var(--t3);font-weight:400;margin-left:auto"></span>
             <button class="btn p sm" onclick="fetchContracts()" id="search-btn">Search</button>
+            <div id="sam-counter" style="font-size:11px;margin-top:6px;text-align:right"></div>
           </div>
           <div class="fr">
             <div class="fg">
@@ -1807,10 +1808,12 @@ document.getElementById('cta-signin-btn').onclick  = ffSignIn;
         </div>
         <div class="cl" style="margin-bottom:14px">
           <div style="font-size:14px;font-weight:600;margin-bottom:4px">&#128273; SAM.gov API Key</div>
-          <div style="font-size:12px;color:var(--t2);margin-bottom:12px">Your key is stored in your browser. Get yours free at <a href="https://sam.gov/profile/details" target="_blank" style="color:var(--ac)">sam.gov/profile/details</a>.</div>
+          <div style="font-size:12px;color:var(--t2);margin-bottom:8px">Your key is stored in your browser and used for all contract searches. Get yours free at <a href="https://sam.gov/profile/details" target="_blank" style="color:var(--ac)">sam.gov/profile/details</a>.</div>
+          <div style="font-size:11px;color:var(--t3);background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);padding:9px 11px;margin-bottom:10px;line-height:1.6">&#9888;&#65039; <strong>Free SAM.gov keys are limited to ~25 searches per day.</strong> For heavy use, request a higher-volume key from SAM.gov or a third-party provider. ForgeFront tracks your daily usage and warns you before you hit the limit.</div>
           <div style="display:flex;gap:8px">
             <input id="pr-samkey" type="password" placeholder="SAM-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" style="flex:1"/>
             <button class="btn p" onclick="saveSamKey()">Save Key</button>
+            <button class="btn g" onclick="removeSamKey()">Remove</button>
           </div>
           <div id="samkey-status" style="font-size:12px;margin-top:8px;color:var(--t3)"></div>
         </div>
@@ -2875,6 +2878,50 @@ function getSamKey() {
   return localStorage.getItem('ff_sam_key') || SAM_KEY_DEFAULT;
 }
 
+// ── SAM.gov daily call counter (free key cap is ~25/day) ─────────────────────
+var SAM_DAILY_CAP = 25;
+function samCounterKey() {
+  var d = new Date();
+  return 'ff_sam_calls_' + d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
+}
+function samCallsToday() {
+  return parseInt(localStorage.getItem(samCounterKey()) || '0', 10) || 0;
+}
+function samIncrement() {
+  var n = samCallsToday() + 1;
+  try { localStorage.setItem(samCounterKey(), String(n)); } catch(e) {}
+  renderSamCounter();
+  return n;
+}
+function samUsingOwnKey() {
+  return !!localStorage.getItem('ff_sam_key');
+}
+function renderSamCounter() {
+  var el = document.getElementById('sam-counter');
+  if (!el) return;
+  // Counter only meaningful for the free-tier cap; if user has their own key, show their usage
+  var used = samCallsToday();
+  var cap  = SAM_DAILY_CAP;
+  var pct  = Math.min(100, Math.round(used/cap*100));
+  var color = used >= cap ? '#E05050' : used >= 20 ? '#E8A020' : 'var(--t3)';
+  var label = samUsingOwnKey()
+    ? (used + ' SAM.gov searches today (your key)')
+    : (used + ' of ' + cap + ' free searches today');
+  el.innerHTML = '<span style="color:'+color+';font-weight:600">'+label+'</span>'
+    + (used >= 20 ? ' &middot; <a href="#" onclick="go(\'bizprofile\',null);return false;" style="color:var(--ac)">add a paid key</a>' : '');
+}
+function samPreflightOK() {
+  var used = samCallsToday();
+  if (used >= SAM_DAILY_CAP) {
+    toast('Daily SAM.gov free limit reached ('+SAM_DAILY_CAP+'). Add your own paid key in Business Profile for unlimited searches.', 'e');
+    return false;
+  }
+  if (used === 20) {
+    toast('Heads up: '+used+' of '+SAM_DAILY_CAP+' free SAM.gov searches used today. Consider adding a paid key.', 'i');
+  }
+  return true;
+}
+
 function dateFrom(days) {
   const d = new Date(Date.now()-days*86400000);
   return `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${d.getFullYear()}`;
@@ -2907,8 +2954,10 @@ async function fetchFederalContracts(filters) {
     if (filters.setaside) params.set('setaside', filters.setaside);
     if (filters.days)     params.set('days',     String(filters.days || 90));
     if (filters.keyword)  params.set('keyword',  filters.keyword || '');
+    var _uk = getSamKey(); if (_uk) params.set('userkey', _uk);
     var controller = new AbortController();
     var tid = setTimeout(function() { controller.abort(); }, 12000);
+    samIncrement();
     var res = await fetch('/.netlify/functions/contracts?' + params.toString(), {signal: controller.signal});
     clearTimeout(tid);
 
@@ -3063,6 +3112,7 @@ function getSubcontractData(state, naics) {
 
 async function fetchContracts() {
   if(A.contractsLoading) return;
+  if(!samPreflightOK()) { return; }
   A.contractsLoading = true;
   const btn = $('search-btn');
   btn.innerHTML = '<span class="sp"></span> Searching...';
@@ -3329,6 +3379,8 @@ function escapeHtml(s){
 async function fetchContractSOW(c){
   try{
     var q = c.descriptionLink ? ('link='+encodeURIComponent(c.descriptionLink)) : ('noticeId='+encodeURIComponent(c.noticeId));
+    var _uk = getSamKey(); if(_uk) q += '&userkey='+encodeURIComponent(_uk);
+    samIncrement();
     var r = await fetch('/.netlify/functions/sow-fetch?'+q);
     var d = await r.json();
     var el = document.getElementById('cdetail-sow');
@@ -3381,6 +3433,8 @@ function preFillBid(contractId) {
 async function fetchSOWIntoBid(c){
   try{
     var q = c.descriptionLink ? ('link='+encodeURIComponent(c.descriptionLink)) : ('noticeId='+encodeURIComponent(c.noticeId));
+    var _uk = getSamKey(); if(_uk) q += '&userkey='+encodeURIComponent(_uk);
+    samIncrement();
     var r = await fetch('/.netlify/functions/sow-fetch?'+q);
     var d = await r.json();
     if(d.sow && d.sow.length > 20){
@@ -6525,6 +6579,7 @@ function go(page,el) {
   else if(page==='subfinder')  { document.getElementById('sub-results').innerHTML = ''; }
   else if(page==='pricing')    { document.getElementById('calc-results').innerHTML = ''; }
   else if(page==='protest')    { document.getElementById('protest-results').innerHTML = ''; }
+  else if(page==='contracts')  { renderSamCounter(); }
   else if(page==='sow')        { document.getElementById('sow-results').innerHTML = ''; sowInit(); }
   else if(page==='report')     { document.getElementById('rpt-results').innerHTML = ''; reportInit(); }
   else if(page==='support')    {}
@@ -6801,10 +6856,20 @@ async function saveContractPrefs() {
 function saveSamKey() {
   const k=($('pr-samkey').value||'').trim();
   if(!k){toast('Enter your SAM.gov API key','e');return;}
+  if(k.length < 20){toast('That does not look like a valid SAM.gov key — check and re-enter','e');return;}
   localStorage.setItem('ff_sam_key',k);
-  $('samkey-status').textContent='✅ SAM.gov API key saved — searches will use your key';
+  $('samkey-status').innerHTML='&#9989; Your SAM.gov key is saved. All searches now use your key and your own daily limit.';
   $('samkey-status').style.color='var(--ac)';
-  toast('SAM.gov key saved — reload contracts to apply','s');
+  renderSamCounter();
+  toast('SAM.gov key saved — your searches now use your key','s');
+}
+
+function removeSamKey() {
+  localStorage.removeItem('ff_sam_key');
+  if($('pr-samkey')) $('pr-samkey').value='';
+  if($('samkey-status')){ $('samkey-status').textContent='Key removed. Searches use the shared free key (limited).'; $('samkey-status').style.color='var(--t3)'; }
+  renderSamCounter();
+  toast('SAM.gov key removed','i');
 }
 
 // ── Upgrade ───────────────────────────────────────────────────────────────────
