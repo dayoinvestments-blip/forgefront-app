@@ -5,6 +5,8 @@
  * (plus a standard SDVOSB baseline). Returns the proposal text + a compliance
  * checklist for the user to verify. NOT a guaranteed-compliant final submission.
  */
+const { verifyUser, unauthorized } = require('./_verify-auth');
+
 const CORS = {
   'Access-Control-Allow-Origin':  '*',
   'Access-Control-Allow-Headers': 'Content-Type',
@@ -26,6 +28,10 @@ const STANDARD_FAR = [
 
 exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: CORS, body: '' };
+
+  // Cost protection: require a signed-in user before spending Anthropic credits
+  const _authedUser = await verifyUser(event.headers);
+  if (!_authedUser) return unauthorized(CORS);
   if (event.httpMethod !== 'POST')   return { statusCode: 405, headers: CORS, body: JSON.stringify({ error: 'Method not allowed' }) };
 
   try {

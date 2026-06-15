@@ -12,6 +12,8 @@
  * This replaces $1,200-$1,800 of BD consultant work in ~60 seconds.
  */
 
+const { verifyUser, unauthorized } = require('./_verify-auth');
+
 const CORS = {
   'Access-Control-Allow-Origin':  '*',
   'Access-Control-Allow-Headers': 'Content-Type',
@@ -130,6 +132,10 @@ async function getLaborRates(role) {
 
 exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: CORS, body: '' };
+
+  // Cost protection: require a signed-in user before spending Anthropic credits
+  const _authedUser = await verifyUser(event.headers);
+  if (!_authedUser) return unauthorized(CORS);
   if (event.httpMethod !== 'POST')    return { statusCode: 405, headers: CORS, body: '{"error":"Method not allowed"}' };
 
   const apiKey = process.env.ANTHROPIC_API_KEY;

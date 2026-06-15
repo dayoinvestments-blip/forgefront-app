@@ -3403,7 +3403,7 @@ async function generateSOWForBid() {
   try{
     const r = await fetch('/.netlify/functions/sow-analyzer', {
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers: await aiHeaders(),
       body:JSON.stringify({ sow: scope, company: company, certs: certs, naics: naics }),
     });
     const data = await r.json();
@@ -3447,7 +3447,7 @@ async function breakdownLineItems(id) {
   try{
     const r = await fetch('/.netlify/functions/sow-lineitems', {
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers: await aiHeaders(),
       body:JSON.stringify({ sow: sow, title: c.title, naics: c.naics }),
     });
     const d = await r.json();
@@ -3737,7 +3737,7 @@ async function runBidWriter() {
 
   try{
     const r = await fetch('/.netlify/functions/bid-proposal', {
-      method:'POST', headers:{'Content-Type':'application/json'},
+      method:'POST', headers: await aiHeaders(),
       body:JSON.stringify({ sow: scope, company: company, profile: profile, quotes: quotes, contract: contract }),
     });
     const d = await r.json();
@@ -4082,7 +4082,7 @@ async function bpAiField(fieldId, fieldType) {
   try {
     var res = await fetch('/.netlify/functions/ai-assist', {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      headers: await aiHeaders(),
       body: JSON.stringify({prompt: prompt, field: fieldType})
     });
     if (res.ok) {
@@ -5746,7 +5746,7 @@ async function sowAnalyze() {
   try {
     var r = await fetch('/.netlify/functions/sow-analyzer', {
       method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: await aiHeaders(),
       body:    JSON.stringify({ sow: sowText, company: company, certs: certs, naics: naics }),
     });
     var data = await r.json();
@@ -5969,7 +5969,7 @@ async function generateReport() {
   try {
     var r = await fetch('/.netlify/functions/executive-report', {
       method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: await aiHeaders(),
       body:    JSON.stringify({ title, naics, agency, state, role, sow, company, certs }),
     });
     var data = await r.json();
@@ -6199,6 +6199,14 @@ var ADM = { page: 1, metrics: null, searchTimer: null };
 async function admToken() {
   var session = await sb.auth.getSession();
   return session && session.data && session.data.session && session.data.session.access_token || '';
+}
+
+// Headers for AI function calls — includes the user's auth token (cost protection)
+async function aiHeaders() {
+  var t = await admToken();
+  var hdr = { 'Content-Type': 'application/json' };
+  if (t) hdr['Authorization'] = 'Bearer ' + t;
+  return hdr;
 }
 
 async function admFetch(method, params, body) {
