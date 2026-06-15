@@ -3139,6 +3139,14 @@ async function fetchContracts() {
     );
   }
 
+  // NAICS category filter — strip mismatched contract types
+  if (filters.naics) {
+    const _TECH = ['511210','541511','541512','541513','541519','541715','518210','519130'];
+    const _FAB  = ['332312','238190','332313','332999','236220','238220','238110'];
+    if (_TECH.includes(filters.naics)) contracts = contracts.filter(c => !_FAB.includes(c.naics));
+    else if (_FAB.includes(filters.naics)) contracts = contracts.filter(c => !_TECH.includes(c.naics));
+  }
+
   // Sort by score desc
   contracts.sort((a,b)=>b.score-a.score);
   A.contracts = contracts;
