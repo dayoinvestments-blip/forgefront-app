@@ -136,11 +136,12 @@ async function bulkProcess(file) {
         if (dbCol === 'active') { rec[dbCol] = val.toLowerCase() === 'yes'; return; }
         rec[dbCol] = val;
       });
-      // Map inline_desc to description_url only if it looks like a URL
+      // The Description column is inline SOW text (not a URL). Store it so
+      // the SOW prompt Option B can pre-fill the bid writer with it.
       var desc = rec['inline_desc'] || '';
       delete rec['inline_desc'];
-      if (desc && desc.indexOf('http') === 0) { rec['description_url'] = desc; }
-      else { rec['description_url'] = ''; }
+      if (desc && desc.indexOf('http') === 0) { rec['description_url'] = desc; rec['inline_description'] = null; }
+      else { rec['description_url'] = ''; rec['inline_description'] = desc || null; }
       return rec.notice_id ? rec : null;
     }
 
