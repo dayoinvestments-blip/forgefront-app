@@ -1729,7 +1729,7 @@ document.getElementById('cta-signin-btn').onclick  = ffSignIn;
         <div id="cd-agency-intel" style="display:none"></div>
         <div class="cl" style="margin-bottom:16px">
           <div style="font-size:14px;font-weight:600;margin-bottom:4px">Generate a Full SDVOSB Proposal</div>
-          <div style="font-size:12px;color:var(--t2);margin-bottom:14px">Paste a contract solicitation number or description. The AI generates a compliant SDVOSB proposal in ~60 seconds.</div>
+          <div style="font-size:12px;color:var(--t2);margin-bottom:14px">Pulls the real SOW, your collected vendor quotes, and the FAR clauses cited in the solicitation into a strong draft proposal &mdash; with a compliance checklist to verify before you submit. Review carefully; this is a draft, not a guaranteed-compliant final submission.</div>
           <div class="fd"><label class="fla">Solicitation Number or Contract Title</label><input id="bid-sol" placeholder="e.g. W912DR-25-R-0041 or paste contract title"/></div>
           <div class="fd"><label class="fla">Agency</label><input id="bid-agency" placeholder="e.g. Dept. of Veterans Affairs"/></div>
           <div class="fd"><label class="fla">Scope of Work (paste from solicitation)</label><textarea id="bid-scope" style="min-height:100px" placeholder="Paste the scope of work or requirements here..."></textarea></div>
@@ -3677,117 +3677,81 @@ async function runBidWriter() {
   const agency = $('bid-agency').value.trim();
   const scope  = $('bid-scope').value.trim();
   if(!sol) { toast('Enter a solicitation number or title', 'e'); return; }
+  if(scope.length < 50){ toast('Need the SOW / scope text to write a real proposal. Pull it from the contract first.', 'e'); return; }
 
   const btn = $('bid-btn');
-  btn.innerHTML = '<span class="sp"></span> Generating proposal...';
+  btn.innerHTML = '<span class="sp"></span> Writing proposal from SOW, quotes & FAR clauses...';
   btn.disabled = true;
   $('bid-output').style.display='none';
 
   var _bp={}; try{_bp=JSON.parse(localStorage.getItem('ff_bp')||'{}');}catch(e){}
-  const name    = _bp['bp-principal'] || A.profile?.name    || 'LaDarrell Willis';
-  const company = _bp['bp-coname']   || A.profile?.company || 'W4X Technologies LLC';
-  const naics   = _bp['bp-naics']    || (A.profile?.naics_codes||['332312']).join(', ');
+  const company = _bp['bp-coname'] || (A.profile && A.profile.company) || 'My Company';
+  const certs = [ _bp['bp-sdvosb']?'SDVOSB':'', _bp['bp-vosb']?'VOSB':'', _bp['bp-8a']?'8(a)':'', _bp['bp-hubzone']?'HUBZone':'' ].filter(Boolean).join(', ') || 'SDVOSB';
 
-  // Generate proposal using template (Anthropic API would go here)
-  await new Promise(r=>setTimeout(r,2000)); // simulate AI call
+  const profile = {
+    uei: _bp['bp-uei']||'', cage: _bp['bp-cage']||'', naics: _bp['bp-naics']||'',
+    principal: _bp['bp-principal']||'', bio: _bp['bp-bio']||'', capability: _bp['bp-cap']||'',
+    pastPerformance: _bp['bp-pp']||'', certs: certs, address: _bp['bp-addr']||'',
+    phone: _bp['bp-bphone']||'', email: _bp['bp-bemail']||(A.user&&A.user.email)||''
+  };
 
-  const proposal = `TECHNICAL PROPOSAL
-Solicitation: ${sol}
-Submitted to: ${agency}
-Prepared by: ${company}
+  // Pull collected quotes from the current contract's line items, if any
+  var quotes = [];
+  var cc = A._currentContract;
+  if(cc && cc._lineItems){
+    quotes = cc._lineItems.map(function(it){ return { name:it.name, spec:it.spec, unit:it.unit, qty:it.estQty, vendor:it._vendor||'', price:it._price||'' }; });
+  }
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  const contract = {
+    title: (cc && cc.title) || sol, solNum: (cc && cc.solNum) || sol,
+    agency: agency || (cc && cc.agency) || '', value: (cc && cc.value) || $('bid-val').value || '',
+    deadline: $('bid-due').value || (cc && cc.deadline) || ''
+  };
 
-SECTION 1: EXECUTIVE SUMMARY
+  try{
+    const r = await fetch('/.netlify/functions/bid-proposal', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ sow: scope, company: company, profile: profile, quotes: quotes, contract: contract }),
+    });
+    const d = await r.json();
+    if(!d.proposal) throw new Error(d.error || 'Proposal generation failed');
 
-${company} is a Service-Disabled Veteran-Owned Small Business (SDVOSB) headquartered in Minden, Louisiana, specializing in structural steel fabrication and welding services under NAICS ${naics}. We are uniquely positioned to respond to this requirement with a combination of veteran leadership, certified craftsmen, and a proven track record of federal performance.
+    $('bid-text').textContent = d.proposal;
+    renderComplianceChecklist(d.checklist || [], d.disclaimer || '');
+    $('bid-output').style.display='block';
+    if(tier==='pro') incUsage('bid_writer');
+    toast('Draft proposal generated — review the compliance checklist before submitting', 's');
+  }catch(e){
+    toast('Proposal generation failed: '+e.message, 'e');
+  }finally{
+    btn.innerHTML = '\u270D Generate SDVOSB Proposal';
+    btn.disabled = false;
+  }
+}
 
-Our principal, ${name}, is a retired U.S. Army Major with 24+ years of service and a 100% Permanent and Total VA disability rating. We bring military precision, discipline, and accountability to every project.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-SECTION 2: TECHNICAL APPROACH
-
-${scope ? `Based on the stated scope of work:\n"${scope}"\n\n` : ''}${company} proposes the following technical approach:
-
-1. MOBILIZATION & SAFETY PLANNING
-   - Pre-task safety briefings compliant with OSHA 29 CFR 1926
-   - Site-specific hazard assessment within 24 hours of notice-to-proceed
-   - All personnel hold current OSHA 10/30 certifications
-
-2. FABRICATION & WELDING EXECUTION
-   - AWS D1.1 Structural Welding Code compliance for all welds
-   - AWS Certified Welding Inspectors (CWI) on-site for quality control
-   - Documented weld procedures (WPS/PQR) submitted prior to start
-   - Daily progress reports and photographic documentation
-
-3. QUALITY ASSURANCE
-   - 100% visual inspection per AWS D1.1 Table 6.1
-   - NDE (ultrasonic or magnetic particle) testing as required
-   - Final inspection with government representative sign-off
-
-4. PROJECT TIMELINE
-   - Week 1: Mobilization, material procurement, shop drawings
-   - Weeks 2-3: Primary fabrication and shop welding
-   - Final weeks: Site installation, inspection, closeout documentation
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-SECTION 3: RELEVANT PAST PERFORMANCE
-
-1. Fort Johnson Gate Fabrication — Dept. of Army
-   Contract Value: $31,000 | Completed on time, under budget
-   Scope: Custom metal gate systems, security hardware installation
-   POC: Available upon request
-
-2. USDA Rural Development Fence Installation — USDA
-   Contract Value: $22,000 | Awarded SDVOSB set-aside
-   Scope: Agricultural fence systems, structural welding
-   POC: Available upon request
-
-3. Minden Welding Shop Build-out
-   Contract Value: $48,000 | Full commercial build-out
-   Scope: Structural steel framing, custom fabrication
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-SECTION 4: KEY PERSONNEL
-
-${name} — Principal / Project Manager
-- Retired U.S. Army Major, 24+ years service
-- 100% P&T Service-Connected Disability
-- MBA, Construction Project Management Certificate (LSU)
-- TS/SCI Clearance (active)
-
-Lead Welder — AWS Certified (SMAW, GMAW, FCAW)
-- CWI — Certified Welding Inspector
-- OSHA 30 Construction
-- 15+ years structural welding experience
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-SECTION 5: SDVOSB COMPLIANCE STATEMENT
-
-${company} is a verified Service-Disabled Veteran-Owned Small Business registered in SAM.gov with all certifications current. We fully meet the SDVOSB set-aside requirements and commit to performing at least 50% of the work with our own employees as required under 13 CFR Part 125.
-
-UEI: [YOUR UEI FROM SAM.GOV]
-CAGE Code: [YOUR CAGE CODE]
-NAICS: ${naics}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-${company} is ready, willing, and able to perform this requirement with excellence. We thank the contracting officer for this opportunity to serve.
-
-Respectfully submitted,
-${name}
-Principal, ${company}
-${A.user?.email||'darrelltwillis@hotmail.com'}`;
-
-  $('bid-text').textContent = proposal;
-  $('bid-output').style.display='block';
-  btn.innerHTML = '✍ Generate SDVOSB Proposal';
-  btn.disabled = false;
-  toast('Proposal generated ✅ — review and customize before submitting', 's');
+function renderComplianceChecklist(items, disclaimer) {
+  var host = document.getElementById('bid-checklist');
+  if(!host){
+    // create the host right above bid-text
+    var out = document.getElementById('bid-output');
+    var bt = document.getElementById('bid-text');
+    host = document.createElement('div');
+    host.id = 'bid-checklist';
+    if(bt && bt.parentNode) bt.parentNode.insertBefore(host, bt);
+  }
+  if(!items || !items.length){ host.innerHTML=''; return; }
+  var html = '<div style="background:rgba(232,160,32,.08);border:1px solid rgba(232,160,32,.4);border-radius:var(--r);padding:14px;margin-bottom:14px">';
+  html += '<div style="font-size:14px;font-weight:700;color:#E8A020;margin-bottom:4px">&#9888;&#65039; Compliance Checklist — verify before you submit</div>';
+  html += '<div style="font-size:11px;color:var(--t2);margin-bottom:10px">'+escapeHtml(disclaimer||'This is an AI-generated draft. Verify every item against the full solicitation before submitting.')+'</div>';
+  items.forEach(function(it, i){
+    html += '<label style="display:flex;gap:9px;align-items:flex-start;padding:7px 0;border-top:1px solid rgba(255,255,255,.06);cursor:pointer">';
+    html += '<input type="checkbox" style="margin-top:3px" onchange="this.parentNode.style.opacity=this.checked?0.5:1">';
+    html += '<div><div style="font-size:13px;font-weight:600;color:var(--t)">'+escapeHtml(it.item||'')+'</div>';
+    if(it.why) html += '<div style="font-size:11px;color:var(--t3);margin-top:1px">'+escapeHtml(it.why)+'</div>';
+    html += '</div></label>';
+  });
+  html += '</div>';
+  host.innerHTML = html;
 }
 
 function copyBid() {
