@@ -82,17 +82,16 @@ exports.handler = async (event) => {
   var setaside= params.setaside || 'SDVOSB';
   var days    = params.days     || '90';
   var keyword = params.keyword  || '';
-  // Prefer the user's own SAM.gov key (passed per-request); fall back to env var
-  var samKey  = (params.userkey && params.userkey.trim()) || process.env.SAM_GOV_API_KEY || '';
+  // Require the user's own SAM.gov key — no shared fallback
+  var samKey  = (params.userkey && params.userkey.trim()) || '';
 
-  // No API key — honest empty response, never fabricated data
+  // No user key — instruct the user to add one
   if (!samKey) {
-    console.warn('[FF-contracts] SAM_GOV_API_KEY not set');
     return {
       statusCode: 200,
       headers: CORS,
-      body: JSON.stringify({ contracts: [], source: 'none', reason: 'no_api_key',
-        message: 'SAM.gov API key not configured.' }),
+      body: JSON.stringify({ contracts: [], source: 'none', reason: 'no_user_key',
+        message: 'Add your SAM.gov API key in Business Profile to search live contracts.' }),
     };
   }
 
