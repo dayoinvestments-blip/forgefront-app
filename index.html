@@ -3209,6 +3209,7 @@ function contractCard(c, locked=false) {
         <button class="btn go2 sm" onclick="event.stopPropagation();preFillBid('${c.id}')">✍ Write Bid</button>
         <button class="btn g sm" onclick="event.stopPropagation();viewContractDetail('${c.id}')">View →</button>
         ${(c.source==='federal' && c.noticeId && c.url)?`<a href="${c.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="btn g sm" title="Open the actual listing on SAM.gov">SAM.gov ↗</a>`:''}
+        ${(c.source==='federal' && c.noticeId && c.url)?`<a href="${c.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="btn g sm" title="Open the actual listing on SAM.gov">SAM.gov ↗</a>`:''}
       </div>
     </div>
   </div>`;
