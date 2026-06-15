@@ -120,6 +120,13 @@ function transformSAMOpportunity(opp) {
     posted:   opp.postedDate || '',
     url:      opp.uiLink || ('https://sam.gov/opp/' + (opp.noticeId || '')),
     score:    score,
+    noticeId: opp.noticeId || '',
+    description:     (typeof opp.description === 'string' && opp.description.indexOf('http') !== 0) ? opp.description : '',
+    descriptionLink:(typeof opp.description === 'string' && opp.description.indexOf('http') === 0) ? opp.description : '',
+    naicsDesc:      opp.naicsDescription || '',
+    office:         opp.officeAddress ? [opp.officeAddress.city, opp.officeAddress.state].filter(Boolean).join(', ') : '',
+    pocName:        (opp.pointOfContact && opp.pointOfContact[0] && opp.pointOfContact[0].fullName) || '',
+    pocEmail:       (opp.pointOfContact && opp.pointOfContact[0] && opp.pointOfContact[0].email) || '',
   };
 }
 
