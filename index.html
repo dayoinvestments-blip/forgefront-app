@@ -1568,7 +1568,9 @@ document.getElementById('cta-signin-btn').onclick  = ffSignIn;
             <div class="fg">
               <div class="fl">Source</div>
               <select id="f-source">
+                <option value="all">All Live Sources</option>
                 <option value="federal">🏛 Federal (SAM.gov) — live</option>
+                <option value="subcontract">🤝 SBA SubNet (Subcontracts) — live</option>
               </select>
             </div>
             <div class="fg">
@@ -3062,7 +3064,7 @@ async function fetchContracts() {
   btn.disabled = true;
 
   const filters = {
-    source:   'federal',
+    source:   $('f-source') ? $('f-source').value : 'all',
     state:    $('f-state').value,
     setaside: $('f-setaside').value,
     naics:    $('f-naics').value,
@@ -3081,7 +3083,17 @@ async function fetchContracts() {
     $('sam-status').textContent = `${fed.length} federal contracts loaded from SAM.gov`;
   }
 
-  // (State/Local + Subcontract sample sources removed — federal SAM.gov data only)
+  // SBA SubNet — live subcontracting opportunities (real data, parsed from sba.gov)
+  if(filters.source==='all'||filters.source==='subcontract') {
+    try {
+      var ps = new URLSearchParams();
+      if (filters.state)   ps.set('state',   filters.state);
+      if (filters.naics)   ps.set('naics',   filters.naics);
+      if (filters.keyword) ps.set('keyword', filters.keyword || '');
+      var rs = await fetch('/.netlify/functions/subnet?' + ps.toString());
+      if (rs.ok) { var ds = await rs.json(); contracts.push(...(ds.contracts || [])); }
+    } catch(e) { /* SubNet unavailable — show nothing rather than fake data */ }
+  }
 
   // Keyword filter (client-side)
   if(filters.keyword) {
@@ -3141,7 +3153,7 @@ function contractCard(c, locked=false) {
   const dlColor = dl!==null?(dl<=7?'var(--dn)':dl<=14?'var(--go)':'var(--t3)'):'var(--t3)';
   const dlText  = dl!==null?(dl<0?'Closed':dl===0?'Due today':`${dl}d left`):'—';
   const srcCls  = {federal:'fed',state_local:'sl2',subcontract:'sub'}[c.source]||'fed';
-  const srcLbl  = {federal:'🏛 Federal',state_local:'🏗 State/Local',subcontract:'🤝 Subcontract'}[c.source];
+  const srcLbl  = {federal:'🏛 Federal',state_local:'🏗 State/Local',subcontract:'🤝 SBA SubNet'}[c.source];
 
   return `<div class="cc${locked?' locked':''}" onclick="${locked?'showUpgrade()':'viewContractDetail(\''+c.id+'\')'}">
     <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px">
