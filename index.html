@@ -3208,6 +3208,7 @@ function contractCard(c, locked=false) {
         </div>
         <button class="btn go2 sm" onclick="event.stopPropagation();preFillBid('${c.id}')">✍ Write Bid</button>
         <button class="btn g sm" onclick="event.stopPropagation();viewContractDetail('${c.id}')">View →</button>
+        ${(c.source==='federal' && c.noticeId && c.url)?`<a href="${c.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="btn g sm" title="Open the actual listing on SAM.gov">SAM.gov ↗</a>`:''}
       </div>
     </div>
   </div>`;
@@ -3293,8 +3294,9 @@ function viewContractDetail(id) {
 
   h += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
   h += '<button class="btn p" onclick="preFillBid(\''+c.id+'\')">&#9997; Write Bid &#8594;</button>';
-  if(isReal && c.url){
-    h += '<a href="'+c.url+'" target="_blank" rel="noopener" class="btn g">Open on SAM.gov &#8599;</a>';
+  if(isReal){
+    var samUrl = c.url || ('https://sam.gov/opp/' + c.noticeId + '/view');
+    h += '<a href="'+samUrl+'" target="_blank" rel="noopener" class="btn g">Open on SAM.gov &#8599;</a>';
   }
   h += '</div>';
   h += '</div>';
