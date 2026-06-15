@@ -1725,7 +1725,14 @@ document.getElementById('cta-signin-btn').onclick  = ffSignIn;
       </div>
 
       <div class="pg" id="p-bid">
-        <div class="sl">AI Bid Writer</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px">
+          <div class="sl" style="margin:0">AI Bid Writer</div>
+          <button class="btn g sm" onclick="toggleSavedProposals()" id="saved-prop-btn">&#128194; My Saved Proposals</button>
+        </div>
+        <div id="saved-proposals-panel" style="display:none;background:var(--s);border:1px solid var(--bd);border-radius:var(--r);padding:12px;margin-bottom:14px">
+          <div style="font-size:13px;font-weight:700;margin-bottom:8px">Your Saved Proposals</div>
+          <div id="saved-proposals-list"><div style="font-size:12px;color:var(--t3)">Loading...</div></div>
+        </div>
         <div id="cd-agency-intel" style="display:none"></div>
         <div class="cl" style="margin-bottom:16px">
           <div style="font-size:14px;font-weight:600;margin-bottom:4px">Generate a Full SDVOSB Proposal</div>
@@ -1828,7 +1835,7 @@ document.getElementById('cta-signin-btn').onclick  = ffSignIn;
         <div class="cl" style="margin-bottom:14px">
           <div style="font-size:14px;font-weight:600;margin-bottom:4px">&#128273; SAM.gov API Key</div>
           <div style="font-size:12px;color:var(--t2);margin-bottom:8px">Your key is stored in your browser and used for all contract searches. Get yours free at <a href="https://sam.gov/profile/details" target="_blank" style="color:var(--ac)">sam.gov/profile/details</a>.</div>
-          <div style="font-size:11px;color:var(--t3);background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);padding:9px 11px;margin-bottom:10px;line-height:1.6">&#9888;&#65039; <strong>Free SAM.gov keys are limited to ~25 searches per day.</strong> For heavy use, request a higher-volume key from SAM.gov or a third-party provider. ForgeFront tracks your daily usage and warns you before you hit the limit.</div>
+          <div style="font-size:11px;color:var(--t3);background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);padding:9px 11px;margin-bottom:10px;line-height:1.6">&#9888;&#65039; <strong>SAM.gov daily limits:</strong> a public key allows ~10 searches/day. <strong>Register your entity in SAM.gov</strong> (which you already do as an SDVOSB) and your key jumps to <strong>1,000 searches/day</strong> &mdash; effectively unlimited for normal use. ForgeFront tracks your daily usage and warns you before you hit the limit.</div>
           <div style="display:flex;gap:8px">
             <input id="pr-samkey" type="password" placeholder="SAM-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" style="flex:1"/>
             <button class="btn p" onclick="saveSamKey()">Save Key</button>
@@ -3851,16 +3858,80 @@ function downloadBidWord() {
 }
 
 async function saveBid() {
-  const { error } = await sb.from('bids').insert({
+  if(!A.user || !A.user.id){ toast('Sign in to save proposals', 'e'); return; }
+  var record = {
     user_id: A.user.id,
     contract_id: $('bid-sol').value||'manual',
     contract_title: $('bid-sol').value,
     agency: $('bid-agency').value,
     proposal_text: $('bid-text').textContent,
+    scope_text: $('bid-scope').value || '',
+    contract_value: $('bid-val').value || null,
+    response_deadline: $('bid-due').value || null,
     status: (document.getElementById('bid-status') ? document.getElementById('bid-status').value : 'draft'),
-  });
-  if(error) toast('Failed to save bid', 'e');
-  else toast('Bid saved to your proposal history ✅', 's');
+  };
+  try{
+    const { data, error } = await sb.from('bids').insert(record).select();
+    if(error) throw error;
+    toast('Proposal saved \u2705', 's');
+    // refresh the list if the panel is open
+    if(document.getElementById('saved-proposals-panel') && document.getElementById('saved-proposals-panel').style.display!=='none'){
+      loadSavedProposals();
+    }
+  }catch(e){
+    toast('Save failed: '+(e.message||'error'), 'e');
+  }
+}
+
+function toggleSavedProposals() {
+  var p = document.getElementById('saved-proposals-panel');
+  if(!p) return;
+  if(p.style.display==='none'){ p.style.display='block'; loadSavedProposals(); }
+  else { p.style.display='none'; }
+}
+
+async function loadSavedProposals() {
+  var el = document.getElementById('saved-proposals-list');
+  if(!el) return;
+  if(!A.user || !A.user.id){ el.innerHTML='<div style="font-size:12px;color:var(--t3)">Sign in to see saved proposals.</div>'; return; }
+  el.innerHTML = '<div style="font-size:12px;color:var(--t3)"><span class="sp"></span> Loading...</div>';
+  try{
+    const { data, error } = await sb.from('bids')
+      .select('id,contract_title,agency,status,proposal_text,scope_text,contract_value,response_deadline,created_at')
+      .eq('user_id', A.user.id)
+      .order('created_at', { ascending: false })
+      .limit(50);
+    if(error) throw error;
+    A._savedProposals = data || [];
+    if(!A._savedProposals.length){ el.innerHTML='<div style="font-size:12px;color:var(--t3)">No saved proposals yet. Generate one and click Save Bid.</div>'; return; }
+    var statusColors = {draft:'var(--t3)', submitted:'#E8A020', won:'var(--ac)', lost:'#E05050'};
+    el.innerHTML = A._savedProposals.map(function(b){
+      var d = b.created_at ? new Date(b.created_at).toLocaleDateString() : '';
+      return '<div style="background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
+        + '<div style="flex:1;min-width:150px"><div style="font-size:13px;font-weight:600">'+escapeHtml(b.contract_title||'Untitled')+'</div>'
+        + '<div style="font-size:11px;color:var(--t3);margin-top:2px">'+escapeHtml(b.agency||'')+' &middot; '+d+' &middot; <span style="color:'+(statusColors[b.status]||'var(--t3)')+';font-weight:600;text-transform:capitalize">'+escapeHtml(b.status||'draft')+'</span></div></div>'
+        + '<button class="btn p sm" onclick="reloadProposal(\''+b.id+'\')">Open &#8594;</button>'
+        + '</div>';
+    }).join('');
+  }catch(e){
+    el.innerHTML='<div style="font-size:12px;color:var(--t3)">Could not load proposals: '+escapeHtml(e.message||'error')+'</div>';
+  }
+}
+
+function reloadProposal(id) {
+  var b = (A._savedProposals||[]).find(function(x){ return String(x.id)===String(id); });
+  if(!b){ toast('Proposal not found', 'e'); return; }
+  $('bid-sol').value = b.contract_title || '';
+  $('bid-agency').value = b.agency || '';
+  $('bid-scope').value = b.scope_text || '';
+  if(b.contract_value) $('bid-val').value = b.contract_value;
+  if(b.response_deadline) $('bid-due').value = b.response_deadline;
+  $('bid-text').textContent = b.proposal_text || '';
+  $('bid-output').style.display = (b.proposal_text ? 'block' : 'none');
+  if(document.getElementById('bid-status')) document.getElementById('bid-status').value = b.status || 'draft';
+  var p = document.getElementById('saved-proposals-panel'); if(p) p.style.display='none';
+  toast('Proposal loaded — edit and regenerate or export', 's');
+  document.getElementById('bid-output').scrollIntoView({behavior:'smooth'});
 }
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
@@ -6806,6 +6877,7 @@ function go(page,el) {
   else if(page==='pricing')    { document.getElementById('calc-results').innerHTML = ''; }
   else if(page==='protest')    { document.getElementById('protest-results').innerHTML = ''; }
   else if(page==='contracts')  { renderSamCounter(); }
+  else if(page==='bid')        { if(A.user&&A.user.id&&document.getElementById('saved-proposals-panel')&&document.getElementById('saved-proposals-panel').style.display!=='none'){ loadSavedProposals(); } }
   else if(page==='sow')        { document.getElementById('sow-results').innerHTML = ''; sowInit(); }
   else if(page==='report')     { document.getElementById('rpt-results').innerHTML = ''; reportInit(); }
   else if(page==='support')    {}
