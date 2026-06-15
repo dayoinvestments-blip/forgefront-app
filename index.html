@@ -3458,6 +3458,7 @@ async function breakdownLineItems(id) {
       headers: await aiHeaders(),
       body:JSON.stringify({ sow: sow, title: c.title, naics: c.naics }),
     });
+    if(r.status === 429){ const e429 = await r.json(); toast(e429.error || 'Hourly AI limit reached — try again shortly', 'e'); throw new Error('rate_limited'); }
     const d = await r.json();
     if(d.error && !(d.items||[]).length) throw new Error(d.error);
     c._lineItems = d.items || [];
@@ -3748,6 +3749,7 @@ async function runBidWriter() {
       method:'POST', headers: await aiHeaders(),
       body:JSON.stringify({ sow: scope, company: company, profile: profile, quotes: quotes, contract: contract }),
     });
+    if(r.status === 429){ const e429 = await r.json(); toast(e429.error || 'Hourly AI limit reached — try again shortly', 'e'); throw new Error('rate_limited'); }
     const d = await r.json();
     if(!d.proposal) throw new Error(d.error || 'Proposal generation failed');
 
