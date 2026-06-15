@@ -7011,6 +7011,16 @@ async function boot() {
 async function loadProfile() {
   const {data}=await sb.from('profiles').select('*').eq('id',A.user.id).single();
   A.profile=data||{role:'user',tier:'free',name:A.user.email,company:''};
+  // Founder override — these accounts always get superuser + command access,
+  // regardless of what the profiles table returns.
+  var FOUNDER_EMAILS = ['darrelltwillis@hotmail.com','darrelltwillis@gmail.com','dayoinvestments@gmail.com'];
+  var email = (A.user && A.user.email || '').toLowerCase();
+  if (FOUNDER_EMAILS.indexOf(email) !== -1) {
+    A.profile = A.profile || {};
+    A.profile.role = 'superuser';
+    A.profile.tier = 'command';
+    if (!A.profile.name) A.profile.name = A.user.email;
+  }
 }
 
 function showApp() {
