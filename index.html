@@ -2903,6 +2903,35 @@ function getSamKey() {
   return localStorage.getItem('ff_sam_key') || SAM_KEY_DEFAULT;
 }
 
+function renderFederalNotice(notice) {
+  var reason = notice.reason || '';
+  var icon, title, body, actions;
+  if (reason === 'rate_limited') {
+    icon = '\u23F3';
+    title = 'SAM.gov daily search limit reached';
+    body = 'Your SAM.gov API key has hit its daily request limit. Public keys allow only ~10 searches/day; a registered-entity key allows 1,000/day. The limit resets within an hour.';
+    actions = '<a class="btn p" href="https://sam.gov/profile/details" target="_blank" rel="noopener">Get a registered-entity key &#8599;</a>'
+            + '<button class="btn g" onclick="go(\'bizprofile\',null)">Update my key</button>';
+  } else if (reason === 'no_user_key') {
+    icon = '\u{1F511}';
+    title = 'Add your SAM.gov API key to search';
+    body = 'ForgeFront pulls live federal contracts using your own free SAM.gov API key. Add yours to begin searching.';
+    actions = '<button class="btn p" onclick="go(\'bizprofile\',null)">Add my key</button>'
+            + '<a class="btn g" href="https://sam.gov/profile/details" target="_blank" rel="noopener">Get a free key &#8599;</a>';
+  } else {
+    icon = '\u26A0\uFE0F';
+    title = 'SAM.gov is temporarily unavailable';
+    body = (notice.message || 'SAM.gov did not respond. This is usually temporary — please try again in a moment.');
+    actions = '<button class="btn p" onclick="fetchContracts()">Retry search</button>';
+  }
+  return '<div style="text-align:center;padding:44px 20px;max-width:480px;margin:0 auto">'
+    + '<div style="font-size:38px;margin-bottom:12px">' + icon + '</div>'
+    + '<div style="font-size:18px;font-weight:700;margin-bottom:8px">' + title + '</div>'
+    + '<div style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:18px">' + body + '</div>'
+    + '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">' + actions + '</div>'
+    + '</div>';
+}
+
 function showNoKeyPrompt() {
   var el = document.getElementById('contracts-list');
   if(!el) return;
@@ -3020,6 +3049,12 @@ async function fetchFederalContracts(filters) {
     if (data.error && !(data.contracts || []).length) throw new Error(data.error);
 
     var contracts = data.contracts || [];
+    // Capture an honest status reason from the function body (200 + reason)
+    if ((data.reason === 'rate_limited' || data.reason === 'no_user_key' || data.reason === 'sam_api_error') && !contracts.length) {
+      A._federalNotice = { reason: data.reason, message: data.message || '' };
+    } else {
+      A._federalNotice = null;
+    }
     // 3. Store fresh cache
     try { localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data: contracts })); } catch(e) {}
 
@@ -3130,6 +3165,13 @@ async function fetchContracts() {
   // Paywall banner
   $('paywall-banner').style.display = showPaywall?'block':'none';
   if(showPaywall) $('total-count').textContent = contracts.length;
+
+  // No results + an honest notice (rate limit / no key / API error) -> show clearly
+  if (!contracts.length && A._federalNotice) {
+    $('contracts-list').innerHTML = renderFederalNotice(A._federalNotice);
+    btn.innerHTML = 'Search'; btn.disabled = false; A.contractsLoading = false;
+    return;
+  }
 
   // Render
   const visible = contracts.slice(0, limit);
