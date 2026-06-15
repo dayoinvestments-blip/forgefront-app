@@ -50,11 +50,14 @@ function transformSAMOpportunity(opp) {
     deadline: opp.responseDeadLine || opp.archiveDate || '',
     solNum:   opp.solicitationNumber || '',
     posted:   opp.postedDate || '',
-    url:      opp.uiLink || ('https://sam.gov/opp/' + (opp.noticeId || '')),
+    url:      opp.uiLink || opp.samUrl || ('https://sam.gov/opp/' + (opp.noticeId || '') + '/view'),
     score:    score,
     noticeId: opp.noticeId || '',
+    // SAM.gov puts inline text in 'description' OR a fetch URL in 'description'/'descriptionUrl'
     description:     (typeof opp.description === 'string' && opp.description.indexOf('http') !== 0) ? opp.description : '',
-    descriptionLink:(typeof opp.description === 'string' && opp.description.indexOf('http') === 0) ? opp.description : '',
+    descriptionLink: opp.descriptionUrl
+                     || ((typeof opp.description === 'string' && opp.description.indexOf('http') === 0) ? opp.description : '')
+                     || (opp.noticeId ? ('https://api.sam.gov/prod/opportunities/v1/noticedesc?noticeid=' + opp.noticeId) : ''),
     naicsDesc:      opp.naicsDescription || '',
     office:         opp.officeAddress ? [opp.officeAddress.city, opp.officeAddress.state].filter(Boolean).join(', ') : '',
     pocName:        (opp.pointOfContact && opp.pointOfContact[0] && opp.pointOfContact[0].fullName) || '',

@@ -42,13 +42,14 @@ exports.handler = async (event) => {
     return { statusCode: 200, headers: CORS, body: JSON.stringify({ sow: '', reason: 'no_api_key' }) };
   }
 
-  // Build the description URL
+  // Build the description URL — SAM.gov serves SOW text via /v1/noticedesc
   var url = '';
   if (link && link.indexOf('http') === 0) {
+    // descriptionUrl from the opportunity record, e.g. .../opportunities/v1/noticedesc?noticeid=...
     url = link + (link.indexOf('?') >= 0 ? '&' : '?') + 'api_key=' + encodeURIComponent(samKey);
   } else if (noticeId) {
-    url = 'https://api.sam.gov/opportunities/v2/opportunities/' + encodeURIComponent(noticeId) +
-          '/description?api_key=' + encodeURIComponent(samKey);
+    url = 'https://api.sam.gov/prod/opportunities/v1/noticedesc?noticeid=' + encodeURIComponent(noticeId) +
+          '&api_key=' + encodeURIComponent(samKey);
   } else {
     return { statusCode: 400, headers: CORS, body: JSON.stringify({ sow: '', error: 'link or noticeId required' }) };
   }
@@ -68,7 +69,8 @@ exports.handler = async (event) => {
     // Response may be JSON {description:"..."} or raw HTML/text
     try {
       var j = JSON.parse(raw);
-      sow = j.description || j.body || j.text || raw;
+      // /v1/noticedesc returns { "description": "..." }
+      sow = j.description || j.descriptionText || j.body || j.text || raw;
     } catch (e) {
       sow = raw;
     }
