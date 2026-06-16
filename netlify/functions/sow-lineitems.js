@@ -158,14 +158,27 @@ Extract 3-8 items. For services contracts, include labor categories, operational
     const data = await aiRes.json();
     let raw = (data.content && data.content[0] && data.content[0].text) || '{}';
     console.log('[sow-lineitems] RAW MODEL OUTPUT:', raw.slice(0, 800));
+
     let parsed;
     try {
-      const clean = raw.replace(/```json/g, '').replace(/```/g, '').trim();
+      const clean = raw
+        .replace(/^\s*```(?:json)?\s*/i, '')
+        .replace(/\s*```\s*$/i, '')
+        .trim();
       parsed = JSON.parse(clean);
     } catch (e) {
       const m = raw.match(/\{[\s\S]*\}/);
-      if (m) { try { parsed = JSON.parse(m[0]); } catch (_) { parsed = { items: [] }; } }
-      else parsed = { items: [] };
+      if (m) {
+        try { parsed = JSON.parse(m[0]); } catch (_) {
+          const result = { items: [], error: 'parse_failed' };
+          if (debug) result._raw = raw.slice(0, 1500);
+          return { statusCode: 200, headers: CORS, body: JSON.stringify(result) };
+        }
+      } else {
+        const result = { items: [], error: 'parse_failed' };
+        if (debug) result._raw = raw.slice(0, 1500);
+        return { statusCode: 200, headers: CORS, body: JSON.stringify(result) };
+      }
     }
 
     const result = { items: parsed.items || [], summary: parsed.summary || '' };
