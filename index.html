@@ -3703,7 +3703,7 @@ async function breakdownLineItems(id) {
     const r = await fetch('/.netlify/functions/sow-lineitems', {
       method:'POST',
       headers: await aiHeaders(),
-      body:JSON.stringify({ sow: sow, title: c.title, naics: c.naics }),
+      body:JSON.stringify({ sow: sow, title: c.title, naics: c.naics, notice_id: c.noticeId, description_url: c.descriptionLink }),
     });
     if(r.status === 429){ const e429 = await r.json(); toast(e429.error || 'Hourly AI limit reached — try again shortly', 'e'); throw new Error('rate_limited'); }
     const d = await r.json();
