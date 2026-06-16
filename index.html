@@ -3035,93 +3035,149 @@ async function bulkProcess(file) {
   var res  = document.getElementById('bulk-result');
   prog.style.display = 'block'; res.innerHTML = '';
   bar.style.width = '0%'; pct.textContent = '0%';
-  stat.textContent = 'Reading file...';
+  stat.textContent = 'Starting...';
 
-  try {
-    var buf = await file.arrayBuffer();
-    var bytes = new Uint8Array(buf);
-    // SAM.gov CSV is latin-1 encoded
-    var latin1 = '';
-    var CHUNK_SIZE = 65536;
-    for (var b = 0; b < bytes.length; b += CHUNK_SIZE) {
-      var slice = bytes.subarray(b, Math.min(b + CHUNK_SIZE, bytes.length));
-      latin1 += String.fromCharCode.apply(null, slice);
-    }
-    stat.textContent = 'Parsing CSV (' + (bytes.length / 1024 / 1024).toFixed(1) + ' MB)...';
-    bar.style.width = '5%'; pct.textContent = '5%';
+  var SLICE = 4 * 1024 * 1024;   // read 4MB at a time
+  var BATCH = 400;               // upsert 400 rows per request
+  var totalSize = file.size;
+  var offset = 0;
+  var leftover = '';             // partial line carried between slices
+  var headers = null;
+  var colIdx = {};
+  var batch = [];
+  var inserted = 0;
+  var errors = 0;
+  var seenHeader = false;
 
-    var rows = bulkParseCSV(latin1);
-    if (rows.length < 2) { throw new Error('No data rows found'); }
-
-    var headers = rows[0].map(function(hdr) { return hdr.trim().replace(/^\uFEFF/, ''); });
-    var colIdx = {};
-    headers.forEach(function(hdr, i) { colIdx[hdr] = i; });
-
-    var missing = ['NoticeId', 'Title', 'SetASideCode'].filter(function(c) { return colIdx[c] === undefined; });
-    if (missing.length) { throw new Error('Wrong file format — missing: ' + missing.join(', ')); }
-
-    var dataRows = rows.slice(1).filter(function(r) {
-      return r.length > 1 && r[colIdx['NoticeId']] && r[colIdx['NoticeId']].trim();
-    });
-    var total = dataRows.length;
-    det.textContent = total.toLocaleString() + ' rows found';
-    bar.style.width = '10%'; pct.textContent = '10%';
-
-    function mapRow(r) {
-      var rec = { synced_at: new Date().toISOString() };
-      Object.keys(BULK_COL_MAP).forEach(function(csvCol) {
-        var dbCol = BULK_COL_MAP[csvCol];
-        var idx = colIdx[csvCol];
-        if (idx === undefined) return;
-        var val = (r[idx] || '').trim();
-        if (!val || val === 'nan' || val === 'NULL' || val === 'null') { rec[dbCol] = null; return; }
-        if (dbCol === 'active') { rec[dbCol] = val.toLowerCase() === 'yes'; return; }
-        rec[dbCol] = val;
-      });
-      // The Description column is inline SOW text (not a URL). Store it so
-      // the SOW prompt Option B can pre-fill the bid writer with it.
-      var desc = rec['inline_desc'] || '';
-      delete rec['inline_desc'];
-      if (desc && desc.indexOf('http') === 0) { rec['description_url'] = desc; rec['inline_description'] = null; }
-      else { rec['description_url'] = ''; rec['inline_description'] = desc || null; }
-      return rec.notice_id ? rec : null;
-    }
-
-    var records = dataRows.map(mapRow).filter(Boolean);
-    var CHUNK = 400;
-    var inserted = 0;
-    var errors = 0;
-
-    for (var start = 0; start < records.length; start += CHUNK) {
-      var chunk = records.slice(start, Math.min(start + CHUNK, records.length));
-      var pctDone = Math.round(10 + (start / records.length) * 85);
-      bar.style.width = pctDone + '%'; pct.textContent = pctDone + '%';
-      stat.textContent = 'Uploading ' + (start + 1).toLocaleString() + '\u2013' +
-        Math.min(start + CHUNK, records.length).toLocaleString() + ' of ' + records.length.toLocaleString();
-
-      var result = await sb.from('opportunities_cache').upsert(chunk, { onConflict: 'notice_id', ignoreDuplicates: false });
-      if (result.error) {
-        errors++;
-        det.textContent = 'Warning on batch ' + (start + 1) + ': ' + result.error.message;
+  // --- incremental CSV line parser state (handles quoted fields) ---
+  function parseLine(line) {
+    var out = [], field = '', inQ = false;
+    for (var i = 0; i < line.length; i++) {
+      var c = line[i], n = line[i+1];
+      if (inQ) {
+        if (c === '"' && n === '"') { field += '"'; i++; }
+        else if (c === '"') { inQ = false; }
+        else field += c;
       } else {
-        inserted += chunk.length;
+        if (c === '"') inQ = true;
+        else if (c === ',') { out.push(field); field = ''; }
+        else field += c;
       }
     }
+    out.push(field);
+    return out;
+  }
+
+  // A row may span multiple physical lines if a quoted field contains newlines.
+  // We detect an "open quote" carry to join lines correctly.
+  var rowBuf = '';
+  function quotesBalanced(s) {
+    var count = 0;
+    for (var i = 0; i < s.length; i++) if (s[i] === '"') count++;
+    return count % 2 === 0;
+  }
+
+  function mapRow(cells) {
+    var rec = { synced_at: new Date().toISOString() };
+    Object.keys(BULK_COL_MAP).forEach(function(csvCol) {
+      var dbCol = BULK_COL_MAP[csvCol];
+      var idx = colIdx[csvCol];
+      if (idx === undefined) return;
+      var val = (cells[idx] || '').trim();
+      if (!val || val === 'nan' || val === 'NULL' || val === 'null') { rec[dbCol] = null; return; }
+      if (dbCol === 'active') { rec[dbCol] = val.toLowerCase() === 'yes'; return; }
+      rec[dbCol] = val;
+    });
+    var desc = rec['inline_desc'] || '';
+    delete rec['inline_desc'];
+    if (desc && desc.indexOf('http') === 0) { rec['description_url'] = desc; rec['inline_description'] = null; }
+    else { rec['description_url'] = ''; rec['inline_description'] = desc || null; }
+    return rec.notice_id ? rec : null;
+  }
+
+  async function flushBatch() {
+    if (!batch.length) return;
+    var chunk = batch;
+    batch = [];
+    try {
+      var result = await sb.from('opportunities_cache').upsert(chunk, { onConflict: 'notice_id', ignoreDuplicates: false });
+      if (result.error) { errors++; det.textContent = 'Batch warning: ' + result.error.message; }
+      else inserted += chunk.length;
+    } catch (e) { errors++; det.textContent = 'Batch error: ' + e.message; }
+  }
+
+  function readSlice(start) {
+    return new Promise(function(resolve, reject) {
+      var blob = file.slice(start, Math.min(start + SLICE, totalSize));
+      var reader = new FileReader();
+      reader.onload = function() { resolve(reader.result); };
+      reader.onerror = function() { reject(reader.error); };
+      // read as latin-1 (binary string) to match SAM.gov encoding
+      reader.readAsBinaryString(blob);
+    });
+  }
+
+  async function processLines(textChunk, isLast) {
+    var data = leftover + textChunk;
+    var lines = data.split(/\r\n|\n|\r/);
+    // keep the last (possibly partial) line as leftover unless this is the final chunk
+    leftover = isLast ? '' : lines.pop();
+
+    for (var li = 0; li < lines.length; li++) {
+      var line = lines[li];
+      // join multi-line quoted rows
+      if (rowBuf) { rowBuf += '\n' + line; }
+      else { rowBuf = line; }
+      if (!quotesBalanced(rowBuf)) { continue; } // row continues on next line
+      var full = rowBuf; rowBuf = '';
+      if (full === '') continue;
+
+      var cells = parseLine(full);
+      if (!seenHeader) {
+        headers = cells.map(function(x){ return x.trim().replace(/^\uFEFF/, ''); });
+        headers.forEach(function(hh, i){ colIdx[hh] = i; });
+        var missing = ['NoticeId','Title','SetASideCode'].filter(function(c){ return colIdx[c] === undefined; });
+        if (missing.length) { throw new Error('Wrong file format - missing: ' + missing.join(', ')); }
+        seenHeader = true;
+        continue;
+      }
+      if (cells.length < 2) continue;
+      var rec = mapRow(cells);
+      if (rec) batch.push(rec);
+      if (batch.length >= BATCH) { await flushBatch(); }
+    }
+  }
+
+  try {
+    while (offset < totalSize) {
+      var isLast = (offset + SLICE) >= totalSize;
+      var textChunk = await readSlice(offset);
+      await processLines(textChunk, isLast);
+      offset += SLICE;
+      var pctDone = Math.min(99, Math.round((offset / totalSize) * 100));
+      bar.style.width = pctDone + '%'; pct.textContent = pctDone + '%';
+      stat.textContent = 'Processing ' + (offset/1024/1024).toFixed(0) + ' / ' + (totalSize/1024/1024).toFixed(0) + ' MB';
+      det.textContent = inserted.toLocaleString() + ' contracts loaded so far';
+      // yield to the browser so the tab stays responsive and memory is reclaimed
+      await new Promise(function(r){ setTimeout(r, 0); });
+    }
+    // process any final leftover line
+    if (leftover && seenHeader) { await processLines('', true); }
+    await flushBatch();
 
     bar.style.width = '100%'; pct.textContent = '100%';
     stat.textContent = 'Complete';
     det.textContent = '';
-    res.innerHTML = '<div style="color:var(--ac);font-weight:600;font-size:13px;padding:10px 0">' +
-      '\u2705 ' + inserted.toLocaleString() + ' contracts loaded' +
-      (errors ? ' (' + errors + ' batch warnings — check console)' : '') + '. ' +
-      'Users now search the cached database.</div>';
-    toast('Bulk upload complete: ' + inserted.toLocaleString() + ' contracts loaded', 's');
+    res.innerHTML = '<div style="color:var(--ac);font-weight:600;font-size:13px;padding:10px 0">'
+      + '&#9989; ' + inserted.toLocaleString() + ' contracts loaded'
+      + (errors ? ' (' + errors + ' batch warnings)' : '')
+      + '. Users now search the cached database.</div>';
+    if (typeof toast === 'function') toast('Bulk upload complete: ' + inserted.toLocaleString() + ' contracts', 's');
 
   } catch (e) {
-    bar.style.width = '0%'; pct.textContent = '0%';
     stat.textContent = 'Error';
-    res.innerHTML = '<div style="color:#E05050;font-size:12px">\u274C ' + e.message + '</div>';
-    toast('Bulk upload failed: ' + e.message, 'e');
+    res.innerHTML = '<div style="color:#E05050;font-size:12px">&#10060; ' + e.message + '</div>';
+    if (typeof toast === 'function') toast('Bulk upload failed: ' + e.message, 'e');
   }
 }
 
