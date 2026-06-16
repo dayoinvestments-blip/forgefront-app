@@ -113,7 +113,7 @@ Respond with valid JSON only. No markdown, no backticks, no preamble. Exact stru
   "summary": "1 sentence on what the contractor is sourcing or performing overall"
 }
 
-Extract 3-8 items. For services contracts, include labor categories, operational tasks, and compliance requirements. For construction or supply contracts, include materials, equipment, and technical specs. Do not invent items with no basis in the provided text.`;
+Extract 3-5 items, keeping notes concise (one sentence max). For services contracts, include labor categories, operational tasks, and compliance requirements. For construction or supply contracts, include materials, equipment, and technical specs. Do not invent items with no basis in the provided text.`;
 
     const USER_PROMPT = 'Extract priceable line items from this SOW'
       + (title ? ' for contract: ' + title : '')
@@ -134,7 +134,7 @@ Extract 3-8 items. For services contracts, include labor categories, operational
         },
         body: JSON.stringify({
           model:      'claude-haiku-4-5-20251001',
-          max_tokens: 700,
+          max_tokens: 1500,
           system:     SYSTEM_PROMPT,
           messages:   [{ role: 'user', content: USER_PROMPT }],
         }),
@@ -160,25 +160,33 @@ Extract 3-8 items. For services contracts, include labor categories, operational
     console.log('[sow-lineitems] RAW MODEL OUTPUT:', raw.slice(0, 800));
 
     let parsed;
-    try {
-      const clean = raw
-        .replace(/^\s*```(?:json)?\s*/i, '')
-        .replace(/\s*```\s*$/i, '')
-        .trim();
-      parsed = JSON.parse(clean);
-    } catch (e) {
-      const m = raw.match(/\{[\s\S]*\}/);
-      if (m) {
-        try { parsed = JSON.parse(m[0]); } catch (_) {
-          const result = { items: [], error: 'parse_failed' };
-          if (debug) result._raw = raw.slice(0, 1500);
-          return { statusCode: 200, headers: CORS, body: JSON.stringify(result) };
-        }
-      } else {
-        const result = { items: [], error: 'parse_failed' };
-        if (debug) result._raw = raw.slice(0, 1500);
-        return { statusCode: 200, headers: CORS, body: JSON.stringify(result) };
-      }
+    const clean = raw
+      .replace(/^\s*```(?:json)?\s*/i, '')
+      .replace(/\s*```\s*$/i, '')
+      .trim();
+
+    // Attempt 1: parse the fence-stripped string directly.
+    try { parsed = JSON.parse(clean); } catch (_) {}
+
+    // Attempt 2: extract the outermost {...} block and parse that.
+    if (!parsed) {
+      const m = clean.match(/\{[\s\S]*\}/);
+      if (m) { try { parsed = JSON.parse(m[0]); } catch (_) {} }
+    }
+
+    // Attempt 3: truncation repair — drop a trailing incomplete item and close the array.
+    if (!parsed && clean.includes('"items"')) {
+      try {
+        const repaired = clean.replace(/,\s*\{[^}]*$/, '') + ']}';
+        parsed = JSON.parse(repaired);
+        console.log('[sow-lineitems] repaired truncated JSON, items:', (parsed.items || []).length);
+      } catch (_) {}
+    }
+
+    if (!parsed) {
+      const result = { items: [], error: 'parse_failed' };
+      if (debug) result._raw = raw.slice(0, 1500);
+      return { statusCode: 200, headers: CORS, body: JSON.stringify(result) };
     }
 
     const result = { items: parsed.items || [], summary: parsed.summary || '' };
