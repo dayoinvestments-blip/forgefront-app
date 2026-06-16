@@ -7601,34 +7601,6 @@ function renderInvoices() {
   :`<div style="text-align:center;padding:48px;color:var(--t3)"><div style="font-size:36px;margin-bottom:10px">🧾</div><div style="font-size:14px;font-weight:500;color:var(--t2)">No invoices yet</div><button class="btn p" style="margin-top:16px" onclick="openM('inv-modal')">+ New Invoice</button></div>`;
 }
 
-async function renderAdmin() {
-  try {
-    const {data:p}=await sb.from('profiles').select('*').order('created_at',{ascending:false});
-    const pr=p||[];
-    var elU=$('a-users'); if(elU) elU.textContent=pr.length;
-    var elP=$('a-pro'); if(elP) elP.textContent=pr.filter(u=>u.tier==='pro').length;
-    var elM=$('a-mrr'); if(elM) elM.textContent=`$${pr.filter(u=>u.tier==='pro').length*79+pr.filter(u=>u.tier==='base').length*29}`;
-    var elList=$('admin-users');
-    if(elList) elList.innerHTML=pr.map(u=>`
-      <tr>
-        <td><strong>${u.name||'—'}</strong><br><span style="font-size:11px;color:var(--t3)">${u.email}</span></td>
-        <td>${u.company||'—'}</td>
-        <td><span style="font-size:11px;font-weight:600;color:var(--ac)">${(u.tier||'free').toUpperCase()}</span></td>
-        <td><span class="rb ${rc(u.role)}">${(u.role||'user').toUpperCase()}</span></td>
-        <td><button class="btn g sm" onclick="editRole('${u.id}','${u.role}')">Edit</button></td>
-      </tr>`).join('')||'<tr><td colspan="5" style="color:var(--t3)">No users</td></tr>';
-  } catch(e) { console.warn('renderAdmin (legacy) skipped:', e.message); }
-}
-
-async function editRole(id, cur) {
-  const roles=['user','support','admin','superuser'];
-  const newRole=prompt(`Change role for user ${id}\nCurrent: ${cur}\nOptions: ${roles.join(', ')}`);
-  if(!newRole||!roles.includes(newRole)) return;
-  const {error}=await sb.from('profiles').update({role:newRole}).eq('id',id);
-  if(error) toast('Failed to update role','e');
-  else {toast(`Role updated to ${newRole}`,'s');renderAdmin();}
-}
-
 // ── Job actions ───────────────────────────────────────────────────────────────
 async function addJob() {
   const n=$('jm-n').value.trim(),c=$('jm-c').value.trim();

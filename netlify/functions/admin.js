@@ -130,13 +130,18 @@ exports.handler = async (event) => {
   // ── GET /admin?action=metrics ─────────────────────────────────────────────
   if (method === 'GET' && params.action === 'metrics') {
     const MRR = { starter: 29, pro: 79, command: 199 };
-    const profiles = await sbGet('/rest/v1/profiles?select=id,tier,is_comp,account_status,created_at');
+    const profiles = await sbGet('/rest/v1/profiles?select=id,tier,role,is_comp,account_status,created_at');
     const all = Array.isArray(profiles) ? profiles : [];
     const now = new Date();
     const d30 = new Date(now - 30 * 86400000).toISOString();
     const d7  = new Date(now - 7  * 86400000).toISOString();
 
-    const paid      = all.filter(p => p.tier !== 'free' && !p.is_comp && p.account_status !== 'suspended' && p.account_status !== 'archived');
+    // Internal accounts (founder/staff) never count as revenue.
+    const isInternal = function (p) {
+      return p.role === 'superuser' || p.role === 'admin' || p.role === 'founder' || p.tier === 'founder';
+    };
+
+    const paid      = all.filter(p => p.tier !== 'free' && !p.is_comp && !isInternal(p) && p.account_status !== 'suspended' && p.account_status !== 'archived');
     const comp      = all.filter(p => p.is_comp);
     const suspended = all.filter(p => p.account_status === 'suspended');
     const archived  = all.filter(p => p.account_status === 'archived');
@@ -144,7 +149,7 @@ exports.handler = async (event) => {
     const new7d     = all.filter(p => p.created_at >= d7).length;
     const new30d    = all.filter(p => p.created_at >= d30).length;
 
-    // Tier breakdown — exclude comp from revenue
+    // Tier breakdown — exclude comp and internal accounts from revenue
     const tierBreakdown = {};
     for (const [t, price] of Object.entries(MRR)) {
       const users = paid.filter(p => p.tier === t);
