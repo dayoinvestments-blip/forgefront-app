@@ -81,7 +81,7 @@ exports.handler = async (event) => {
       return { statusCode: 200, headers: CORS, body: JSON.stringify({ items: [], error: 'ANTHROPIC_API_KEY not configured' }) };
     }
 
-    const truncated = sow.length > 8000 ? sow.slice(0, 8000) + '\n\n[... truncated]' : sow;
+    const truncated = sow.length > 6000 ? sow.slice(0, 6000) + '\n\n[... truncated]' : sow;
 
     const SYSTEM_PROMPT = `You are a federal contracting estimator. Read a Statement of Work or contract description and extract the concrete deliverables, tasks, and requirements a contractor must fulfill to execute this contract.
 
@@ -111,20 +111,32 @@ Extract 3-12 items. For services contracts, include labor categories, operationa
       + (naics ? ' (NAICS ' + naics + ')' : '')
       + '.\n\nSOW TEXT:\n' + truncated;
 
-    const aiRes = await fetch('https://api.anthropic.com/v1/messages', {
-      method:  'POST',
-      headers: {
-        'Content-Type':      'application/json',
-        'x-api-key':         apiKey,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model:      'claude-haiku-4-5-20251001',
-        max_tokens: 1000,
-        system:     SYSTEM_PROMPT,
-        messages:   [{ role: 'user', content: USER_PROMPT }],
-      }),
-    });
+    console.log('[sow-lineitems] sending', truncated.length, 'chars to Haiku');
+    let aiRes;
+    try {
+      aiRes = await fetch('https://api.anthropic.com/v1/messages', {
+        method:  'POST',
+        headers: {
+          'Content-Type':      'application/json',
+          'x-api-key':         apiKey,
+          'anthropic-version': '2023-06-01',
+        },
+        body: JSON.stringify({
+          model:      'claude-haiku-4-5-20251001',
+          max_tokens: 1000,
+          system:     SYSTEM_PROMPT,
+          messages:   [{ role: 'user', content: USER_PROMPT }],
+        }),
+        signal: AbortSignal.timeout(8500),
+      });
+    } catch (e) {
+      if (e.name === 'TimeoutError' || e.name === 'AbortError') {
+        console.error('[sow-lineitems] Anthropic call timed out after 8.5s');
+        return { statusCode: 200, headers: CORS, body: JSON.stringify({ items: [], error: 'AI timed out — try again' }) };
+      }
+      throw e;
+    }
+    console.log('[sow-lineitems] Anthropic response status:', aiRes.status);
 
     if (!aiRes.ok) {
       const err = await aiRes.text();

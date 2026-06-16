@@ -23,6 +23,7 @@ async function verifyUser(headers) {
 
     const res = await fetch(SB + '/auth/v1/user', {
       headers: { apikey: KEY, Authorization: 'Bearer ' + token },
+      signal: AbortSignal.timeout(3000),
     });
     if (!res.ok) return null;
     const user = await res.json();
@@ -42,6 +43,7 @@ async function getUserTier(userId) {
     const { SB, KEY } = sbEnv();
     const r = await fetch(SB + '/rest/v1/profiles?id=eq.' + userId + '&select=tier,role', {
       headers: { apikey: KEY, Authorization: 'Bearer ' + KEY },
+      signal: AbortSignal.timeout(3000),
     });
     if (!r.ok) return 'starter';
     const rows = await r.json();
@@ -68,7 +70,7 @@ async function checkRateLimit(userId, fnName) {
     const since = new Date(Date.now() - 3600 * 1000).toISOString();
     const r = await fetch(
       SB + '/rest/v1/ai_usage?user_id=eq.' + userId + '&created_at=gte.' + encodeURIComponent(since) + '&select=id',
-      { headers: { apikey: KEY, Authorization: 'Bearer ' + KEY, Prefer: 'count=exact' } }
+      { headers: { apikey: KEY, Authorization: 'Bearer ' + KEY, Prefer: 'count=exact' }, signal: AbortSignal.timeout(3000) }
     );
     // Prefer count header if present
     let count = 0;
