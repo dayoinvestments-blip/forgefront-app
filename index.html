@@ -19,6 +19,8 @@
 <title>ForgeFront · SDVOSB Command Center</title>
 <meta name="theme-color" content="#E8B030"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>if(window.pdfjsLib){window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}</script>
 <style>
 :root{--bg:#08101E;--s:#0C1828;--s2:#111E30;--s3:#162238;--bd:#1E2E44;--ac:#E8B030;--ad:rgba(232,176,48,.10);--ab:rgba(232,176,48,.28);--go:#C9A030;--gd:rgba(201,160,48,.10);--gb:rgba(201,160,48,.28);--bl:#5A8FD4;--bld:rgba(90,143,212,.10);--dn:#CC2030;--t:#F0F2F5;--t2:#A8B8C8;--t3:#5A6880;--r:12px;--rs:8px;--rl:16px}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
@@ -3683,7 +3685,72 @@ async function generateSOWForBid() {
 
 function viewContractDetail2_placeholder(){}
 
-// A SAM.gov "combined synopsis/solicitation" intro is procurement boilerplate with
+// ── Client-side PDF text extraction (PDF.js) ────────────────────────────────
+// Agencies post the real scope (PWS/RFQ) as PDF attachments that can't be parsed
+// server-side without a library. Instead we let the user drop the PDF(s) here and
+// extract the text in the browser, then run line-item extraction on real scope.
+function handlePdfDrop(ev, id){
+  ev.preventDefault();
+  var zone = document.getElementById('pdf-drop-'+id);
+  if(zone) zone.style.borderColor='var(--bd)';
+  var files = ev.dataTransfer && ev.dataTransfer.files ? ev.dataTransfer.files : null;
+  if(files && files.length) extractPdfsAndBreakdown(files, id);
+}
+
+function handlePdfSelect(input, id){
+  if(input.files && input.files.length) extractPdfsAndBreakdown(input.files, id);
+}
+
+async function extractTextFromPdf(file){
+  if(!window.pdfjsLib) throw new Error('PDF reader not loaded — refresh and try again.');
+  var buf = await file.arrayBuffer();
+  var pdf = await window.pdfjsLib.getDocument({ data: buf }).promise;
+  var parts = [];
+  var maxPages = Math.min(pdf.numPages, 40); // safety cap on very large docs
+  for(var p=1; p<=maxPages; p++){
+    var page = await pdf.getPage(p);
+    var content = await page.getTextContent();
+    var line = content.items.map(function(it){ return it.str; }).join(' ');
+    if(line.trim()) parts.push(line);
+  }
+  return parts.join('\n');
+}
+
+async function extractPdfsAndBreakdown(fileList, id){
+  var c = (A.contracts || []).find(function(x){return x.id===id;}) || A._currentContract;
+  if(!c) return;
+  var status = document.getElementById('pdf-status-'+id);
+  var files = Array.prototype.slice.call(fileList).filter(function(f){
+    return f.type === 'application/pdf' || /\.pdf$/i.test(f.name);
+  });
+  if(!files.length){ if(status) status.textContent='No PDF files detected. Drop a .pdf attachment.'; return; }
+
+  if(status) status.textContent='Reading '+files.length+' PDF'+(files.length>1?'s':'')+'...';
+
+  var combined = [];
+  for(var i=0;i<files.length;i++){
+    try{
+      if(status) status.textContent='Extracting '+files[i].name+' ('+(i+1)+'/'+files.length+')...';
+      var text = await extractTextFromPdf(files[i]);
+      if(text && text.trim().length>40) combined.push('=== '+files[i].name+' ===\n'+text);
+    }catch(e){
+      if(status) status.textContent='Could not read '+files[i].name+': '+e.message;
+    }
+  }
+
+  var merged = combined.join('\n\n').trim();
+  if(merged.length < 100){
+    if(status) status.textContent='Could not extract usable text (the PDF may be scanned/image-only).';
+    return;
+  }
+
+  // Store on the record and run the existing extraction flow on real scope.
+  c.description = merged;
+  if(status) status.textContent='Extracted '+merged.length.toLocaleString()+' characters. Breaking down into line items...';
+  breakdownLineItems(id);
+}
+
+
 // no priceable scope — the real scope lives in attached PWS/RFQ documents. Detect that
 // so we know to pull the attachment text before extracting line items.
 function sowLooksLikeBoilerplate(text){
@@ -3916,6 +3983,19 @@ function viewContractDetail(id) {
   h += '<div class="cl"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px"><div class="sl" style="margin:0">Statement of Work / Description</div>';
   h += '<button class="btn p sm" onclick="breakdownLineItems(\''+c.id+'\')" id="lineitem-btn">&#128203; Break Down Into Line Items</button></div>';
   h += '<div id="lineitem-results" style="margin-bottom:10px"></div>';
+
+  // Drag-and-drop PWS/RFQ PDF zone — extracts text client-side and feeds line-item extraction.
+  h += '<div id="pdf-drop-'+c.id+'" '
+    + 'ondragover="event.preventDefault();this.style.borderColor=\'var(--gold,#E8B030)\';" '
+    + 'ondragleave="this.style.borderColor=\'var(--bd)\';" '
+    + 'ondrop="handlePdfDrop(event,\''+c.id+'\')" '
+    + 'style="border:2px dashed var(--bd);border-radius:var(--rs,8px);padding:16px;text-align:center;margin-bottom:10px;cursor:pointer;transition:border-color .15s" '
+    + 'onclick="document.getElementById(\'pdf-input-'+c.id+'\').click()">';
+  h += '<div style="font-size:13px;color:var(--t2);font-weight:600;margin-bottom:3px">&#128206; Drop the solicitation PDF(s) here to extract the SOW</div>';
+  h += '<div style="font-size:11px;color:var(--t3)">Drag in the PWS / RFQ attachments (e.g. <strong>Atth B_PWS.pdf</strong>), or click to browse. Multiple files are merged.</div>';
+  h += '<input type="file" id="pdf-input-'+c.id+'" accept="application/pdf,.pdf" multiple style="display:none" onchange="handlePdfSelect(this,\''+c.id+'\')">';
+  h += '<div id="pdf-status-'+c.id+'" style="font-size:11px;color:var(--ac);margin-top:8px"></div>';
+  h += '</div>';
   if(c.description){
     h += '<div id="cdetail-sow" style="font-size:13px;line-height:1.7;color:var(--t2);white-space:pre-wrap;max-height:400px;overflow-y:auto">'+escapeHtml(c.description)+'</div>';
   } else if(isReal && (c.descriptionLink || c.noticeId)){
