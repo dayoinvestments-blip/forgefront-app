@@ -89,7 +89,7 @@ exports.handler = async (event) => {
       .replace(/\.{3,}/g, ' ')        // table-of-contents dot leaders  (……… → space)
       .replace(/\n{3,}/g, '\n\n')     // collapse excessive blank lines
       .trim();
-    const truncated = cleaned.length > 12000 ? cleaned.slice(0, 12000) + '\n\n[... truncated]' : cleaned;
+    const truncated = cleaned.length > 6000 ? cleaned.slice(0, 6000) + '\n\n[... truncated]' : cleaned;
 
     const SYSTEM_PROMPT = `You are a federal contracting estimator. Read a Statement of Work or contract description and extract the concrete deliverables, tasks, and requirements a contractor must fulfill to execute this contract.
 
@@ -112,7 +112,7 @@ Respond with valid JSON only. No markdown, no backticks, no preamble. Exact stru
   "summary": "1 sentence on what the contractor is sourcing or performing overall"
 }
 
-Extract 3-12 items. For services contracts, include labor categories, operational tasks, and compliance requirements. For construction or supply contracts, include materials, equipment, and technical specs. Do not invent items with no basis in the provided text.`;
+Extract 3-8 items. For services contracts, include labor categories, operational tasks, and compliance requirements. For construction or supply contracts, include materials, equipment, and technical specs. Do not invent items with no basis in the provided text.`;
 
     const USER_PROMPT = 'Extract priceable line items from this SOW'
       + (title ? ' for contract: ' + title : '')
@@ -133,11 +133,11 @@ Extract 3-12 items. For services contracts, include labor categories, operationa
         },
         body: JSON.stringify({
           model:      'claude-haiku-4-5-20251001',
-          max_tokens: 1000,
+          max_tokens: 700,
           system:     SYSTEM_PROMPT,
           messages:   [{ role: 'user', content: USER_PROMPT }],
         }),
-        signal: AbortSignal.timeout(7000),
+        signal: AbortSignal.timeout(9000),
       });
     } catch (e) {
       if (e.name === 'TimeoutError' || e.name === 'AbortError') {
