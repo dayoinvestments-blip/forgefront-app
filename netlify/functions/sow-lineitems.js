@@ -89,7 +89,7 @@ exports.handler = async (event) => {
       .replace(/\.{3,}/g, ' ')        // table-of-contents dot leaders  (……… → space)
       .replace(/\n{3,}/g, '\n\n')     // collapse excessive blank lines
       .trim();
-    const truncated = cleaned.length > 24000 ? cleaned.slice(0, 24000) + '\n\n[... truncated]' : cleaned;
+    const truncated = cleaned.length > 12000 ? cleaned.slice(0, 12000) + '\n\n[... truncated]' : cleaned;
 
     const SYSTEM_PROMPT = `You are a federal contracting estimator. Read a Statement of Work or contract description and extract the concrete deliverables, tasks, and requirements a contractor must fulfill to execute this contract.
 
@@ -137,7 +137,7 @@ Extract 3-12 items. For services contracts, include labor categories, operationa
           system:     SYSTEM_PROMPT,
           messages:   [{ role: 'user', content: USER_PROMPT }],
         }),
-        signal: AbortSignal.timeout(9500),
+        signal: AbortSignal.timeout(7000),
       });
     } catch (e) {
       if (e.name === 'TimeoutError' || e.name === 'AbortError') {
