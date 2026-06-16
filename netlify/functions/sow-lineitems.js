@@ -39,7 +39,9 @@ exports.handler = async (event) => {
 
     const truncated = sow.length > 8000 ? sow.slice(0, 8000) + '\n\n[... truncated]' : sow;
 
-    const SYSTEM_PROMPT = `You are a federal contracting estimator. Read a Statement of Work and extract the concrete, priceable line items a contractor must source or perform to deliver the contract. Focus on things that need a vendor or subcontractor quote: materials, equipment, labor categories, services, deliverables.
+    const SYSTEM_PROMPT = `You are a federal contracting estimator. Read a Statement of Work or contract description and extract the concrete deliverables, tasks, and requirements a contractor must fulfill to win and execute this contract.
+
+Focus on concrete deliverables, labor categories, operational tasks, equipment, materials, compliance requirements, and services — anything a contractor must staff, source, subcontract, or perform to fulfill the PWS/SOW.
 
 Respond with valid JSON only. No markdown, no backticks, no preamble. Exact structure:
 
@@ -48,17 +50,17 @@ Respond with valid JSON only. No markdown, no backticks, no preamble. Exact stru
     {
       "id": "1",
       "name": "short line item name",
-      "spec": "specific requirement/specification from the SOW (size, grade, standard, code)",
-      "category": "Material | Labor | Equipment | Service | Subcontract",
-      "unit": "unit of measure (each, LF, SF, hours, lot, etc.)",
+      "spec": "specific requirement or standard from the SOW (size, grade, regulation, code, or operational requirement)",
+      "category": "Material | Labor | Equipment | Service | Subcontract | Compliance",
+      "unit": "unit of measure (each, LF, SF, hours, lot, month, etc.)",
       "estQty": "estimated quantity if derivable, else 'TBD'",
-      "notes": "anything a vendor needs to quote accurately, or compliance standard referenced"
+      "notes": "anything a vendor or subcontractor needs to quote accurately, or compliance standard referenced"
     }
   ],
-  "summary": "1 sentence on what the contractor is sourcing overall"
+  "summary": "1 sentence on what the contractor is sourcing or performing overall"
 }
 
-Extract 3-15 items. Be specific and pull real specs/standards from the SOW text (AWS D1.1, ASTM grades, NAICS-relevant requirements). Do not invent items not implied by the SOW.`;
+Extract 3-12 items. For services contracts, include labor categories, operational tasks, and compliance requirements. For construction or supply contracts, include materials, equipment, and technical specs. Pull real standards, regulations, or requirements referenced in the SOW text. Do not invent items with no basis in the provided text.`;
 
     const USER_PROMPT = 'Extract priceable line items from this SOW'
       + (title ? ' for contract: ' + title : '')
