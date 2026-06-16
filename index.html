@@ -3821,26 +3821,28 @@ async function breakdownLineItems(id) {
     return;
   }
 
+  const _t = await admToken();
+  if(!_t){
+    const _msg = 'Please sign in to use AI extraction';
+    toast(_msg, 'e');
+    if(out) out.innerHTML = '<div style="padding:16px;color:var(--t3)">'+escapeHtml(_msg)+'</div>';
+    hideProgress(id);
+    if(btn){ btn.disabled=false; btn.innerHTML='\u{1F4CB} Break Down Into Line Items'; }
+    return;
+  }
+
   if(out) out.innerHTML = '<div style="padding:20px;text-align:center;color:var(--t3)"><span class="sp"></span> Reading the SOW and pulling out priceable items...</div>';
 
   try{
     const r = await fetch('/.netlify/functions/sow-lineitems', {
       method:'POST',
-      headers: await aiHeaders(),
+      headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+_t },
       body:JSON.stringify({ sow: sow, title: c.title, naics: c.naics, notice_id: c.noticeId, description_url: c.descriptionLink }),
     });
-    if(r.status === 401){
-      const msg = 'Your session expired or could not be verified — please sign out and sign back in.';
-      toast(msg, 'e');
-      if(out) out.innerHTML = '<div style="padding:16px;color:var(--t3)">'+escapeHtml(msg)+'</div>';
-      hideProgress(id);
-      if(btn){ btn.disabled=false; btn.innerHTML='\u{1F4CB} Break Down Into Line Items'; }
-      return;
-    }
     if(r.status === 429){ const e429 = await r.json(); toast(e429.error || 'Hourly AI limit reached — try again shortly', 'e'); throw new Error('rate_limited'); }
     if(!r.ok){
       const errText = await r.text().catch(function(){ return ''; });
-      const msg = 'Line item service error (status '+r.status+')';
+      const msg = 'Line item error (status '+r.status+')';
       toast(msg, 'e');
       if(out) out.innerHTML = '<div style="padding:16px;color:var(--t3)">'+escapeHtml(msg)+(errText ? ': '+escapeHtml(errText.slice(0,120)) : '')+'</div>';
       hideProgress(id);
@@ -3851,10 +3853,10 @@ async function breakdownLineItems(id) {
     if(d.error && !(d.items||[]).length) throw new Error(d.error);
     c._lineItems = d.items || [];
     if((c._lineItems||[]).length === 0){
-      hideProgress(id);
+      setProgress(id, 100); hideProgress(id);
       renderNoSOWFallback(out, c, attachmentLinks);
     } else {
-      hideProgress(id);
+      setProgress(id, 100); hideProgress(id);
       renderLineItems(c);
       toast('Found '+(c._lineItems||[]).length+' priceable line items', 's');
     }
