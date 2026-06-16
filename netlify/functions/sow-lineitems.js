@@ -65,6 +65,7 @@ exports.handler = async (event) => {
     const title           = body.title           || '';
     const naics           = body.naics           || '';
     const description_url = body.description_url || '';
+    const debug           = body.debug === true;
 
     if (sow.length < 500 && description_url && description_url.startsWith('http')) {
       console.log('SOW short (' + sow.length + ' chars). Fetching from:', description_url.split('?')[0]);
@@ -156,6 +157,7 @@ Extract 3-8 items. For services contracts, include labor categories, operational
 
     const data = await aiRes.json();
     let raw = (data.content && data.content[0] && data.content[0].text) || '{}';
+    console.log('[sow-lineitems] RAW MODEL OUTPUT:', raw.slice(0, 800));
     let parsed;
     try {
       const clean = raw.replace(/```json/g, '').replace(/```/g, '').trim();
@@ -166,10 +168,12 @@ Extract 3-8 items. For services contracts, include labor categories, operational
       else parsed = { items: [] };
     }
 
+    const result = { items: parsed.items || [], summary: parsed.summary || '' };
+    if (debug) result._raw = raw.slice(0, 1500);
     return {
       statusCode: 200,
       headers: CORS,
-      body: JSON.stringify({ items: parsed.items || [], summary: parsed.summary || '' }),
+      body: JSON.stringify(result),
     };
   } catch (err) {
     return { statusCode: 200, headers: CORS, body: JSON.stringify({ items: [], error: err.message }) };
