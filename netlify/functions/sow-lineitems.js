@@ -81,7 +81,12 @@ exports.handler = async (event) => {
       return { statusCode: 200, headers: CORS, body: JSON.stringify({ items: [], error: 'ANTHROPIC_API_KEY not configured' }) };
     }
 
-    const truncated = sow.length > 6000 ? sow.slice(0, 6000) + '\n\n[... truncated]' : sow;
+    // Strip front-matter noise before truncating so the window contains real scope.
+    let cleaned = sow
+      .replace(/\.{3,}/g, ' ')        // table-of-contents dot leaders  (……… → space)
+      .replace(/\n{3,}/g, '\n\n')     // collapse excessive blank lines
+      .trim();
+    const truncated = cleaned.length > 24000 ? cleaned.slice(0, 24000) + '\n\n[... truncated]' : cleaned;
 
     const SYSTEM_PROMPT = `You are a federal contracting estimator. Read a Statement of Work or contract description and extract the concrete deliverables, tasks, and requirements a contractor must fulfill to execute this contract.
 
@@ -112,6 +117,7 @@ Extract 3-12 items. For services contracts, include labor categories, operationa
       + '.\n\nSOW TEXT:\n' + truncated;
 
     console.log('[sow-lineitems] sending', truncated.length, 'chars to Haiku');
+    console.log('[sow-lineitems] first 200 chars:', truncated.slice(0, 200).replace(/\n/g, '\\n'));
     let aiRes;
     try {
       aiRes = await fetch('https://api.anthropic.com/v1/messages', {
