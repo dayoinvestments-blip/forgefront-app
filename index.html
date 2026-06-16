@@ -1540,7 +1540,7 @@ document.getElementById('cta-signin-btn').onclick  = ffSignIn;
           </div>
         </div>
 
-        <div class="ib">ℹ️ <strong>SAM.gov API connected</strong> — Showing real federal opportunities nationwide. <span id="sam-status">Loading...</span></div>
+        <div class="ib">ℹ️ <strong>Live contract database</strong> — ~78,000 federal opportunities, updated daily. No API key needed to search. <span id="sam-status">Loading...</span></div>
       </div>
 
       <!-- CONTRACTS -->
@@ -3202,16 +3202,17 @@ function samUsingOwnKey() {
 function renderSamCounter() {
   var el = document.getElementById('sam-counter');
   if (!el) return;
-  // Counter only meaningful for the free-tier cap; if user has their own key, show their usage
+  // Searches run off the cached database (no API). The key is only used for
+  // the optional live-refresh source, so only surface usage if a key exists
+  // AND it has actually been used today.
   var used = samCallsToday();
-  var cap  = SAM_DAILY_CAP;
-  var pct  = Math.min(100, Math.round(used/cap*100));
-  var color = used >= cap ? '#E05050' : used >= 20 ? '#E8A020' : 'var(--t3)';
-  var label = samUsingOwnKey()
-    ? (used + ' SAM.gov searches today (your key)')
-    : (used + ' of ' + cap + ' free searches today');
-  el.innerHTML = '<span style="color:'+color+';font-weight:600">'+label+'</span>'
-    + (used >= 20 ? ' &middot; <a href="#" onclick="go(\'bizprofile\',null);return false;" style="color:var(--ac)">add a paid key</a>' : '');
+  if (!samUsingOwnKey() || used === 0) {
+    el.innerHTML = '<span style="color:var(--t3)">Searching the daily-updated database · no API key used</span>';
+    return;
+  }
+  var color = used >= 30 ? '#E8A020' : 'var(--t3)';
+  el.innerHTML = '<span style="color:'+color+';font-weight:600">'
+    + used + ' live SAM.gov refresh' + (used === 1 ? '' : 'es') + ' today (your key)</span>';
 }
 function samPreflightOK() {
   var used = samCallsToday();
