@@ -35,6 +35,13 @@ html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-sys
 .li:hover{background:var(--s2);color:var(--t)}
 .li.on{background:var(--ad);color:var(--ac);border-color:var(--ab)}
 .ns{padding:12px 14px 3px;font-size:9px;font-weight:700;letter-spacing:1.2px;color:var(--t3);text-transform:uppercase}
+.help-card{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);padding:20px 22px;margin-bottom:16px}
+.help-h{font-size:16px;font-weight:700;color:var(--t);margin-bottom:10px}
+.help-p{font-size:13px;line-height:1.7;color:var(--t2);margin:8px 0}
+.help-ul,.help-ol{font-size:13px;line-height:1.8;color:var(--t2);margin:8px 0;padding-left:20px}
+.help-ul li,.help-ol li{margin-bottom:5px}
+.help-jump{display:inline-block;font-size:12px;color:var(--ac);background:var(--ad);border:1px solid var(--ab);border-radius:99px;padding:5px 12px;cursor:pointer;text-decoration:none;transition:all .12s}
+.help-jump:hover{background:var(--ab)}
 .nb{margin-left:auto;background:var(--ac);color:var(--bg);font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
 .sf{margin-top:auto;padding:12px;border-top:1px solid var(--bd)}
@@ -1467,6 +1474,7 @@ document.getElementById('cta-signin-btn').onclick  = ffSignIn;
       <div style="font-size:17px;font-weight:700;letter-spacing:.5px;font-family:Georgia,serif;color:#E8B030">FORGE<span style="color:#F0C840">FRONT</span></div>
     </div>
     <div class="ns">Main</div>
+    <div class="li" onclick="go('help',this)" style="background:var(--ad);border:1px solid var(--ab);color:var(--ac);font-weight:700;margin-bottom:6px">&#128214; User Manual</div>
     <div class="li on" onclick="go('dash',this)">&#9638; Dashboard</div>
     <div class="li" onclick="go('contracts',this)">&#128196; Contracts <span class="nb" id="cct">&#8212;</span></div>
     <div class="li" onclick="go('watchlist',this)">&#128278; Watchlist <span id="wl-badge" style="display:none;margin-left:auto;background:var(--s3);color:var(--t2);font-size:10px;font-weight:700;padding:2px 6px;border-radius:99px">0</span></div>
@@ -1543,6 +1551,132 @@ document.getElementById('cta-signin-btn').onclick  = ffSignIn;
         </div>
 
         <div class="ib">ℹ️ <strong>Live contract database</strong> — ~78,000 federal opportunities, updated daily. No API key needed to search. <span id="sam-status">Loading...</span></div>
+      </div>
+
+      <!-- ============ USER MANUAL PAGE ============ -->
+      <div class="pg" id="p-help">
+        <div style="max-width:880px;margin:0 auto">
+
+          <div style="background:linear-gradient(135deg,var(--s2),var(--s));border:1px solid var(--ab);border-radius:var(--r);padding:24px 26px;margin-bottom:20px">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+              <div style="font-size:30px">&#128214;</div>
+              <div>
+                <div style="font-size:22px;font-weight:800;color:var(--t)">ForgeFront User Manual</div>
+                <div style="font-size:13px;color:var(--t2)">Everything you need to find, analyze, bid, and win federal contracts.</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);padding:16px 20px;margin-bottom:20px">
+            <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--t3);margin-bottom:10px">JUMP TO A SECTION</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px">
+              <a class="help-jump" onclick="document.getElementById('h-start').scrollIntoView({behavior:'smooth'})">Getting Started</a>
+              <a class="help-jump" onclick="document.getElementById('h-contracts').scrollIntoView({behavior:'smooth'})">Finding Contracts</a>
+              <a class="help-jump" onclick="document.getElementById('h-detail').scrollIntoView({behavior:'smooth'})">Contract Detail &amp; SOW</a>
+              <a class="help-jump" onclick="document.getElementById('h-lineitems').scrollIntoView({behavior:'smooth'})">Line Items &amp; PDFs</a>
+              <a class="help-jump" onclick="document.getElementById('h-bid').scrollIntoView({behavior:'smooth'})">Bid Writer</a>
+              <a class="help-jump" onclick="document.getElementById('h-tools').scrollIntoView({behavior:'smooth'})">Tools</a>
+              <a class="help-jump" onclick="document.getElementById('h-pipeline').scrollIntoView({behavior:'smooth'})">Pipeline &amp; Crew</a>
+              <a class="help-jump" onclick="document.getElementById('h-account').scrollIntoView({behavior:'smooth'})">Account &amp; Plans</a>
+              <a class="help-jump" onclick="document.getElementById('h-faq').scrollIntoView({behavior:'smooth'})">Troubleshooting</a>
+            </div>
+          </div>
+
+          <div class="help-card" id="h-start">
+            <div class="help-h">&#128640; Getting Started</div>
+            <p class="help-p">ForgeFront is a federal contracting intelligence platform built for Service-Disabled Veteran-Owned Small Businesses (SDVOSBs) and other small-business contractors. It helps you discover opportunities, read and break down statements of work, price your labor, find teaming partners, and generate bid proposals.</p>
+            <p class="help-p"><strong>First steps:</strong></p>
+            <ol class="help-ol">
+              <li>Complete your <strong>Business Profile</strong> (Account &rarr; Business Profile) &mdash; your NAICS codes, set-aside status, and capabilities power match scoring across the app.</li>
+              <li>Go to <strong>Contracts</strong> and run a search to load live federal opportunities.</li>
+              <li>Open any contract to read its scope, break it into priceable line items, and draft a bid.</li>
+            </ol>
+          </div>
+
+          <div class="help-card" id="h-contracts">
+            <div class="help-h">&#128196; Finding Contracts</div>
+            <p class="help-p">The <strong>Contracts</strong> page searches a database of roughly 78,000 federal opportunities, updated daily. Search is instant and does not consume any API limits.</p>
+            <p class="help-p"><strong>Filters available:</strong></p>
+            <ul class="help-ul">
+              <li><strong>Set-Aside</strong> &mdash; SDVOSB, 8(a), WOSB, HUBZone, small business, or full &amp; open.</li>
+              <li><strong>State</strong> &mdash; place of performance.</li>
+              <li><strong>NAICS</strong> &mdash; industry code matching your business.</li>
+              <li><strong>Keyword</strong> &mdash; words in the title or description.</li>
+              <li><strong>Days posted</strong> &mdash; how recently the opportunity was posted.</li>
+            </ul>
+            <p class="help-p">Each result shows a <strong>Match %</strong> based on how well the opportunity aligns with your Business Profile. Click any result to open the full detail page.</p>
+          </div>
+
+          <div class="help-card" id="h-detail">
+            <div class="help-h">&#128269; Contract Detail &amp; Statement of Work</div>
+            <p class="help-p">The detail page shows the agency, NAICS, set-aside, solicitation number, response deadline, point of contact, and match score for an opportunity.</p>
+            <p class="help-p">The <strong>Statement of Work / Description</strong> section displays the scope. For many federal listings the full scope lives in attached solicitation documents on SAM.gov rather than in the short synopsis. When that happens, use the line-item tools below or the <strong>Open on SAM.gov</strong> button to view the official posting.</p>
+          </div>
+
+          <div class="help-card" id="h-lineitems">
+            <div class="help-h">&#128203; Breaking Down Into Line Items</div>
+            <p class="help-p">This feature reads a statement of work and extracts the concrete, priceable items a contractor must source or perform &mdash; labor categories, equipment, materials, services, and compliance requirements &mdash; so you can collect vendor quotes and build your pricing.</p>
+            <p class="help-p"><strong>Two ways to use it:</strong></p>
+            <ol class="help-ol">
+              <li><strong>Click "Break Down Into Line Items"</strong> &mdash; the app analyzes the available scope text automatically.</li>
+              <li><strong>Drop the solicitation PDF(s)</strong> &mdash; when the real scope is in an attachment (like <em>Atth B_PWS.pdf</em>), drag the file into the drop zone. The app reads the PDF in your browser, extracts the text, and breaks it down. You can drop multiple files and they will be merged.</li>
+            </ol>
+            <p class="help-p"><strong>Where to get the PDF:</strong> click <strong>Open on SAM.gov</strong>, download the PWS / RFQ / solicitation attachment, then drag it into the drop zone. Look for files named "PWS" (Performance Work Statement) or "SOW" &mdash; those contain the scope.</p>
+            <p class="help-p">Each extracted line item gives you a <strong>Vendor</strong> field and a <strong>Quoted Price</strong> field. Enter prices as vendors reply, and the totals flow into your proposal pricing. The <strong>RFQ</strong> button drafts a request-for-quote email for that item.</p>
+          </div>
+
+          <div class="help-card" id="h-bid">
+            <div class="help-h">&#9997; Bid Writer</div>
+            <p class="help-p">The <strong>Bid Writer</strong> drafts a proposal from a contract's scope. Click <strong>Write Bid</strong> on a contract detail page to pre-fill it with the SOW, or open Bid Writer directly and paste your scope.</p>
+            <p class="help-p">It produces proposal sections with AI assistance, incorporates your line-item pricing, and can export the finished document to Word or PDF.</p>
+          </div>
+
+          <div class="help-card" id="h-tools">
+            <div class="help-h">&#128736; Tools</div>
+            <ul class="help-ul">
+              <li><strong>SOW Analyzer</strong> &mdash; deeper analysis of a statement of work: requirements, risks, and evaluation factors.</li>
+              <li><strong>Executive Report</strong> (Command tier) &mdash; a strategic intelligence brief on an opportunity or agency.</li>
+              <li><strong>Award Intelligence</strong> &mdash; research who has won similar contracts and at what values.</li>
+              <li><strong>Subcontractor Finder</strong> &mdash; locate subcontractors by trade and location.</li>
+              <li><strong>Labor Rate Pricing</strong> &mdash; build labor rates for your proposal pricing.</li>
+              <li><strong>Incumbent Vulnerability</strong> &mdash; assess the current contract holder and protest history.</li>
+              <li><strong>Teaming Partners</strong> &mdash; find businesses to team with on larger pursuits.</li>
+            </ul>
+          </div>
+
+          <div class="help-card" id="h-pipeline">
+            <div class="help-h">&#128202; Pipeline, Crew &amp; Invoices</div>
+            <ul class="help-ul">
+              <li><strong>Dashboard</strong> &mdash; your pipeline value, active jobs, expiring certifications, and recent contracts at a glance.</li>
+              <li><strong>Watchlist</strong> &mdash; save opportunities you want to track.</li>
+              <li><strong>Job Tracker</strong> &mdash; manage active jobs, values, and invoiced amounts.</li>
+              <li><strong>Crew</strong> &mdash; track team members and certification expiration dates.</li>
+              <li><strong>Invoices</strong> &mdash; generate and track invoices for your jobs.</li>
+            </ul>
+          </div>
+
+          <div class="help-card" id="h-account">
+            <div class="help-h">&#127970; Account &amp; Plans</div>
+            <p class="help-p"><strong>Business Profile</strong> drives match scoring &mdash; keep your NAICS codes, set-aside status, certifications, and capabilities current. <strong>Settings</strong> manages your account and preferences.</p>
+            <p class="help-p"><strong>Subscription tiers:</strong></p>
+            <ul class="help-ul">
+              <li><strong>Starter</strong> ($29/mo) &mdash; core contract search and tracking.</li>
+              <li><strong>Pro</strong> ($79/mo) &mdash; adds advanced analysis tools.</li>
+              <li><strong>Command</strong> ($199/mo) &mdash; full suite including Executive Strategic Reports.</li>
+            </ul>
+            <p class="help-p">All plans include a 14-day free trial.</p>
+          </div>
+
+          <div class="help-card" id="h-faq">
+            <div class="help-h">&#128295; Troubleshooting</div>
+            <p class="help-p"><strong>"No line items found" on a contract:</strong> the synopsis is too brief &mdash; the real scope is in a PDF attachment. Click Open on SAM.gov, download the PWS/SOW attachment, and drop it into the drop zone.</p>
+            <p class="help-p"><strong>The page looks out of date after an update:</strong> do a hard refresh (Ctrl+Shift+R). ForgeFront caches files to work offline, so a normal refresh may show an older version.</p>
+            <p class="help-p"><strong>A feature says you need to sign in:</strong> sign out and sign back in to refresh your session.</p>
+            <p class="help-p"><strong>Still stuck?</strong> Use the feedback option in your account, or contact support.</p>
+          </div>
+
+          <div style="text-align:center;color:var(--t3);font-size:11px;padding:14px 0 30px">ForgeFront &mdash; SDVOSB Contracting Intelligence</div>
+        </div>
       </div>
 
       <!-- CONTRACTS -->
@@ -7349,7 +7483,7 @@ function go(page,el) {
   document.querySelectorAll('.li').forEach(n=>n.classList.remove('on'));
   $('p-'+page)?.classList.add('on');
   el?.classList.add('on');
-  const T={dash:'Dashboard',contracts:'Contracts',cdetail:'Contract Detail',jobs:'Job Tracker',crew:'Crew',invoices:'Invoices',bid:'Bid Writer',profile:'Settings',bizprofile:'Business Profile',watchlist:'Watchlist',teaming:'Teaming Partners',intel:'Award Intelligence',subfinder:'Subcontractor Finder',support:'Support',admin:'Admin'};
+  const T={dash:'Dashboard',contracts:'Contracts',cdetail:'Contract Detail',jobs:'Job Tracker',crew:'Crew',invoices:'Invoices',bid:'Bid Writer',profile:'Settings',bizprofile:'Business Profile',watchlist:'Watchlist',teaming:'Teaming Partners',intel:'Award Intelligence',subfinder:'Subcontractor Finder',support:'Support',help:'User Manual',admin:'Admin'};
   $('pt').textContent=T[page]||page;
   closeSB();
   if(page==='dash')          renderDashboard();
