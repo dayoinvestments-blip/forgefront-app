@@ -3683,20 +3683,56 @@ async function generateSOWForBid() {
 
 function viewContractDetail2_placeholder(){}
 
+// A SAM.gov "combined synopsis/solicitation" intro is procurement boilerplate with
+// no priceable scope — the real scope lives in attached PWS/RFQ documents. Detect that
+// so we know to pull the attachment text before extracting line items.
+function sowLooksLikeBoilerplate(text){
+  if(!text) return true;
+  if(text.trim().length < 600) return true;
+  var t = text.toLowerCase();
+  var markers = ['combined synopsis/solicitation','far subpart 12.6','this announcement constitutes the only solicitation','see rfq','see attached','incorporated provisions and clauses'];
+  var hits = markers.reduce(function(n,m){ return n + (t.indexOf(m) >= 0 ? 1 : 0); }, 0);
+  // Boilerplate-heavy AND short-on-substance -> treat as not enough on its own
+  return hits >= 2 && text.trim().length < 2500;
+}
+
 async function breakdownLineItems(id) {
   const c = (A.contracts || []).find(function(x){return x.id===id;}) || A._currentContract;
   if(!c) return;
-  const sow = c.description || (document.getElementById('cdetail-sow') ? document.getElementById('cdetail-sow').textContent : '');
-  if(!sow || sow.trim().length < 50){
-    toast('No SOW text available yet to break down. Open the SOW first or use Open on SAM.gov.', 'e');
-    return;
-  }
+
   const tier = getTier();
   if(tier==='free'){ ppuGate('sow_analyzer','Line Item Breakdown'); return; }
 
   const btn = document.getElementById('lineitem-btn');
   const out = document.getElementById('lineitem-results');
   if(btn){ btn.disabled=true; btn.textContent='Extracting line items...'; }
+
+  // 1. Start with whatever SOW text we already have on the page / record.
+  let sow = c.description || (document.getElementById('cdetail-sow') ? document.getElementById('cdetail-sow').textContent : '');
+  let attachmentLinks = [];
+
+  // 2. If that text is missing, thin, or boilerplate, pull the real PWS/RFQ
+  //    attachment text from SAM.gov before sending anything to the AI.
+  if((!sow || sowLooksLikeBoilerplate(sow)) && c.noticeId){
+    if(out) out.innerHTML = '<div style="padding:20px;text-align:center;color:var(--t3)"><span class="sp"></span> Pulling the full solicitation document from SAM.gov...</div>';
+    try{
+      const ar = await fetch('/.netlify/functions/sow-attachments?noticeId='+encodeURIComponent(c.noticeId));
+      const ad = await ar.json();
+      if(Array.isArray(ad.links)) attachmentLinks = ad.links;
+      if(ad.sow && ad.sow.trim().length > (sow ? sow.trim().length : 0)){
+        sow = ad.sow;            // real document text — use it
+        c.description = sow;     // cache it on the record for reuse
+      }
+    }catch(_){ /* fall through to whatever sow we have */ }
+  }
+
+  // 3. If we still have nothing usable, show the attachment links (or SAM.gov) and stop.
+  if(!sow || sow.trim().length < 50){
+    if(out) renderNoSOWFallback(out, c, attachmentLinks);
+    if(btn){ btn.disabled=false; btn.innerHTML='\u{1F4CB} Break Down Into Line Items'; }
+    return;
+  }
+
   if(out) out.innerHTML = '<div style="padding:20px;text-align:center;color:var(--t3)"><span class="sp"></span> Reading the SOW and pulling out priceable items...</div>';
 
   try{
@@ -3709,14 +3745,36 @@ async function breakdownLineItems(id) {
     const d = await r.json();
     if(d.error && !(d.items||[]).length) throw new Error(d.error);
     c._lineItems = d.items || [];
-    renderLineItems(c);
-    toast('Found '+(d.items||[]).length+' priceable line items', 's');
+    if((c._lineItems||[]).length === 0){
+      renderNoSOWFallback(out, c, attachmentLinks);
+    } else {
+      renderLineItems(c);
+      toast('Found '+(c._lineItems||[]).length+' priceable line items', 's');
+    }
   }catch(e){
-    if(out) out.innerHTML = '<div style="padding:16px;color:var(--t3)">Could not extract line items: '+e.message+'</div>';
+    if(out) out.innerHTML = '<div style="padding:16px;color:var(--t3)">Could not extract line items: '+escapeHtml(e.message)+'</div>';
     toast('Line item extraction failed: '+e.message, 'e');
   }finally{
     if(btn){ btn.disabled=false; btn.innerHTML='\u{1F4CB} Break Down Into Line Items'; }
   }
+}
+
+// Shown when no priceable scope could be extracted. If SAM.gov returned attachment
+// links, point the user straight at the actual documents; otherwise the SAM.gov listing.
+function renderNoSOWFallback(out, c, links){
+  if(!out) return;
+  var samUrl = c.url || ('https://sam.gov/opp/' + (c.noticeId||'') + '/view');
+  var html = '<div style="text-align:center;padding:1.5rem 1rem;">';
+  html += '<p style="color:var(--t3);margin:0 0 .85rem;font-size:.93rem;line-height:1.6;">The priceable scope for this contract is in the solicitation document, which is posted as a non-text attachment (PDF/Word).<br>Open it directly below, then paste the scope into the Bid Writer for line-item pricing.</p>';
+  if(Array.isArray(links) && links.length){
+    links.slice(0,5).forEach(function(lnk, i){
+      html += '<a href="'+lnk+'" target="_blank" rel="noopener" style="display:inline-block;margin:4px;padding:.5rem 1.1rem;background:var(--gold,#E8B030);color:#08101E;font-weight:700;border-radius:6px;text-decoration:none;font-size:.85rem;">Attachment '+(i+1)+' &#x2197;</a>';
+    });
+  } else {
+    html += '<a href="'+samUrl+'" target="_blank" rel="noopener" style="display:inline-block;padding:.55rem 1.4rem;background:var(--gold,#E8B030);color:#08101E;font-weight:700;border-radius:6px;text-decoration:none;font-size:.9rem;">Open Full Solicitation on SAM.gov &#x2197;</a>';
+  }
+  html += '</div>';
+  out.innerHTML = html;
 }
 
 function renderLineItems(c) {
