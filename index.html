@@ -3816,6 +3816,7 @@ async function breakdownLineItems(id) {
 
   // 3. If we still have nothing usable, show the attachment links (or SAM.gov) and stop.
   if(!sow || sow.trim().length < 50){
+    hideProgress(id);
     if(out) renderNoSOWFallback(out, c, attachmentLinks);
     if(btn){ btn.disabled=false; btn.innerHTML='\u{1F4CB} Break Down Into Line Items'; }
     return;
@@ -3834,8 +3835,10 @@ async function breakdownLineItems(id) {
     if(d.error && !(d.items||[]).length) throw new Error(d.error);
     c._lineItems = d.items || [];
     if((c._lineItems||[]).length === 0){
+      hideProgress(id);
       renderNoSOWFallback(out, c, attachmentLinks);
     } else {
+      hideProgress(id);
       renderLineItems(c);
       toast('Found '+(c._lineItems||[]).length+' priceable line items', 's');
     }
@@ -3843,6 +3846,7 @@ async function breakdownLineItems(id) {
     if(out) out.innerHTML = '<div style="padding:16px;color:var(--t3)">Could not extract line items: '+escapeHtml(e.message)+'</div>';
     toast('Line item extraction failed: '+e.message, 'e');
   }finally{
+    hideProgress(id);
     if(btn){ btn.disabled=false; btn.innerHTML='\u{1F4CB} Break Down Into Line Items'; }
   }
 }
