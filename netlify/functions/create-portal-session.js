@@ -14,8 +14,8 @@ const CORS = {
   'Content-Type': 'application/json',
 };
 
-const SUPABASE_URL        = 'https://ycadicxcwcgdiefdqbrn.supabase.co';
-const SUPABASE_SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InljYWRpY3hjd2NnZGllZmRxYnJuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3OTQ5ODI0NCwiZXhwIjoyMDk1MDc0MjQ0fQ.6M_jrAF9WH-HRbHaxvWgDa-dCiY043VbDI12fCB5OaU';
+const SUPABASE_URL        = process.env.SUPABASE_URL || 'https://ycadicxcwcgdiefdqbrn.supabase.co';
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: CORS, body: '' };
