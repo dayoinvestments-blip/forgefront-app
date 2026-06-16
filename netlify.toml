@@ -1,6 +1,9 @@
 [build]
   publish = "."
   functions = "netlify/functions"
+  # Static single-file HTML app — no build step. Prevents Netlify from
+  # auto-detecting the legacy Expo package.json and running Metro.
+  command = "echo 'No build step — static site'"
 
 [functions."sow-lineitems"]
   timeout = 26
