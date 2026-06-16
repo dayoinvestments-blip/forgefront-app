@@ -2,6 +2,7 @@
  * Netlify Function: /.netlify/functions/sow-lineitems
  * Extracts priceable line items from a SOW so the user can collect vendor quotes.
  * Returns structured JSON: each item = what to buy/do, spec, unit, est qty.
+ * Uses Haiku for speed (avoids Netlify 10s timeout).
  */
 const { verifyUser, checkRateLimit, unauthorized, rateLimited } = require('./_verify-auth');
 
@@ -72,8 +73,8 @@ Extract 3-15 items. Be specific and pull real specs/standards from the SOW text 
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model:      'claude-sonnet-4-6',
-        max_tokens: 2000,
+        model:      'claude-haiku-4-5-20251001',  // Fast model — completes well within Netlify 10s timeout
+        max_tokens: 1000,                          // Haiku is concise; 1000 is plenty for structured extraction
         system:     SYSTEM_PROMPT,
         messages:   [{ role: 'user', content: USER_PROMPT }],
       }),
