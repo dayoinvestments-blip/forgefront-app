@@ -54,33 +54,39 @@ async function getUserTier(userId) {
   } catch (e) { return 'starter'; }
 }
 
+async function fetchUsageCount(userId, since, SB, KEY) {
+  try {
+    const r = await fetch(
+      SB + '/rest/v1/ai_usage?user_id=eq.' + userId + '&created_at=gte.' + encodeURIComponent(since) + '&select=id',
+      { headers: { apikey: KEY, Authorization: 'Bearer ' + KEY, Prefer: 'count=exact' }, signal: AbortSignal.timeout(3000) }
+    );
+    const cr = r.headers.get('content-range');
+    if (cr && cr.indexOf('/') >= 0) return parseInt(cr.split('/')[1], 10) || 0;
+    const rows = await r.json();
+    return Array.isArray(rows) ? rows.length : 0;
+  } catch (e) {
+    return 0; // fail open — don't block on a count error
+  }
+}
+
 /**
  * Returns { ok: true } if under the limit, or { ok:false, retryAfter, cap } if over.
  * Also logs this call when allowed.
+ * getUserTier and fetchUsageCount run in parallel to cut auth latency.
  */
 async function checkRateLimit(userId, fnName) {
   try {
     const { SB, KEY } = sbEnv();
     if (!SB || !KEY) return { ok: true }; // fail open if misconfigured (don't block real users)
 
-    const tier = await getUserTier(userId);
+    const since = new Date(Date.now() - 3600 * 1000).toISOString();
+    const [tier, count] = await Promise.all([
+      getUserTier(userId),
+      fetchUsageCount(userId, since, SB, KEY),
+    ]);
+
     const cap = HOURLY_CAPS[tier] != null ? HOURLY_CAPS[tier] : 40;
     if (cap >= 9999) { logUsage(userId, fnName); return { ok: true }; }
-
-    const since = new Date(Date.now() - 3600 * 1000).toISOString();
-    const r = await fetch(
-      SB + '/rest/v1/ai_usage?user_id=eq.' + userId + '&created_at=gte.' + encodeURIComponent(since) + '&select=id',
-      { headers: { apikey: KEY, Authorization: 'Bearer ' + KEY, Prefer: 'count=exact' }, signal: AbortSignal.timeout(3000) }
-    );
-    // Prefer count header if present
-    let count = 0;
-    const cr = r.headers.get('content-range');
-    if (cr && cr.indexOf('/') >= 0) {
-      count = parseInt(cr.split('/')[1], 10) || 0;
-    } else {
-      const rows = await r.json();
-      count = Array.isArray(rows) ? rows.length : 0;
-    }
 
     if (count >= cap) {
       return { ok: false, cap: cap, retryAfter: 3600 };

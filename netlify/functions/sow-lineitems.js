@@ -48,11 +48,14 @@ async function fetchFullDescription(description_url) {
 }
 
 exports.handler = async (event) => {
+  const t0 = Date.now();
   if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: CORS, body: '' };
 
   const _authedUser = await verifyUser(event.headers);
+  console.log('[timing] verifyUser done', Date.now() - t0, 'ms');
   if (!_authedUser) return unauthorized(CORS);
   const _rl = await checkRateLimit(_authedUser.id, 'sow-lineitems');
+  console.log('[timing] checkRateLimit done', Date.now() - t0, 'ms');
   if (!_rl.ok) return rateLimited(CORS, _rl);
   if (event.httpMethod !== 'POST') return { statusCode: 405, headers: CORS, body: JSON.stringify({ error: 'Method not allowed' }) };
 
@@ -116,6 +119,7 @@ Extract 3-12 items. For services contracts, include labor categories, operationa
       + (naics ? ' (NAICS ' + naics + ')' : '')
       + '.\n\nSOW TEXT:\n' + truncated;
 
+    console.log('[timing] pre-Anthropic fetch', Date.now() - t0, 'ms');
     console.log('[sow-lineitems] sending', truncated.length, 'chars to Haiku');
     console.log('[sow-lineitems] first 200 chars:', truncated.slice(0, 200).replace(/\n/g, '\\n'));
     let aiRes;
@@ -133,7 +137,7 @@ Extract 3-12 items. For services contracts, include labor categories, operationa
           system:     SYSTEM_PROMPT,
           messages:   [{ role: 'user', content: USER_PROMPT }],
         }),
-        signal: AbortSignal.timeout(8500),
+        signal: AbortSignal.timeout(9500),
       });
     } catch (e) {
       if (e.name === 'TimeoutError' || e.name === 'AbortError') {
@@ -142,7 +146,7 @@ Extract 3-12 items. For services contracts, include labor categories, operationa
       }
       throw e;
     }
-    console.log('[sow-lineitems] Anthropic response status:', aiRes.status);
+    console.log('[timing] Anthropic responded', Date.now() - t0, 'ms', '| status:', aiRes.status);
 
     if (!aiRes.ok) {
       const err = await aiRes.text();
