@@ -1,12 +1,12 @@
 {
-  "name": "ForgeFront \u2014 SDVOSB Command Center",
+  "name": "ForgeFront — SDVOSB Command Center",
   "short_name": "ForgeFront",
   "description": "The federal contract command center for service-disabled veteran-owned businesses.",
   "start_url": "https://forgefront.app/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#0A0C0F",
-  "theme_color": "#00E5A0",
+  "background_color": "#08101E",
+  "theme_color": "#E8B030",
   "categories": [
     "business",
     "productivity",

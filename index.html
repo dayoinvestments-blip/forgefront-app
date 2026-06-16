@@ -21,9 +21,33 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>if(window.pdfjsLib){window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}</script>
+<script>
+/* Store-mode detection: when running inside the Capacitor native app (App Store /
+   Google Play build), hide all pricing, upgrade, trial, and checkout UI so the app
+   complies with Apple App Store Guideline 3.1.1 (no selling/advertising digital
+   subscriptions outside their IAP). Subscriptions are sold only on the website.
+   The same files serve both the website (pricing visible) and the native app. */
+(function(){
+  function markNative(){
+    var isNative = !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function'
+      ? window.Capacitor.isNativePlatform()
+      : (window.Capacitor && window.Capacitor.isNative));
+    if (isNative) {
+      document.documentElement.classList.add('is-native');
+      if (document.body) document.body.classList.add('is-native');
+    }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', markNative);
+  else markNative();
+  window.__isNativeApp = function(){ return document.documentElement.classList.contains('is-native'); };
+})();
+</script>
 <style>
 :root{--bg:#08101E;--s:#0C1828;--s2:#111E30;--s3:#162238;--bd:#1E2E44;--ac:#E8B030;--ad:rgba(232,176,48,.10);--ab:rgba(232,176,48,.28);--go:#C9A030;--gd:rgba(201,160,48,.10);--gb:rgba(201,160,48,.28);--bl:#5A8FD4;--bld:rgba(90,143,212,.10);--dn:#CC2030;--t:#F0F2F5;--t2:#A8B8C8;--t3:#5A6880;--r:12px;--rs:8px;--rl:16px}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+/* Store-mode (native app) — hide everything that sells or advertises subscriptions.
+   Marked elements get class "paywall-ui"; native build hides them. Website unaffected. */
+html.is-native .paywall-ui{display:none!important}
 html,body{height:100%;background:var(--bg);color:var(--t);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif;overflow:hidden}
 #app{display:flex;height:100vh;overflow:hidden}
 #sb{width:225px;background:var(--s);border-right:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0;transition:transform .25s;overflow-y:auto;height:100vh;padding-bottom:20px}
@@ -912,9 +936,9 @@ body{background:#0A0E17;color:#F0EDE6;font-family:'Georgia','Times New Roman',se
     </a>
     <div class="nav-links">
       <button class="nav-link" onclick="document.getElementById('s-caps').scrollIntoView({behavior:'smooth'})">Capabilities</button>
-      <button class="nav-link" onclick="document.getElementById('s-pricing').scrollIntoView({behavior:'smooth'})">Pricing</button>
+      <button class="nav-link paywall-ui" onclick="document.getElementById('s-pricing').scrollIntoView({behavior:'smooth'})">Pricing</button>
       <button class="nav-link nav-signin" id="nav-signin-btn">Sign In</button>
-      <button class="nav-link nav-cta" id="nav-cta-btn">Start Free Trial</button>
+      <button class="nav-link nav-cta paywall-ui" id="nav-cta-btn">Start Free Trial</button>
     </div>
   </div>
 </nav>
@@ -938,7 +962,7 @@ body{background:#0A0E17;color:#F0EDE6;font-family:'Georgia','Times New Roman',se
       that only prime contractors could afford — until now.
     </p>
     <div class="hero-btns">
-      <button class="btn-gold" id="hero-cta-btn">Start Free — 14 Days &nbsp;→</button>
+      <button class="btn-gold paywall-ui" id="hero-cta-btn">Start Free — 14 Days &nbsp;→</button>
       <button class="btn-outline" onclick="document.getElementById('s-problem').scrollIntoView({behavior:'smooth'})">See the Numbers</button>
     </div>
     <!-- ANIMATED STATS -->
@@ -1185,7 +1209,7 @@ body{background:#0A0E17;color:#F0EDE6;font-family:'Georgia','Times New Roman',se
 <!-- ══════════════════════════════════════════════════════════
      SECTION 8 — PRICING
 ══════════════════════════════════════════════════════════ -->
-<section id="s-pricing">
+<section id="s-pricing" class="paywall-ui">
   <div class="frame">
     <div class="pricing-header reveal">
       <div class="section-tag">Pricing</div>
@@ -1278,7 +1302,7 @@ body{background:#0A0E17;color:#F0EDE6;font-family:'Georgia','Times New Roman',se
       <p class="cta-headline">Your next<br>contract is waiting.</p>
       <p class="cta-sub">Stop competing blind. Start with 14 days free — no credit card, no commitment.</p>
       <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
-        <button class="btn-dark" id="cta-final-btn">Start Your Free Trial</button>
+        <button class="btn-dark paywall-ui" id="cta-final-btn">Start Your Free Trial</button>
         <button class="btn-dark-outline" id="cta-signin-btn">Sign In</button>
       </div>
       <p class="cta-fine">SDVOSB-owned · Veteran-built · Cancel anytime</p>
@@ -1686,7 +1710,7 @@ document.getElementById('cta-signin-btn').onclick  = ffSignIn;
           <h3 style="font-size:15px;font-weight:700;margin-bottom:5px">&#128274; You are missing contracts matched to your NAICS</h3>
           <p style="font-size:13px;color:var(--t2);margin-bottom:12px">Showing 10 of <strong id="total-count" style="color:var(--t)">&#8212;</strong> contracts matched to your profile. Upgrade to see all of them.</p>
           <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-            <button class="btn go2" onclick="showUpgrade()">Upgrade to Pro &#8212; $79/mo</button>
+            <button class="btn go2 paywall-ui" onclick="showUpgrade()">Upgrade to Pro &#8212; $79/mo</button>
             <button class="btn g sm" onclick="alert('Single proposal $4.99 - Stripe coming soon')">Or $4.99 per proposal</button>
           </div>
         </div>
@@ -5379,6 +5403,8 @@ function hasAllocation(feature) {
 }
 
 function ppuGate(feature, featureName) {
+  // Store-mode: never show pricing / pay-per-use UI in the native app.
+  if (window.__isNativeApp && window.__isNativeApp()) { nativeManageNotice(); return; }
   var tier      = getTier();
   var meta      = PPU_FEATURES[feature] || {};
   var prices    = PPU_PRICES[feature]  || {};
@@ -7771,7 +7797,17 @@ function removeSamKey() {
 function showUpgrade(){
   // Superusers and admins never see the paywall
   if (A.profile && ['superuser','admin'].includes(A.profile.role)) return;
+  // Store-mode (native app): Apple/Google forbid selling or advertising
+  // subscriptions outside their IAP. Show a neutral notice instead of pricing.
+  if (window.__isNativeApp && window.__isNativeApp()) { nativeManageNotice(); return; }
   openM('upgrade-modal');
+}
+
+// Neutral, store-compliant notice shown in the native app wherever the web app
+// would otherwise show pricing/upgrade UI. No prices, no buy buttons, no links.
+function nativeManageNotice(){
+  try { toast('This feature requires a higher plan. Manage your subscription at forgefront.app from any browser.', 'i'); }
+  catch(e) { alert('This feature requires a higher plan. Manage your subscription at forgefront.app from any browser.'); }
 }
 
 // ── Modal helpers ─────────────────────────────────────────────────────────────
