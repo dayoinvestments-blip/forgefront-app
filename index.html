@@ -42,6 +42,30 @@
   window.__isNativeApp = function(){ return document.documentElement.classList.contains('is-native'); };
 })();
 </script>
+<script>
+/* Native API routing: in the Capacitor build the app origin is capacitor://localhost
+   (iOS) or https://localhost (Android), which has no Netlify Functions. Rewrite all
+   relative /.netlify/ calls to the production backend when native. No-op on the website. */
+(function(){
+  var FN_ORIGIN = 'https://forgefront.app';
+  function isNative(){
+    return !!(window.Capacitor && (typeof window.Capacitor.isNativePlatform === 'function'
+      ? window.Capacitor.isNativePlatform() : window.Capacitor.isNative));
+  }
+  if (!isNative()) return;
+  var _fetch = window.fetch.bind(window);
+  window.fetch = function(input, init){
+    try {
+      if (typeof input === 'string' && input.indexOf('/.netlify/') === 0) {
+        input = FN_ORIGIN + input;
+      } else if (input && input.url && input.url.indexOf('/.netlify/') === 0) {
+        input = new Request(FN_ORIGIN + input.url, input);
+      }
+    } catch(e){}
+    return _fetch(input, init);
+  };
+})();
+</script>
 <style>
 :root{--bg:#08101E;--s:#0C1828;--s2:#111E30;--s3:#162238;--bd:#1E2E44;--ac:#E8B030;--ad:rgba(232,176,48,.10);--ab:rgba(232,176,48,.28);--go:#C9A030;--gd:rgba(201,160,48,.10);--gb:rgba(201,160,48,.28);--bl:#5A8FD4;--bld:rgba(90,143,212,.10);--dn:#CC2030;--t:#F0F2F5;--t2:#A8B8C8;--t3:#5A6880;--r:12px;--rs:8px;--rl:16px}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
