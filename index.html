@@ -7433,7 +7433,10 @@ function showApp() {
   $('uname').textContent=A.profile?.name||A.user.email;
   $('urole').textContent=`⚡ ${(A.profile?.role||'user').toUpperCase()}`;
   $('tbadge').textContent=`${(A.profile?.tier||'free').toUpperCase()} · SDVOSB`;
-  if(['superuser','admin'].includes(A.profile?.role)) $('anav').style.display='flex';
+  if(['superuser','admin'].includes(A.profile?.role)) {
+    $('anav').style.display='flex';
+    var _ma=$('mob-admin-item'); if(_ma) _ma.style.display='flex';
+  }
 
   // Profile page defaults
   $('pr-name').value=A.profile?.name||'';
@@ -7736,6 +7739,7 @@ function printInv(){
     <button class="mob-drawer-item" onclick="mobNav('profile',null);mobToolsClose()"><span>&#9881;</span> My Profile</button>
     <button class="mob-drawer-item" onclick="mobNav('watchlist',null);mobToolsClose()"><span>&#128278;</span> Watchlist</button>
     <button class="mob-drawer-item" onclick="mobNav('support',null);mobToolsClose()"><span>&#127914;</span> Support</button>
+    <button class="mob-drawer-item" id="mob-admin-item" style="display:none;color:var(--ac)" onclick="mobNav('admin',null);mobToolsClose()"><span>&#128737;</span> Admin</button>
   </div>
 </div>
 
@@ -7854,6 +7858,7 @@ boot();
     <button class="mob-drawer-item" onclick="mobNav('profile',null);mobToolsClose()"><span>&#9881;</span> My Profile</button>
     <button class="mob-drawer-item" onclick="mobNav('watchlist',null);mobToolsClose()"><span>&#128278;</span> Watchlist</button>
     <button class="mob-drawer-item" onclick="mobNav('support',null);mobToolsClose()"><span>&#127914;</span> Support</button>
+    <button class="mob-drawer-item" id="mob-admin-item" style="display:none;color:var(--ac)" onclick="mobNav('admin',null);mobToolsClose()"><span>&#128737;</span> Admin</button>
   </div>
 </div>
 
