@@ -3537,7 +3537,7 @@ async function fetchFederalContracts(filters) {
     var controller = new AbortController();
     var tid = setTimeout(function() { controller.abort(); }, 12000);
     samIncrement();
-    var res = await fetch('/.netlify/functions/contracts?' + params.toString(), {signal: controller.signal});
+    var res = await fetch(FN_ORIGIN + '/.netlify/functions/contracts?' + params.toString(), {signal: controller.signal});
     clearTimeout(tid);
 
     // Rate limited — use stale cache if we have any, else mock
@@ -3650,7 +3650,7 @@ async function fetchContracts() {
       if (filters.state)   ps.set('state',   filters.state);
       if (filters.naics)   ps.set('naics',   filters.naics);
       if (filters.keyword) ps.set('keyword', filters.keyword || '');
-      var rs = await fetch('/.netlify/functions/subnet?' + ps.toString());
+      var rs = await fetch(FN_ORIGIN + '/.netlify/functions/subnet?' + ps.toString());
       if (rs.ok) { var ds = await rs.json(); contracts.push(...(ds.contracts || [])); }
     } catch(e) { /* SubNet unavailable — show nothing rather than fake data */ }
   }
@@ -3821,7 +3821,7 @@ async function byodSearch(list) {
       params.set('keyword', list[i]);
       params.set('userkey', key);
       samIncrement();
-      var r = await fetch('/.netlify/functions/contracts?'+params.toString());
+      var r = await fetch(FN_ORIGIN + '/.netlify/functions/contracts?'+params.toString());
       var d = await r.json();
       if(d.contracts && d.contracts.length){
         // Prefer exact solicitation-number match if present
@@ -3858,7 +3858,7 @@ async function generateSOWForBid() {
   out.textContent = 'Reading the scope, extracting requirements, evaluating fit...';
 
   try{
-    const r = await fetch('/.netlify/functions/sow-analyzer', {
+    const r = await fetch(FN_ORIGIN + '/.netlify/functions/sow-analyzer', {
       method:'POST',
       headers: await aiHeaders(),
       body:JSON.stringify({ sow: scope, company: company, certs: certs, naics: naics }),
@@ -4003,7 +4003,7 @@ async function breakdownLineItems(id) {
   if((!sow || sowLooksLikeBoilerplate(sow)) && c.noticeId){
     if(out) out.innerHTML = '<div style="padding:20px;text-align:center;color:var(--t3)"><span class="sp"></span> Pulling the full solicitation document from SAM.gov...</div>';
     try{
-      const ar = await fetch('/.netlify/functions/sow-attachments?noticeId='+encodeURIComponent(c.noticeId));
+      const ar = await fetch(FN_ORIGIN + '/.netlify/functions/sow-attachments?noticeId='+encodeURIComponent(c.noticeId));
       const ad = await ar.json();
       if(Array.isArray(ad.links)) attachmentLinks = ad.links;
       if(ad.sow && ad.sow.trim().length > (sow ? sow.trim().length : 0)){
@@ -4034,7 +4034,7 @@ async function breakdownLineItems(id) {
   if(out) out.innerHTML = '<div style="padding:20px;text-align:center;color:var(--t3)"><span class="sp"></span> Reading the SOW and pulling out priceable items...</div>';
 
   try{
-    const r = await fetch('/.netlify/functions/sow-lineitems', {
+    const r = await fetch(FN_ORIGIN + '/.netlify/functions/sow-lineitems', {
       method:'POST',
       headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+_t },
       body:JSON.stringify({ sow: sow, title: c.title, naics: c.naics, notice_id: c.noticeId, description_url: c.descriptionLink }),
@@ -4267,7 +4267,7 @@ async function fetchContractSOW(c){
     var q = c.descriptionLink ? ('link='+encodeURIComponent(c.descriptionLink)) : ('noticeId='+encodeURIComponent(c.noticeId));
     var _uk = getSamKey(); if(_uk) q += '&userkey='+encodeURIComponent(_uk);
     samIncrement();
-    var r = await fetch('/.netlify/functions/sow-fetch?'+q);
+    var r = await fetch(FN_ORIGIN + '/.netlify/functions/sow-fetch?'+q);
     var d = await r.json();
     var el = document.getElementById('cdetail-sow');
     if(d.sow && d.sow.length > 20){
@@ -4362,7 +4362,7 @@ async function fetchSOWIntoBid(c){
     var q = c.descriptionLink ? ('link='+encodeURIComponent(c.descriptionLink)) : ('noticeId='+encodeURIComponent(c.noticeId));
     var _uk = getSamKey(); if(_uk) q += '&userkey='+encodeURIComponent(_uk);
     samIncrement();
-    var r = await fetch('/.netlify/functions/sow-fetch?'+q);
+    var r = await fetch(FN_ORIGIN + '/.netlify/functions/sow-fetch?'+q);
     var d = await r.json();
     if(d.sow && d.sow.length > 20){
       c.description = d.sow;
@@ -4418,7 +4418,7 @@ async function runBidWriter() {
   };
 
   try{
-    const r = await fetch('/.netlify/functions/bid-proposal', {
+    const r = await fetch(FN_ORIGIN + '/.netlify/functions/bid-proposal', {
       method:'POST', headers: await aiHeaders(),
       body:JSON.stringify({ sow: scope, company: company, profile: profile, quotes: quotes, contract: contract }),
     });
@@ -4664,7 +4664,7 @@ async function confirmDeleteAccount() {
   try {
     const { data: { session } } = await sb.auth.getSession();
     if (!session || !session.access_token) throw new Error('Your session has expired. Please sign in again.');
-    const res = await fetch('/.netlify/functions/delete-account', {
+    const res = await fetch(FN_ORIGIN + '/.netlify/functions/delete-account', {
       method: 'POST',
       headers: { 'Authorization': 'Bearer ' + session.access_token }
     });
@@ -4869,7 +4869,7 @@ async function bpAiField(fieldId, fieldType) {
     ? 'Improve this ' + fieldType + ' for federal contractor "' + name + '", NAICS ' + naics + ', ' + certs + '. Professional, specific, compelling. Under 150 words. Current: "' + existing.slice(0, 300) + '"'
     : 'Write a professional ' + fieldType + ' for federal contractor "' + name + '", NAICS ' + naics + ', ' + certs + '. Under 150 words.';
   try {
-    var res = await fetch('/.netlify/functions/ai-assist', {
+    var res = await fetch(FN_ORIGIN + '/.netlify/functions/ai-assist', {
       method: 'POST',
       headers: await aiHeaders(),
       body: JSON.stringify({prompt: prompt, field: fieldType})
@@ -4920,7 +4920,7 @@ async function ffCheckout(plan) {
   var btn = event && event.target ? event.target : null;
   if (btn) { btn.disabled = true; btn.textContent = 'Loading...'; }
   try {
-    var res = await fetch('/.netlify/functions/create-checkout', {
+    var res = await fetch(FN_ORIGIN + '/.netlify/functions/create-checkout', {
       method:  'POST',
       headers: {'Content-Type': 'application/json'},
       body:    JSON.stringify({ plan: plan, userId: A.user.id, email: A.user.email })
@@ -6125,7 +6125,7 @@ function manageBilling() {
   if (!email) { toast('Please log in to manage billing', 'e'); return; }
   toast('Redirecting to billing portal...', 'i');
   // POST to a function that creates a portal session
-  fetch('/.netlify/functions/create-portal-session', {
+  fetch(FN_ORIGIN + '/.netlify/functions/create-portal-session', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({email: email, userId: A.user.id || ''})
@@ -6535,7 +6535,7 @@ async function sowAnalyze() {
     + '</div>';
 
   try {
-    var r = await fetch('/.netlify/functions/sow-analyzer', {
+    var r = await fetch(FN_ORIGIN + '/.netlify/functions/sow-analyzer', {
       method:  'POST',
       headers: await aiHeaders(),
       body:    JSON.stringify({ sow: sowText, company: company, certs: certs, naics: naics }),
@@ -6758,7 +6758,7 @@ async function generateReport() {
     + '</div>';
 
   try {
-    var r = await fetch('/.netlify/functions/executive-report', {
+    var r = await fetch(FN_ORIGIN + '/.netlify/functions/executive-report', {
       method:  'POST',
       headers: await aiHeaders(),
       body:    JSON.stringify({ title, naics, agency, state, role, sow, company, certs }),
@@ -7288,7 +7288,7 @@ async function submitGrantComp() {
 
   // Look up user by email first
   var token = await admToken();
-  var res = await fetch('/.netlify/functions/admin?action=list_users&search=' + encodeURIComponent(email), {
+  var res = await fetch(FN_ORIGIN + '/.netlify/functions/admin?action=list_users&search=' + encodeURIComponent(email), {
     headers: { Authorization: 'Bearer ' + token },
   });
   var data = await res.json();
