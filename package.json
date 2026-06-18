@@ -5,5 +5,17 @@
   "description": "ForgeFront — federal contracting intelligence platform (static HTML + Netlify Functions). No build step.",
   "scripts": {
     "build": "echo 'No build step — static site'"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.4.0",
+    "@capacitor/cli": "^8.4.0",
+    "@capacitor/core": "^8.4.0",
+    "@capacitor/ios": "^8.4.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5"
+  },
+  "overrides": {
+    "sharp": "^0.33.5"
   }
 }

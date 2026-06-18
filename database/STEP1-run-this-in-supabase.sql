@@ -297,11 +297,12 @@ ON CONFLICT (id) DO UPDATE SET
   status           = 'active';
 
 -- ── Sample Jobs (pre-loaded for your account) ─────────────────────────────────
-INSERT INTO public.jobs (user_id, name, client, value, invoiced, status, phase) VALUES
-  ('6ec73761-8179-4780-bf58-712bc7140901', 'Minden Welding Shop Build-out',  'Private Client',      48000, 28000, 'active',  'Phase 2 of 3'),
-  ('6ec73761-8179-4780-bf58-712bc7140901', 'USDA Rural Dev Fence Install',   'USDA Rural Development', 22000, 0,     'pending', 'Awaiting materials'),
-  ('6ec73761-8179-4780-bf58-712bc7140901', 'Fort Johnson Gate Fabrication',  'Dept of Army',        31000, 15000, 'review',  'Change order #2')
-ON CONFLICT DO NOTHING;
+-- Disabled: sample jobs removed so a fresh database setup won't seed mock data.
+-- INSERT INTO public.jobs (user_id, name, client, value, invoiced, status, phase) VALUES
+--   ('6ec73761-8179-4780-bf58-712bc7140901', 'Minden Welding Shop Build-out',  'Private Client',      48000, 28000, 'active',  'Phase 2 of 3'),
+--   ('6ec73761-8179-4780-bf58-712bc7140901', 'USDA Rural Dev Fence Install',   'USDA Rural Development', 22000, 0,     'pending', 'Awaiting materials'),
+--   ('6ec73761-8179-4780-bf58-712bc7140901', 'Fort Johnson Gate Fabrication',  'Dept of Army',        31000, 15000, 'review',  'Change order #2')
+-- ON CONFLICT DO NOTHING;
 
 -- ── Sample Crew ───────────────────────────────────────────────────────────────
 WITH crew_insert AS (

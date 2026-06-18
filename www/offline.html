@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Offline — ForgeFront</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0A0C0F;color:#F0F2F5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center}
+.box{max-width:360px}
+.icon{font-size:56px;margin-bottom:20px}
+h1{font-size:22px;font-weight:700;margin-bottom:10px}
+p{font-size:14px;color:#A8B3C0;line-height:1.65;margin-bottom:24px}
+.btn{display:inline-block;background:#00E5A0;color:#0A0C0F;padding:12px 28px;border-radius:10px;font-size:14px;font-weight:700;text-decoration:none;cursor:pointer;border:none}
+.note{font-size:12px;color:#7A8494;margin-top:14px}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="icon">📡</div>
+  <h1>You're offline</h1>
+  <p>ForgeFront needs a connection to load contracts and sync your data. Your saved proposals and business profile are still available once you reconnect.</p>
+  <button class="btn" onclick="location.reload()">Try Again</button>
+  <p class="note">Your data is safe — everything syncs automatically when you're back online.</p>
+</div>
+</body>
+</html>

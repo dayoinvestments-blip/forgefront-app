@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Payment Successful — ForgeFront</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0A0C0F;color:#F0F2F5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.box{width:100%;max-width:460px;text-align:center}
+.icon{font-size:60px;margin-bottom:20px;animation:pop 0.5s ease}
+@keyframes pop{0%{transform:scale(0.5);opacity:0}80%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+.badge{display:inline-block;padding:5px 18px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:0.12em;margin-bottom:20px}
+.badge.green{background:rgba(0,229,160,.12);border:1px solid rgba(0,229,160,.3);color:#00E5A0}
+.badge.gold{background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.3);color:#C9A84C}
+h1{font-size:26px;font-weight:800;margin-bottom:12px;letter-spacing:-0.5px}
+.desc{font-size:15px;color:#A8B3C0;line-height:1.7;margin-bottom:12px}
+.features{text-align:left;background:#111418;border:1px solid #232830;border-radius:12px;padding:18px 22px;margin-bottom:28px}
+.feature-row{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:13px;color:#A8B3C0;border-bottom:1px solid #1a1e26}
+.feature-row:last-child{border-bottom:none}
+.feature-row .ck{color:#00E5A0;font-weight:700;flex-shrink:0}
+.btn{display:inline-block;background:#00E5A0;color:#0A0C0F;padding:14px 40px;border-radius:10px;font-size:15px;font-weight:700;text-decoration:none;transition:opacity 0.2s}
+.btn:hover{opacity:0.9}
+.btn.gold-btn{background:#C9A84C;color:#0A0C0F}
+.note{font-size:12px;color:#7A8494;margin-top:16px}
+.redirect-bar{height:3px;background:#1a1e26;border-radius:2px;margin-top:20px;overflow:hidden}
+.redirect-fill{height:3px;background:#00E5A0;border-radius:2px;width:0%;transition:width 5s linear}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="icon" id="icon">🎖️</div>
+  <div class="badge green" id="badge">PLAN ACTIVATED</div>
+  <h1 id="headline">Payment confirmed.</h1>
+  <p class="desc" id="desc">Your ForgeFront subscription is active.</p>
+  <div class="features" id="features"></div>
+  <a href="/" class="btn" id="cta-btn">Launch ForgeFront →</a>
+  <div class="redirect-bar"><div class="redirect-fill" id="rfill"></div></div>
+  <p class="note">Redirecting in <span id="n">5</span> seconds...</p>
+</div>
+<script>
+var plan = new URLSearchParams(location.search).get('plan') || 'pro_monthly';
+
+var PLANS = {
+  starter_monthly: {
+    badge:    'STARTER PLAN ACTIVATED',
+    badgeCls: 'green',
+    icon:     '✅',
+    headline: 'You're in. Let's find contracts.',
+    desc:     'Your Starter plan is active. Search federal contracts filtered to your NAICS codes and certifications, track jobs, and manage your crew.',
+    features: [
+      '10 contracts per search across SAM.gov',
+      'Job tracker & professional invoicing',
+      'Crew management with cert expiration alerts',
+      '3 AI proposals per month',
+      '14-day free trial included',
+    ],
+    btnCls: '',
+  },
+  pro_monthly: {
+    badge:    'PRO PLAN ACTIVATED',
+    badgeCls: 'green',
+    icon:     '🎖️',
+    headline: 'Pro is live. Start winning.',
+    desc:     'Unlimited contracts, 10 AI proposals per month, and intelligence tools that prime contractors pay thousands for — at $79/month.',
+    features: [
+      'Unlimited contracts across all 3 sources',
+      '10 AI SDVOSB proposals per month',
+      'SOW Analyzer — 3 uses/month included',
+      'USASpending Intel — 3 uses/month included',
+      'Subcontractor Finder included',
+    ],
+    btnCls: '',
+  },
+  pro_annual: {
+    badge:    'PRO ANNUAL ACTIVATED',
+    badgeCls: 'green',
+    icon:     '🎖️',
+    headline: 'Pro Annual is live.',
+    desc:     'Full Pro access for the next 12 months. You've locked in the best rate — now go win contracts.',
+    features: [
+      'Unlimited contracts across all 3 sources',
+      '10 AI SDVOSB proposals per month',
+      'SOW Analyzer — 3 uses/month included',
+      'USASpending Intel — 3 uses/month included',
+      'Best annual rate locked in',
+    ],
+    btnCls: '',
+  },
+  command_monthly: {
+    badge:    'COMMAND PLAN ACTIVATED',
+    badgeCls: 'gold',
+    icon:     '⭐',
+    headline: 'Command is active.',
+    desc:     'Unlimited everything. No caps, no pay-per-use charges, no limits. This is the full intelligence stack.',
+    features: [
+      'Unlimited contracts & unlimited AI proposals',
+      'Unlimited SOW Analyzer & USASpending Intel',
+      'Unlimited Subcontractor Finder',
+      'Executive Strategic Report included',
+      'Grant Opportunities Finder included',
+    ],
+    btnCls: 'gold-btn',
+  },
+  proposal_single: {
+    badge:    'PROPOSAL PURCHASED',
+    badgeCls: 'green',
+    icon:     '✍️',
+    headline: 'Your proposal credit is ready.',
+    desc:     'One AI-generated SDVOSB proposal credit has been added to your account. Head to the Bid Writer and enter your solicitation number.',
+    features: [
+      'Full 5-section technical proposal',
+      'SDVOSB compliance language built in',
+      'Structured to mirror evaluation criteria',
+      'Export-ready — no formatting required',
+    ],
+    btnCls: '',
+  },
+};
+
+var p = PLANS[plan] || PLANS.pro_monthly;
+
+document.getElementById('icon').textContent     = p.icon;
+document.getElementById('badge').textContent    = p.badge;
+document.getElementById('badge').className      = 'badge ' + p.badgeCls;
+document.getElementById('headline').textContent = p.headline;
+document.getElementById('desc').textContent     = p.desc;
+document.getElementById('features').innerHTML   = p.features.map(function(f) {
+  return '<div class="feature-row"><span class="ck">✓</span><span>' + f + '</span></div>';
+}).join('');
+var btn = document.getElementById('cta-btn');
+if (p.btnCls) btn.className = 'btn ' + p.btnCls;
+
+// Set pending tier for when app loads
+try {
+  var tierMap = {starter_monthly:'starter', pro_monthly:'pro', pro_annual:'pro', command_monthly:'command'};
+  var tier = tierMap[plan] || 'pro';
+  localStorage.setItem('ff_pending_tier', tier);
+} catch(e) {}
+
+// Redirect countdown
+var t = 5;
+setTimeout(function() {
+  document.getElementById('rfill').style.width = '100%';
+}, 50);
+var iv = setInterval(function() {
+  t--;
+  var el = document.getElementById('n');
+  if (el) el.textContent = t;
+  if (t <= 0) { clearInterval(iv); location.href = '/'; }
+}, 1000);
+</script>
+</body>
+</html>
