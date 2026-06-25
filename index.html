@@ -47,11 +47,14 @@
    (iOS) or https://localhost (Android), which has no Netlify Functions. Rewrite all
    relative /.netlify/ calls to the production backend when native. No-op on the website. */
 (function(){
-  var FN_ORIGIN = 'https://forgefront.app';
   function isNative(){
     return !!(window.Capacitor && (typeof window.Capacitor.isNativePlatform === 'function'
       ? window.Capacitor.isNativePlatform() : window.Capacitor.isNative));
   }
+  // FN_ORIGIN is global so every fetch(FN_ORIGIN + '/.netlify/...') call works.
+  // Empty string on web => correct relative URLs. Production origin on native (no local backend).
+  window.FN_ORIGIN = isNative() ? 'https://forgefront.app' : '';
+  var FN_ORIGIN = window.FN_ORIGIN;
   if (!isNative()) return;
   var _fetch = window.fetch.bind(window);
   window.fetch = function(input, init){
