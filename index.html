@@ -7034,19 +7034,23 @@ function adminTab(tab, btn) {
 
 // ── Overview / Metrics ─────────────────────────────────────────────────
 async function renderAdmin() {
+  // Null-safe setters: a single missing element must never crash the whole
+  // admin render (which would leave the Actions / Grant Comp buttons dead).
+  var setTxt = function(id, val){ var el = document.getElementById(id); if (el) el.textContent = val; };
+  var setHtml = function(id, val){ var el = document.getElementById(id); if (el) el.innerHTML = val; };
   try {
     var data = await admFetch('GET', { action: 'metrics' });
     ADM.metrics = data;
     var ov = data.overview || {};
     var fmt = function(n) { return '$' + Number(n||0).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}); };
 
-    document.getElementById('adm-total').textContent     = (ov.totalUsers||0).toLocaleString();
-    document.getElementById('adm-paid').textContent      = (ov.paidUsers||0).toLocaleString();
-    document.getElementById('adm-mrr').textContent       = fmt(ov.mrr);
-    document.getElementById('adm-new7').textContent      = (ov.new7d||0).toLocaleString();
-    document.getElementById('adm-comp').textContent      = (ov.compUsers||0).toLocaleString();
-    document.getElementById('adm-suspended').textContent = (ov.suspendedUsers||0).toLocaleString();
-    document.getElementById('adm-archived').textContent  = (ov.archivedUsers||0).toLocaleString();
+    setTxt('adm-total',     (ov.totalUsers||0).toLocaleString());
+    setTxt('adm-paid',      (ov.paidUsers||0).toLocaleString());
+    setTxt('adm-mrr',       fmt(ov.mrr));
+    setTxt('adm-new7',      (ov.new7d||0).toLocaleString());
+    setTxt('adm-comp',      (ov.compUsers||0).toLocaleString());
+    setTxt('adm-suspended', (ov.suspendedUsers||0).toLocaleString());
+    setTxt('adm-archived',  (ov.archivedUsers||0).toLocaleString());
 
     // Tier breakdown
     var tb = data.tierBreakdown || {};
@@ -7068,14 +7072,14 @@ async function renderAdmin() {
     }).join('');
     tbHTML += '<div style="display:flex;justify-content:flex-end;padding-top:10px;font-size:13px;font-weight:700;color:var(--go)">' +
       'Total MRR: ' + fmt(ov.mrr) + '</div>';
-    document.getElementById('adm-tier-breakdown').innerHTML = tbHTML;
+    setHtml('adm-tier-breakdown', tbHTML);
 
     // Health
-    document.getElementById('adm-health').innerHTML =
+    setHtml('adm-health',
       '<div>✅ Supabase connected</div>' +
       '<div>' + (process_env_anthropic_check() ? '✅' : '⚠️') + ' Anthropic API key</div>' +
       '<div>' + (process_env_stripe_check() ? '✅' : '⚠️') + ' Stripe configured</div>' +
-      '<div>' + (ov.totalUsers||0) + ' total users · ' + (ov.new30d||0) + ' new this month</div>';
+      '<div>' + (ov.totalUsers||0) + ' total users · ' + (ov.new30d||0) + ' new this month</div>');
 
   } catch(e) {
     console.error('Admin metrics error:', e);
